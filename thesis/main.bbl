@@ -1,0 +1,261 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global/global}
+    \entry{celery}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=a1db27179aedb5c3ca1937ad8598f620}{%
+           family={{Celery Project}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{a1db27179aedb5c3ca1937ad8598f620}
+      \strng{fullhash}{a1db27179aedb5c3ca1937ad8598f620}
+      \strng{fullhashraw}{a1db27179aedb5c3ca1937ad8598f620}
+      \strng{bibnamehash}{a1db27179aedb5c3ca1937ad8598f620}
+      \strng{authorbibnamehash}{a1db27179aedb5c3ca1937ad8598f620}
+      \strng{authornamehash}{a1db27179aedb5c3ca1937ad8598f620}
+      \strng{authorfullhash}{a1db27179aedb5c3ca1937ad8598f620}
+      \strng{authorfullhashraw}{a1db27179aedb5c3ca1937ad8598f620}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Framework for concurrent and asynchronous task management}
+      \field{title}{Celery: Distributed Task Queue}
+      \field{year}{2025}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://docs.celeryproject.org/en/stable/
+      \endverb
+      \verb{url}
+      \verb https://docs.celeryproject.org/en/stable/
+      \endverb
+    \endentry
+    \entry{django}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=f831bff1f5132f6edd2ec0e00e5b9af9}{%
+           family={{Django Software Foundation}},
+           familyi={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \strng{fullhash}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \strng{fullhashraw}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \strng{bibnamehash}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \strng{authorbibnamehash}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \strng{authornamehash}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \strng{authorfullhash}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \strng{authorfullhashraw}{f831bff1f5132f6edd2ec0e00e5b9af9}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Framework for web application development}
+      \field{title}{Django Web Framework}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.djangoproject.com/
+      \endverb
+      \verb{url}
+      \verb https://www.djangoproject.com/
+      \endverb
+    \endentry
+    \entry{docker}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=4bd3b392874c74fba4ed57a24eae0ac1}{%
+           family={{Docker Inc.}},
+           familyi={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \strng{fullhash}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \strng{fullhashraw}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \strng{bibnamehash}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \strng{authorbibnamehash}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \strng{authornamehash}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \strng{authorfullhash}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \strng{authorfullhashraw}{4bd3b392874c74fba4ed57a24eae0ac1}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Platform for developing software containers}
+      \field{title}{Docker Documentation}
+      \field{year}{2024}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://docs.docker.com
+      \endverb
+      \verb{url}
+      \verb https://docs.docker.com
+      \endverb
+    \endentry
+    \entry{whisper}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=0523b13262b12c215d8009938f5c14f1}{%
+           family={{OpenAI}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{fullhash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{fullhashraw}{0523b13262b12c215d8009938f5c14f1}
+      \strng{bibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorbibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authornamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorfullhash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorfullhashraw}{0523b13262b12c215d8009938f5c14f1}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Open-source AI model for automatic speech recognition}
+      \field{title}{Whisper}
+      \field{year}{2022}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://github.com/openai/whisper
+      \endverb
+      \verb{url}
+      \verb https://github.com/openai/whisper
+      \endverb
+    \endentry
+    \entry{sqlalchemy}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=0717cae3476a0e3e356cc44731cb5d9f}{%
+           family={{SQLAlchemy Project}},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{0717cae3476a0e3e356cc44731cb5d9f}
+      \strng{fullhash}{0717cae3476a0e3e356cc44731cb5d9f}
+      \strng{fullhashraw}{0717cae3476a0e3e356cc44731cb5d9f}
+      \strng{bibnamehash}{0717cae3476a0e3e356cc44731cb5d9f}
+      \strng{authorbibnamehash}{0717cae3476a0e3e356cc44731cb5d9f}
+      \strng{authornamehash}{0717cae3476a0e3e356cc44731cb5d9f}
+      \strng{authorfullhash}{0717cae3476a0e3e356cc44731cb5d9f}
+      \strng{authorfullhashraw}{0717cae3476a0e3e356cc44731cb5d9f}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Toolkit and ORM for database management in Python}
+      \field{title}{SQLAlchemy — The Database Toolkit for Python}
+      \field{year}{2025}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://www.sqlalchemy.org/
+      \endverb
+      \verb{url}
+      \verb https://www.sqlalchemy.org/
+      \endverb
+    \endentry
+    \entry{flower}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=c690e69dd803022670800d868969cf65}{%
+           family={Team},
+           familyi={T\bibinitperiod},
+           given={Flower},
+           giveni={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{c690e69dd803022670800d868969cf65}
+      \strng{fullhash}{c690e69dd803022670800d868969cf65}
+      \strng{fullhashraw}{c690e69dd803022670800d868969cf65}
+      \strng{bibnamehash}{c690e69dd803022670800d868969cf65}
+      \strng{authorbibnamehash}{c690e69dd803022670800d868969cf65}
+      \strng{authornamehash}{c690e69dd803022670800d868969cf65}
+      \strng{authorfullhash}{c690e69dd803022670800d868969cf65}
+      \strng{authorfullhashraw}{c690e69dd803022670800d868969cf65}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Frontend web for monitoring Celery tasks}
+      \field{title}{Flower: A Friendly Federated Learning Framework}
+      \field{year}{2025}
+      \true{nocite}
+      \verb{urlraw}
+      \verb https://flower.dev
+      \endverb
+      \verb{url}
+      \verb https://flower.dev
+      \endverb
+    \endentry
+    \entry{vaswani2017attention}{article}{}{}
+      \name{author}{8}{}{%
+        {{hash=7f28e84700536646dd6620a0db07ad09}{%
+           family={Vaswani},
+           familyi={V\bibinitperiod},
+           given={Ashish},
+           giveni={A\bibinitperiod}}}%
+        {{hash=62efade83d70f0323fe248755e6c90c5}{%
+           family={Shazeer},
+           familyi={S\bibinitperiod},
+           given={Noam},
+           giveni={N\bibinitperiod}}}%
+        {{hash=06649ebab1ea5cac0250746a19764975}{%
+           family={Parmar},
+           familyi={P\bibinitperiod},
+           given={Niki},
+           giveni={N\bibinitperiod}}}%
+        {{hash=831027ee0ebf22375e2a86afc1881909}{%
+           family={Uszkoreit},
+           familyi={U\bibinitperiod},
+           given={Jakob},
+           giveni={J\bibinitperiod}}}%
+        {{hash=2fd2982e30ebcec93ec1cf76e0d797fd}{%
+           family={Jones},
+           familyi={J\bibinitperiod},
+           given={Llion},
+           giveni={L\bibinitperiod}}}%
+        {{hash=27b07e4eacbf4ef7a1438e3badb7dd8d}{%
+           family={Gomez},
+           familyi={G\bibinitperiod},
+           given={Aidan\bibnamedelima N},
+           giveni={A\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=540fcd72e1fa4bbed46604f4e6cff817}{%
+           family={Kaiser},
+           familyi={K\bibinitperiod},
+           given={{Ł}ukasz},
+           giveni={Ł\bibinitperiod}}}%
+        {{hash=95595a0fefb86187cbc36e551017d332}{%
+           family={Polosukhin},
+           familyi={P\bibinitperiod},
+           given={Illia},
+           giveni={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{fullhash}{cb26e47f6b8133865271fc8483132297}
+      \strng{fullhashraw}{cb26e47f6b8133865271fc8483132297}
+      \strng{bibnamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authorbibnamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authornamehash}{ee273ab30cfb889666f8c4d806eb9ce7}
+      \strng{authorfullhash}{cb26e47f6b8133865271fc8483132297}
+      \strng{authorfullhashraw}{cb26e47f6b8133865271fc8483132297}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Advances in neural information processing systems}
+      \field{title}{Attention is all you need}
+      \field{volume}{30}
+      \field{year}{2017}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

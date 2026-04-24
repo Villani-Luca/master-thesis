@@ -1,0 +1,43 @@
+\begin{table}[tb] % Start of floating table environment; [tb] = top or bottom of the page
+\centering % Centers the table
+\caption{Example of a table with various fields, checkmarks, and crosses.} % Caption
+\begin{adjustbox}{width=0.9\textwidth} % Fits the table to 90% of the text width
+{\normalsize % Sets normal font size
+\setlength{\tabcolsep}{8pt} % Sets horizontal spacing between columns
+
+\begin{tabular}{cccrrrr} % Creates a table with 7 columns:
+                         % c = centered alignment, r = right alignment
+\toprule % Thick upper horizontal rule (booktabs)
+
+% \makecell allows formatted or multi-line text inside a cell.
+% It is especially useful in headers to avoid using \parbox or \multicolumn.
+% Here it is used to center and bold the header text.
+\makecell[c]{\textbf{Fruit}} & 
+\makecell[c]{\textbf{Orange-colored}} & 
+\makecell[c]{\textbf{Peelable}} & 
+\makecell[c]{\textbf{Weight}} &   
+\makecell[c]{\textbf{Price}} &   
+\makecell[c]{\textbf{Sugar}} &   
+\makecell[c]{\textbf{Rating (1–10)}} \\  
+% The symbol & separates columns within a row.
+% Each cell of a row is delimited by an &.
+% The \\ command ends the row and starts a new one.
+\midrule % Medium horizontal rule
+
+Orange & \checkmark  & \checkmark & 0.200 & 2.50 & 9.0 & 8 \\ % Example of a row: & separates columns, \\ closes the row
+Mandarin & \checkmark & \checkmark & 0.120 & 3.20 & 8.5 & 9 \\
+Lemon & \ding{55} & \checkmark & 0.100 & 3.50 & 2.5 & 6 \\
+\midrule
+
+Apple & \ding{55} & \ding{55} & 0.180 & 2.80 & 10.0 & 8 \\
+Banana & \ding{55} & \checkmark & 0.150 & 1.10 & 12.2 & 9 \\
+Kiwi & \ding{55} & \checkmark & 0.120 & 4.00 & 9.1 & 7 \\
+Mango & \checkmark & \checkmark & 0.300 & 5.00 & 14.0 & 10 \\
+\bottomrule % Thick lower horizontal rule
+
+\end{tabular} % End of tabular environment
+} % End of \normalsize block
+\end{adjustbox} % End of width adjustment
+\label{tab:table_example} % Label for referencing
+\vspace{-10pt} % Reduces space below the table
+\end{table} % End of table environment

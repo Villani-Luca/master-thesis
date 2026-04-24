@@ -1,0 +1,217 @@
+% Final project for the completion of the bachelor's degree in Computer Engineering 
+% at the "Enzo Ferrari" Department of Engineering at the University of Modena and Reggio Emilia
+
+% 12-point font size
+\documentclass[12pt]{report}
+
+% Margins (2.5cm on all sides)
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm, head=21.75pt, centering]{geometry}
+
+% Line spacing
+\linespread{1.5}
+\usepackage[english]{babel} % applies writing rules for the English language
+\usepackage[utf8]{inputenc} % UTF-8 encoding
+\usepackage{scrlayer-scrpage} % page styles for the title page
+\ifoot[]{}
+\cfoot[]{}
+\ofoot[\pagemark]{\pagemark}
+\pagestyle{scrplain} 
+\usepackage[hidelinks]{hyperref} % package for using hyperlinks
+\usepackage[T1]{fontenc}
+\usepackage{inconsolata}
+\usepackage{newtxtext,newtxmath} % Times New Roman-like font
+\usepackage{graphicx} % insertion of images
+\usepackage{csquotes} % for block quotations
+\usepackage{booktabs}    
+\usepackage{adjustbox}  
+\usepackage{filehook}
+\usepackage{makecell}    
+\usepackage{pifont}  
+\usepackage[utf8]{inputenc} 
+\usepackage[bottom]{footmisc}
+\usepackage[T1]{fontenc} 
+\usepackage[english]{babel}
+\usepackage{graphicx} % insertion of images
+\usepackage{subcaption} % for subfigures
+\usepackage[backend=biber, sorting=nty]{biblatex} % bibliography using biblatex
+\usepackage{verbatim} % to use \begin{comment} \end{comment}
+\usepackage{multirow}
+\appto{\bibsetup}{\raggedright}
+\addbibresource{bibliography.bib} % links the bibliography file
+
+\usepackage{titlesec} % for formatting section, chapter titles, etc.
+\usepackage{float} % for positioning images
+
+\usepackage{listings} % for programming code
+\usepackage{color}
+\usepackage{xurl}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{booktabs} % for \toprule, \midrule, \bottomrule in tables
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% Definition of colors for code
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Styles for programming languages
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, let, const, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  commentstyle=\color{mygreen}\ttfamily,
+  stringstyle=\color{mymauve}\ttfamily,
+  backgroundcolor=\color{backcolour},
+  basicstyle=\footnotesize\ttfamily,
+  showstringspaces=false,
+  extendedchars=true,
+  showspaces=false,
+  numbers=left,
+  numberstyle=\footnotesize,
+  numbersep=9pt,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=b
+}
+
+\lstdefinelanguage{MyPython}{
+  language=Python,
+  morekeywords={with, as},
+  keywordstyle=\bfseries\color{blue},
+  commentstyle=\color{mygreen},
+  stringstyle=\color{mymauve},
+  backgroundcolor=\color{backcolour},
+  basicstyle=\footnotesize\ttfamily,
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\footnotesize,
+  numbersep=9pt,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=t
+}
+
+\lstdefinestyle{bash}{
+    basicstyle=\ttfamily\small,
+    rulesepcolor=\color{black},
+    language=bash,
+    breaklines=true,
+    backgroundcolor=\color{backcolour},
+    literate={"}{{\texttt{"}}}{1},
+    numbers=left,
+    numberstyle=\footnotesize,
+    numbersep=9pt,
+    columns=fixed,
+    keepspaces=true,
+}
+
+\lstdefinestyle{Prompt}{
+  breaklines=true,
+  basicstyle=\ttfamily,
+}
+
+\lstdefinestyle{Myyaml}{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  numbers=left,
+  numberstyle=\footnotesize,
+  numbersep=9pt,
+  showstringspaces=false,
+  tabsize=2,
+  backgroundcolor=\color{backcolour},
+  columns=fixed,
+  keepspaces=true,
+}
+
+% Format of headings
+\titleformat{\chapter}[block]
+  {\normalfont\LARGE\bfseries}{\thechapter.}{0.5em}{\LARGE}
+\titlespacing*{\chapter}{0pt}{-20pt}{25pt}
+
+
+\usepackage{enumitem}
+
+\begin{document}
+
+    \begin{titlepage}
+         
+    
+        \begin{center}
+            \includegraphics[width=8cm]{images/unimore/Sigillo2015.png}
+            \vspace{1cm}
+    
+            {\LARGE{ UNIVERSITY OF MODENA AND REGGIO EMILIA \\}}
+            {\large{ "Enzo Ferrari" Department of Engineering \\}}
+            % Comment and uncomment the right ones
+            %{\large{ Master's Degree in Computer Engineering (LM-32) \\}} 
+            {\large{ Master's Degree in Artificial Intelligence Engineering (LM-32) \\}}
+            \vspace{3cm}
+            {\Large { \textbf{Applying Explainability Methods to Financial Models} }}\\
+            \vspace{3cm}
+        \end{center}
+        
+        \begin{minipage}[t]{0.47\textwidth}
+        	{\large{\bf Supervisor:}\\} 
+        	{\large Prof. Francesco Guerra\\}
+        \end{minipage}\hfill\begin{minipage}[t]{0.47\textwidth}\raggedleft
+        	{\large{\bf Candidate:}\\}
+            {\large Luca Villani}\\
+            {\large Student ID 200412}
+        \end{minipage}
+        
+        \vfill
+        \hrulefill\\
+        \centering{\large{\bf ACADEMIC YEAR 2024/2025}}
+    \end{titlepage}
+    
+    \pagestyle{empty}
+    \input{chapters/00_dedication} 
+    \clearpage
+    
+    \tableofcontents      % Generates the Table of Contents
+    \renewcommand{\listfigurename}{List of Figures}
+    \listoffigures        % Generates the List of Figures
+    \renewcommand{\lstlistingname}{Code}
+    \renewcommand{\lstlistlistingname}{List of Code}
+
+    \lstlistoflistings    % Generates the List of Code Listings
+    
+    \clearpage
+    \pagestyle{scrplain} % Restores the normal page style (with page number)
+    \setcounter{page}{1} % Restart page numbering from 1
+
+    % Add chapters here
+    \input{chapters/01_introduction.tex}
+
+    \input{chapters/02_second_chapter.tex}
+    
+    \input{chapters/03_third_chapter.tex}
+    
+    \input{chapters/05_conclusions.tex}
+
+    \input{chapters/99_acknowledgements}
+    
+    \clearpage 
+    
+    \addcontentsline{toc}{chapter}{References}
+    
+    \printbibliography[heading=subbibliography, title=Bibliography]
+
+    \nocite{*}
+   
+\end{document}

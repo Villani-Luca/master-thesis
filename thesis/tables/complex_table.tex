@@ -1,0 +1,67 @@
+\renewcommand{\arraystretch}{1.2}
+
+\setlength{\tabcolsep}{3pt}
+
+\begin{table}[tb]
+\centering
+
+\caption{Comparative analysis of different fruits combining various ripening methods, origins, and viewpoints. Run IDs represent different experiments on harvests.}
+\label{tab:complex_table}
+
+\begin{adjustbox}{width=0.9\textwidth}
+\begin{tabular}{ccc*{11}r}
+\toprule
+\multirow{2}{*}[-5pt]{\rotatebox{90}{\textbf{Score}}} & 
+\multirow{2}{*}[-3pt]{\rotatebox{90}{\textbf{Origin}} } & 
+\multirow{2}{*}[-12pt]{\rotatebox{90}{\textbf{Fruit}}} & 
+\multicolumn{11}{c}{\textbf{Harvests}}\\
+\cmidrule(lr){4-14}
+ &  &  & 
+\makecell[c]{\rotatebox{90}{\textbf{R1}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R2}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R3}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R4}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R5}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R6}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R7}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R8A}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R8S}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R9}}} & 
+\makecell[c]{\rotatebox{90}{\textbf{R10}}} \\
+\midrule
+
+% ===============================================================
+% FIRST SECTION: Sweetness 
+% ===============================================================
+\multirow{6}{*}{\rotatebox{90}{\textbf{Sweetness}}}
+& \multirow{2}{*}{\rotatebox{90}{All}} & Apple & 87.23 & 88.01 & 87.44 & 86.99 & 88.12 & 87.55 & 88.23 & 87.66 & 88.42 & 88.09 & 87.77 \\
+& & Banana & 91.31 & 92.05 & 91.74 & 91.92 & 90.84 & 92.18 & 91.95 & 92.02 & 91.85 & 91.99 & 91.88 \\
+\cmidrule(lr){2-14}
+& \multirow{2}{*}{\rotatebox{90}{Tropical}} & Pineapple & 84.45 & 85.02 & 84.60 & 84.99 & 84.25 & 85.15 & 84.79 & 84.92 & 85.11 & 84.85 & 84.88 \\
+& & Mango & 90.12 & 90.89 & 91.10 & 90.67 & 90.33 & 91.21 & 90.97 & 91.03 & 91.30 & 90.95 & 91.12 \\
+\cmidrule(lr){2-14}
+& \multirow{2}{*}{\rotatebox{90}{Mediterr.}} & Orange & 88.44 & 89.11 & 88.99 & 89.23 & 88.51 & 89.34 & 89.28 & 89.21 & 89.43 & 89.15 & 89.32 \\
+& & Lemon & 72.62 & 73.40 & 73.88 & 72.95 & 72.50 & 73.91 & 73.65 & 73.75 & 73.84 & 73.70 & 73.78 \\
+\midrule
+
+% ===============================================================
+% SECOND SECTION: Juiciness 
+% ===============================================================
+\multirow{9}{*}{\rotatebox{90}{\textbf{Juiciness}}}
+& \multirow{3}{*}{\rotatebox{90}{All}} & Apple & 65.42 & 67.19 & 66.85 & 67.00 & 65.99 & 67.45 & 67.11 & 67.38 & 67.80 & 67.21 & 67.43 \\
+& & Banana & 78.84 & 79.11 & 79.67 & 79.40 & 78.72 & 79.91 & 79.63 & 79.85 & 80.10 & 79.74 & 79.87 \\
+& & Grape & 82.17 & 82.69 & 82.33 & 82.50 & 82.02 & 82.91 & 82.65 & 82.84 & 83.05 & 82.73 & 82.91 \\
+\cmidrule(lr){2-14}
+& \multirow{3}{*}{\rotatebox{90}{Tropical}} & Mango & 85.15 & 85.44 & 85.98 & 85.67 & 85.01 & 86.11 & 85.79 & 85.92 & 86.22 & 85.83 & 85.96 \\
+& & Papaya & 74.83 & 75.02 & 75.37 & 75.14 & 74.76 & 75.49 & 75.23 & 75.40 & 75.60 & 75.28 & 75.39 \\
+& & Pineapple & 77.04 & 77.49 & 77.71 & 77.31 & 77.05 & 77.80 & 77.58 & 77.66 & 77.93 & 77.60 & 77.74 \\
+\cmidrule(lr){2-14}
+& \multirow{3}{*}{\rotatebox{90}{Mediterr.}} & Orange & 81.90 & 82.30 & 82.65 & 82.49 & 81.87 & 82.76 & 82.52 & 82.68 & 82.95 & 82.59 & 82.70 \\
+& & Lemon & 61.35 & 61.88 & 62.09 & 61.95 & 61.24 & 62.22 & 62.05 & 62.17 & 62.44 & 62.10 & 62.26 \\
+& & Grapefruit & 68.75 & 69.21 & 69.58 & 69.37 & 68.80 & 69.83 & 69.65 & 69.70 & 69.99 & 69.68 & 69.82 \\
+\bottomrule
+
+\end{tabular}
+\end{adjustbox}
+\vspace{-10pt}
+\end{table}
