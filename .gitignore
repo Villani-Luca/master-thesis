@@ -20,15 +20,20 @@ venv.bak/
 
 # Latex
 
-thesis/out
 thesis/*.synctex.*
 thesis/main.pdf
 thesis/main.aux
+thesis/main.lof
+thesis/main.lol
+thesis/main.out
+thesis/main.bcf
+thesis/main.run.xml
 thesis/main.blg
 thesis/main.bbl
 thesis/main.fdb_latexmk
 thesis/main.fls
 thesis/main.log
+thesis/main.toc
 
 # Docs
 docs/OutlineTesi.pdf
