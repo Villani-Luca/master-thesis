@@ -1,1 +1,34 @@
-master-thesis/docs/
+# OSX 
+.DS_Store
+.Spotlight-V100
+.Trashes
+._*
+
+# Python byte-compiled / optimized / DLL
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Latex
+
+thesis/out
+thesis/*.synctex.*
+thesis/main.pdf
+thesis/main.aux
+thesis/main.blg
+thesis/main.bbl
+thesis/main.fdb_latexmk
+thesis/main.fls
+thesis/main.log
+
+# Docs
+docs/OutlineTesi.pdf
