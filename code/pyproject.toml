@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xaifin"
+version = "0.1.0"
+description = "Explainability framework for financial forecasting models (master thesis)"
+requires-python = ">=3.10"
+# Dependencies are managed in requirements.txt: torch must come from the CUDA
+# index, which pyproject dependencies cannot express. Install them first.
+
+[tool.setuptools.packages.find]
+# code/ also holds notebooks/, data/, results/, finbench/ ... only ship xaifin.
+include = ["xaifin*"]

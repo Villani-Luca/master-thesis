@@ -3,53 +3,117 @@
 % 2. Find the "Cite" button
 % 3. In the popup window, press "BibTeX"
 % 4. Copy and paste the text
+%
+% NOTE: main.tex uses \nocite{*}, so EVERY entry below appears in the bibliography.
+% Only keep entries that the thesis actually relies on.
 
-@online{flower,
-  author = {Flower Team},
-  title = {Flower: A Friendly Federated Learning Framework},
-  year = {2025},
-  url = {https://flower.dev},
-  note = {Frontend web for monitoring Celery tasks},
+% =====================================================================
+% Financial forecasting: pipeline, data, benchmark
+% =====================================================================
+
+@article{cavalcante2016computational,
+  author  = {Cavalcante, Rodolfo C. and Brasileiro, Rodrigo C. and Souza, Victor L. F. and Nobrega, Jarley P. and Oliveira, Adriano L. I.},
+  title   = {Computational Intelligence and Financial Markets: A Survey and Future Directions},
+  journal = {Expert Systems with Applications},
+  volume  = {55},
+  pages   = {194--211},
+  year    = {2016},
+  doi     = {10.1016/j.eswa.2016.02.006}
 }
 
-@online{whisper,
-  title = {Whisper},
-  author = {{OpenAI}},
-  year = {2022},
-  url = {https://github.com/openai/whisper},
-  note = {Open-source AI model for automatic speech recognition}
+@misc{yang2020qlib,
+  author        = {Yang, Xiao and Liu, Weiqing and Zhou, Dong and Bian, Jiang and Liu, Tie-Yan},
+  title         = {{Qlib}: An {AI}-oriented Quantitative Investment Platform},
+  year          = {2020},
+  eprint        = {2009.11189},
+  archiveprefix = {arXiv},
+  primaryclass  = {q-fin.GN}
 }
 
-@online{sqlalchemy,
-  title = {SQLAlchemy — The Database Toolkit for Python},
-  author = {{SQLAlchemy Project}},
-  year = {2025},
-  url = {https://www.sqlalchemy.org/},
-  note = {Toolkit and ORM for database management in Python}
+@inproceedings{pederzoli2026finbench,
+  author    = {Pederzoli, Sara and Santacroce, Marta and Guerra, Francesco and Bergianti, Marco and Del Buono, Francesco},
+  title     = {{FinBench}: A Benchmarking Framework for Stock Market Prediction and Portfolio Allocation},
+  booktitle = {Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD '26)},
+  pages     = {9661--9672},
+  year      = {2026},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3770855.3817595}
 }
 
-@online{celery,
-  title = {Celery: Distributed Task Queue},
-  author = {{Celery Project}},
-  year = {2025},
-  url = {https://docs.celeryproject.org/en/stable/},
-  note = {Framework for concurrent and asynchronous task management}
+@article{gu2020empirical,
+  author  = {Gu, Shihao and Kelly, Bryan and Xiu, Dacheng},
+  title   = {Empirical Asset Pricing via Machine Learning},
+  journal = {The Review of Financial Studies},
+  volume  = {33},
+  number  = {5},
+  pages   = {2223--2273},
+  year    = {2020},
+  doi     = {10.1093/rfs/hhaa009}
 }
 
-@online{django,
-  author = {{Django Software Foundation}},
-  title = {Django Web Framework},
-  year = {2024},
-  url = {https://www.djangoproject.com/},
-  note = {Framework for web application development}
+% =====================================================================
+% Forecasting models studied in the thesis (+ building blocks)
+% =====================================================================
+
+@inproceedings{li2024master,
+  author    = {Li, Tong and Liu, Zhaoyang and Shen, Yanyan and Wang, Xue and Chen, Haokun and Huang, Sen},
+  title     = {{MASTER}: Market-Guided Stock Transformer for Stock Price Forecasting},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {38},
+  number    = {1},
+  pages     = {162--170},
+  year      = {2024},
+  doi       = {10.1609/aaai.v38i1.27767}
 }
 
-@online{docker,
-  author = {{Docker Inc.}},
-  title = {Docker Documentation},
-  year = {2024},
-  url = {https://docs.docker.com},
-  note = {Platform for developing software containers}
+@inproceedings{cao2024matcc,
+  author    = {Cao, Zhiyuan and Xu, Jiayu and Dong, Chengqi and Yu, Peiwen and Bai, Tian},
+  title     = {{MATCC}: A Novel Approach for Robust Stock Price Prediction Incorporating Market Trends and Cross-time Correlations},
+  booktitle = {Proceedings of the 33rd ACM International Conference on Information and Knowledge Management (CIKM '24)},
+  pages     = {187--196},
+  year      = {2024},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3627673.3679715}
+}
+
+@inproceedings{duan2022factorvae,
+  author    = {Duan, Yitong and Wang, Lei and Zhang, Qizhong and Li, Jian},
+  title     = {{FactorVAE}: A Probabilistic Dynamic Factor Model Based on Variational Autoencoder for Predicting Cross-Sectional Stock Returns},
+  booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume    = {36},
+  number    = {4},
+  pages     = {4468--4476},
+  year      = {2022},
+  doi       = {10.1609/aaai.v36i4.20369}
+}
+
+@misc{xu2021hist,
+  author        = {Xu, Wentao and Liu, Weiqing and Wang, Lewen and Xia, Yingce and Bian, Jiang and Yin, Jian and Liu, Tie-Yan},
+  title         = {{HIST}: A Graph-based Framework for Stock Trend Forecasting via Mining Concept-Oriented Shared Information},
+  year          = {2021},
+  eprint        = {2110.13716},
+  archiveprefix = {arXiv},
+  primaryclass  = {q-fin.ST}
+}
+
+@article{hou2024discovering,
+  author  = {Hou, Jingyi and Dong, Zhen and Zhou, Jiayu and Liu, Zhijie},
+  title   = {Discovering Predictable Latent Factors for Time Series Forecasting},
+  journal = {IEEE Transactions on Knowledge and Data Engineering},
+  volume  = {36},
+  number  = {10},
+  pages   = {5106--5119},
+  year    = {2024},
+  doi     = {10.1109/TKDE.2023.3335240}
+}
+
+@inproceedings{zu2023finformer,
+  author    = {Zu, Yi and Mi, Jiacong and Song, Lingning and Lu, Shan and He, Jieyue},
+  title     = {{Finformer}: A Static-dynamic Spatiotemporal Framework for Stock Trend Prediction},
+  booktitle = {2023 IEEE International Conference on Big Data (BigData)},
+  pages     = {1460--1469},
+  year      = {2023},
+  doi       = {10.1109/BigData59044.2023.10386751}
 }
 
 @article{vaswani2017attention,
@@ -58,4 +122,341 @@
   journal={Advances in neural information processing systems},
   volume={30},
   year={2017}
+}
+
+@inproceedings{peng2023rwkv,
+  author    = {Peng, Bo and others},
+  title     = {{RWKV}: Reinventing {RNNs} for the Transformer Era},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2023},
+  year      = {2023}
+}
+
+@inproceedings{kingma2014auto,
+  author    = {Kingma, Diederik P. and Welling, Max},
+  title     = {Auto-Encoding Variational {Bayes}},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2014}
+}
+
+% =====================================================================
+% Explainable AI: general attribution methods
+% =====================================================================
+
+@inproceedings{ribeiro2016lime,
+  author    = {Ribeiro, Marco Tulio and Singh, Sameer and Guestrin, Carlos},
+  title     = {``Why Should {I} Trust You?'': Explaining the Predictions of Any Classifier},
+  booktitle = {Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD '16)},
+  pages     = {1135--1144},
+  year      = {2016},
+  doi       = {10.1145/2939672.2939778}
+}
+
+@inproceedings{lundberg2017shap,
+  author    = {Lundberg, Scott M. and Lee, Su-In},
+  title     = {A Unified Approach to Interpreting Model Predictions},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  pages     = {4765--4774},
+  year      = {2017}
+}
+
+@incollection{shapley1953value,
+  author    = {Shapley, Lloyd S.},
+  title     = {A Value for n-Person Games},
+  booktitle = {Contributions to the Theory of Games},
+  volume    = {II},
+  editor    = {Kuhn, Harold W. and Tucker, Albert W.},
+  publisher = {Princeton University Press},
+  pages     = {307--317},
+  year      = {1953}
+}
+
+@inproceedings{sundararajan2017axiomatic,
+  author    = {Sundararajan, Mukund and Taly, Ankur and Yan, Qiqi},
+  title     = {Axiomatic Attribution for Deep Networks},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {70},
+  pages     = {3319--3328},
+  year      = {2017}
+}
+
+@inproceedings{shrikumar2017learning,
+  author    = {Shrikumar, Avanti and Greenside, Peyton and Kundaje, Anshul},
+  title     = {Learning Important Features Through Propagating Activation Differences},
+  booktitle = {Proceedings of the 34th International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {70},
+  pages     = {3145--3153},
+  year      = {2017}
+}
+
+@misc{simonyan2014deep,
+  author        = {Simonyan, Karen and Vedaldi, Andrea and Zisserman, Andrew},
+  title         = {Deep Inside Convolutional Networks: Visualising Image Classification Models and Saliency Maps},
+  year          = {2014},
+  eprint        = {1312.6034},
+  archiveprefix = {arXiv},
+  note          = {ICLR 2014 Workshop}
+}
+
+@misc{kokhlikyan2020captum,
+  author        = {Kokhlikyan, Narine and others},
+  title         = {{Captum}: A unified and generic model interpretability library for {PyTorch}},
+  year          = {2020},
+  eprint        = {2009.07896},
+  archiveprefix = {arXiv}
+}
+
+@article{breiman2001random,
+  author  = {Breiman, Leo},
+  title   = {Random Forests},
+  journal = {Machine Learning},
+  volume  = {45},
+  number  = {1},
+  pages   = {5--32},
+  year    = {2001},
+  doi     = {10.1023/A:1010933404324}
+}
+
+@article{fisher2019all,
+  author  = {Fisher, Aaron and Rudin, Cynthia and Dominici, Francesca},
+  title   = {All Models are Wrong, but Many are Useful: Learning a Variable's Importance by Studying an Entire Class of Prediction Models Simultaneously},
+  journal = {Journal of Machine Learning Research},
+  volume  = {20},
+  number  = {177},
+  pages   = {1--81},
+  year    = {2019}
+}
+
+@article{breiman2001statistical,
+  author  = {Breiman, Leo},
+  title   = {Statistical Modeling: The Two Cultures},
+  journal = {Statistical Science},
+  volume  = {16},
+  number  = {3},
+  pages   = {199--231},
+  year    = {2001},
+  doi     = {10.1214/ss/1009213726}
+}
+
+@inproceedings{jain2019attention,
+  author    = {Jain, Sarthak and Wallace, Byron C.},
+  title     = {Attention is not Explanation},
+  booktitle = {Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics (NAACL-HLT)},
+  pages     = {3543--3556},
+  year      = {2019},
+  doi       = {10.18653/v1/N19-1357}
+}
+
+@inproceedings{wiegreffe2019attention,
+  author    = {Wiegreffe, Sarah and Pinter, Yuval},
+  title     = {Attention is not not Explanation},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing (EMNLP-IJCNLP)},
+  pages     = {11--20},
+  year      = {2019},
+  doi       = {10.18653/v1/D19-1002}
+}
+
+% =====================================================================
+% Explainable AI for time series
+% =====================================================================
+
+@article{theissler2022explainable,
+  author  = {Theissler, Andreas and Spinnato, Francesco and Schlegel, Udo and Guidotti, Riccardo},
+  title   = {Explainable {AI} for Time Series Classification: A Review, Taxonomy and Research Directions},
+  journal = {IEEE Access},
+  volume  = {10},
+  pages   = {100700--100724},
+  year    = {2022},
+  doi     = {10.1109/ACCESS.2022.3207765}
+}
+
+@inproceedings{ismail2020benchmarking,
+  author    = {Ismail, Aya Abdelsalam and Gunady, Mohamed and Corrada Bravo, H{\'e}ctor and Feizi, Soheil},
+  title     = {Benchmarking Deep Learning Interpretability in Time Series Predictions},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  year      = {2020}
+}
+
+@inproceedings{tonekaboni2020went,
+  author    = {Tonekaboni, Sana and Joshi, Shalmali and Campbell, Kieran and Duvenaud, David and Goldenberg, Anna},
+  title     = {What Went Wrong and When? Instance-wise Feature Importance for Time-series Black-box Models},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  year      = {2020}
+}
+
+@inproceedings{crabbe2021explaining,
+  author    = {Crabb{\'e}, Jonathan and van der Schaar, Mihaela},
+  title     = {Explaining Time Series Predictions with Dynamic Masks},
+  booktitle = {Proceedings of the 38th International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {139},
+  year      = {2021}
+}
+
+@inproceedings{bento2021timeshap,
+  author    = {Bento, Jo{\~a}o and Saleiro, Pedro and Cruz, Andr{\'e} F. and Figueiredo, M{\'a}rio A. T. and Bizarro, Pedro},
+  title     = {{TimeSHAP}: Explaining Recurrent Models through Sequence Perturbations},
+  booktitle = {Proceedings of the 27th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD '21)},
+  pages     = {2565--2573},
+  year      = {2021},
+  doi       = {10.1145/3447548.3467166}
+}
+
+@inproceedings{leung2023temporal,
+  author    = {Leung, Kin Kwan and Rooke, Clayton and Smith, Jonathan and Zuberi, Saba and Volkovs, Maksims},
+  title     = {Temporal Dependencies in Feature Importance for Time Series Prediction},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2023}
+}
+
+% =====================================================================
+% Evaluating explanations, disagreement, Rashomon effect
+% =====================================================================
+
+@inproceedings{adebayo2018sanity,
+  author    = {Adebayo, Julius and Gilmer, Justin and Muelly, Michael and Goodfellow, Ian and Hardt, Moritz and Kim, Been},
+  title     = {Sanity Checks for Saliency Maps},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {31},
+  year      = {2018}
+}
+
+@inproceedings{hooker2019benchmark,
+  author    = {Hooker, Sara and Erhan, Dumitru and Kindermans, Pieter-Jan and Kim, Been},
+  title     = {A Benchmark for Interpretability Methods in Deep Neural Networks},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  year      = {2019}
+}
+
+@article{samek2017evaluating,
+  author  = {Samek, Wojciech and Binder, Alexander and Montavon, Gr{\'e}goire and Lapuschkin, Sebastian and M{\"u}ller, Klaus-Robert},
+  title   = {Evaluating the Visualization of What a Deep Neural Network Has Learned},
+  journal = {IEEE Transactions on Neural Networks and Learning Systems},
+  volume  = {28},
+  number  = {11},
+  pages   = {2660--2673},
+  year    = {2017},
+  doi     = {10.1109/TNNLS.2016.2599820}
+}
+
+@inproceedings{yeh2019fidelity,
+  author    = {Yeh, Chih-Kuan and Hsieh, Cheng-Yu and Suggala, Arun and Inouye, David I. and Ravikumar, Pradeep K.},
+  title     = {On the (In)fidelity and Sensitivity of Explanations},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  year      = {2019}
+}
+
+@misc{alvarezmelis2018robustness,
+  author        = {Alvarez-Melis, David and Jaakkola, Tommi S.},
+  title         = {On the Robustness of Interpretability Methods},
+  year          = {2018},
+  eprint        = {1806.08049},
+  archiveprefix = {arXiv},
+  note          = {ICML Workshop on Human Interpretability in Machine Learning}
+}
+
+@article{krishna2024disagreement,
+  author  = {Krishna, Satyapriya and Han, Tessa and Gu, Alex and Wu, Steven and Jabbari, Shahin and Lakkaraju, Himabindu},
+  title   = {The Disagreement Problem in Explainable Machine Learning: A Practitioner's Perspective},
+  journal = {Transactions on Machine Learning Research},
+  year    = {2024},
+  url     = {https://openreview.net/forum?id=jESY2WTZCe}
+}
+
+@article{webber2010similarity,
+  author  = {Webber, William and Moffat, Alistair and Zobel, Justin},
+  title   = {A Similarity Measure for Indefinite Rankings},
+  journal = {ACM Transactions on Information Systems},
+  volume  = {28},
+  number  = {4},
+  pages   = {20:1--20:38},
+  year    = {2010},
+  doi     = {10.1145/1852102.1852106}
+}
+
+% =====================================================================
+% Counterfactual explanations
+% =====================================================================
+
+@article{wachter2018counterfactual,
+  author  = {Wachter, Sandra and Mittelstadt, Brent and Russell, Chris},
+  title   = {Counterfactual Explanations without Opening the Black Box: Automated Decisions and the {GDPR}},
+  journal = {Harvard Journal of Law \& Technology},
+  volume  = {31},
+  number  = {2},
+  pages   = {841--887},
+  year    = {2018}
+}
+
+@inproceedings{mothilal2020explaining,
+  author    = {Mothilal, Ramaravind K. and Sharma, Amit and Tan, Chenhao},
+  title     = {Explaining Machine Learning Classifiers through Diverse Counterfactual Explanations},
+  booktitle = {Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency (FAT* '20)},
+  pages     = {607--617},
+  year      = {2020},
+  doi       = {10.1145/3351095.3372850}
+}
+
+@inproceedings{ates2021counterfactual,
+  author    = {Ates, Emre and Aksar, Burak and Leung, Vitus J. and Coskun, Ayse K.},
+  title     = {Counterfactual Explanations for Multivariate Time Series},
+  booktitle = {2021 International Conference on Applied Artificial Intelligence (ICAPAI)},
+  year      = {2021}
+}
+
+% =====================================================================
+% Explainable AI in finance
+% =====================================================================
+
+@article{weber2024applications,
+  author  = {Weber, Patrick and Carl, K. Valerie and Hinz, Oliver},
+  title   = {Applications of Explainable Artificial Intelligence in Finance---a Systematic Review of Finance, Information Systems, and Computer Science Literature},
+  journal = {Management Review Quarterly},
+  volume  = {74},
+  pages   = {867--907},
+  year    = {2024},
+  doi     = {10.1007/s11301-023-00320-0}
+}
+
+@article{cerneviciene2024explainable,
+  author  = {{\v{C}}ernevi{\v{c}}ien{\.{e}}, Jurgita and Kaba{\v{s}}inskas, Audrius},
+  title   = {Explainable Artificial Intelligence ({XAI}) in Finance: A Systematic Literature Review},
+  journal = {Artificial Intelligence Review},
+  year    = {2024},
+  doi     = {10.1007/s10462-024-10854-8}
+}
+
+@inproceedings{promkaewngarm2025explainable,
+  author    = {Promkaewngarm, Adisorn and Boonchieng, Ekarat},
+  title     = {Explainable Artificial Intelligence in Portfolio Management: A Literature Review},
+  booktitle = {2025 29th International Computer Science and Engineering Conference (ICSEC)},
+  pages     = {546--550},
+  year      = {2025},
+  doi       = {10.1109/ICSEC67360.2025.11298131}
+}
+
+@article{muhammad2024explainable,
+  author  = {Muhammad, Dost and Ahmed, Iftikhar and Naveed, Khwaja and Bendechache, Malika},
+  title   = {An Explainable Deep Learning Approach for Stock Market Trend Prediction},
+  journal = {Heliyon},
+  volume  = {10},
+  pages   = {e40095},
+  year    = {2024},
+  doi     = {10.1016/j.heliyon.2024.e40095}
+}
+
+@article{goswami2026significance,
+  author  = {Goswami, Bhaskar and Uddin, Ajim},
+  title   = {Significance of Predictors: Revisiting Stock Return Predictions Using Explainable {AI}},
+  journal = {Annals of Operations Research},
+  volume  = {357},
+  pages   = {223--257},
+  year    = {2026},
+  doi     = {10.1007/s10479-025-06717-2}
 }

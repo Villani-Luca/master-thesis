@@ -26,6 +26,16 @@ yfinance>=0.2,<1
 pandas-datareader>=0.10,<1
 requests>=2.32,<3
 
+# Explainability (XAI)
+shap>=0.46,<1
+captum>=0.8,<1
+lime>=0.2,<1
+# timeshap>=1.0,<2   # optional, time-series SHAP; pins older deps, install separately if needed
+
+# Application / results store
+streamlit>=1.40,<2
+pyarrow>=17,<26
+
 # Notebook support
 jupyter>=1.0,<2
 ipykernel>=6.29,<7

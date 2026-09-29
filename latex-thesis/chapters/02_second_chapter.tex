@@ -1,100 +1,170 @@
-\chapter{Basic elements}
-\label{ch:second_chapter}
+% ---------------------------------------------------------------------------
+% Chapter 2 - Background and Related Work
+% First draft assembled from the literature notes of Step 0.2 (THESIS_GUIDE.md).
+% Implementation-level details of the six models: code/model_notes.md.
+% ---------------------------------------------------------------------------
 
-This chapter will contain basic examples of bullet lists, figures, tables, formulas, algorithms, and code.
+\chapter{Background and Related Work}
+\label{ch:related_work}
 
-\bigskip
-\noindent Example of a bullet list:
+This chapter introduces the forecasting setting studied in this thesis, the deep learning models whose behaviour is explained in the following chapters, and the explainability literature on which the analysis builds. Section~\ref{sec:rw_forecasting} describes the stock forecasting pipeline and the task formulation shared by all models. Section~\ref{sec:rw_models} presents the six forecasting models. Sections~\ref{sec:rw_xai} to~\ref{sec:rw_counterfactual} review explainable artificial intelligence (XAI): general-purpose attribution methods, methods designed for time series, the evaluation of explanations, and counterfactual explanations. Finally, Section~\ref{sec:rw_finance} discusses how XAI has been applied in finance and identifies the gap addressed by this thesis.
+
+% ===========================================================================
+\section{Machine Learning for Stock Forecasting}
+\label{sec:rw_forecasting}
+
+\subsection{The Forecasting Pipeline}
+
+The survey by Cavalcante et al.~\cite{cavalcante2016computational} describes the typical pipeline of computational intelligence systems for financial markets: raw market data are collected and preprocessed, informative features are extracted, a model forecasts future market movements, and the forecasts drive a trading or allocation decision. In equity forecasting the raw data are usually daily \emph{OHLCV} series (open, high, low and close prices and traded volume) of every asset in an \emph{investment universe}, i.e.\ the set of tradable assets from which the model selects, such as the constituents of a stock index. The universe matters: it defines the opportunity set, and universes of different size and composition differ in liquidity, volatility and noise.
+
+From the raw series a large number of features are engineered. The Qlib platform~\cite{yang2020qlib} standardised two widely used feature sets, which are the inputs of the models studied here:
 \begin{itemize}[noitemsep]
-    \item \textbf{first bullet point in bold}; % in bold
-    \item second bullet point, if you prefer it not to be in bold; % if you prefer it without bold
+    \item \textbf{Alpha158}: engineered factors computed from daily price and volume, namely candlestick descriptors (e.g.\ body and shadow lengths relative to the open price) and rolling operators (rate of change, moving averages, standard deviation, rolling-regression slope, $R^2$ and residual, extrema, quantiles, price--volume correlation, counts and sums of up and down moves, volume statistics) evaluated over windows of 5, 10, 20, 30 and 60 trading days. In the implementation used in this thesis the set contains 157 features, because the volume-weighted average price is not available as an input.
+    \item \textbf{Alpha360}: the raw close, open, high, low, volume-weighted average price (approximated by the typical price in the implementation used here) and volume of the last 60 trading days, with prices divided by the current close price and volumes by the current volume. Unlike Alpha158, it leaves the extraction of temporal patterns to the model.
 \end{itemize}
 
-\section{Section in the Second Chapter}
-\label{sec:id}
+\subsection{Task Formulation}
+\label{sec:rw_task}
 
-Example of an image in Figure \ref{fig:uno}. Remember to always reference in the text, using \textbackslash ref, all the figures/tables/algorithms/code you include.\footnote{An example of how to add a footnote, often used to cite or include a link to a website, such as~\url{https://ditto.ing.unimore.it/}\hspace{2pt}\raisebox{-0.4\height}{},}
-    
-\begin{figure}[H] % Starts the figure environment. [htbp] suggests placement: Here, Top, Bottom, Page.
-    \centering % Centers the image and caption horizontally on the page.
-    
-    % \includegraphics[options]{filename} inserts the image.
-    % --- Options ---
-    % 'width=\linewidth': makes the image span the entire width of the text area.
-    % Other options: 'width=8cm', 'scale=0.5' (half size),
-    % 'height=5cm', 'angle=90' (rotate by 90 degrees).
-    % 'keepaspectratio': prevents distortion when specifying both width and height.
-    \includegraphics[width=0.8\linewidth, keepaspectratio]{images/architectures/t.png}
-    
-    \caption{The architecture introduced by Vaswani in the famous paper \textit{"Attention is All You Need"}~\cite{vaswani2017attention}.}
-    \label{fig:uno}
-\end{figure}
-
-\section{Another Section in the Second Chapter}
-Example of a table with its citation, Table~\ref{tab:table_example}.
-
-\input{tables/table_example} % input helps to keep the latex code cleaner by moving the table into another file
-
-\section{Mathematical Formulas}
-Here are two examples of how to write mathematical formulas. As you can easily recognize in Eq.~\ref{eq:continuous_ft}, we have the integral form of the Fourier Transform, while in Eq.~\ref{eq:discrete_ft} we see its discretized version using a summation.
-
-% --- Formula 1: Continuous Fourier Transform (The Integral) ---
+Let $\mathcal{S}_t$ denote the stocks of the universe available on trading day $t$, and $p_{i,t}$ the adjusted close price of stock $i$. The models considered in this thesis are \emph{regression} models that forecast the return over a horizon of $L$ trading days,
 \begin{equation}
-    \label{eq:continuous_ft}
-    X(f) = \int_{-\infty}^{\infty} x(t) e^{-j 2\pi f t} \, dt
+    \label{eq:rw_return}
+    r_{i,t} = \frac{p_{i,t+L} - p_{i,t}}{p_{i,t}},
 \end{equation}
+from a lookback window $\mathbf{X}_{i,t}$ of $T$ days of features, a $T \times F$ matrix. Since the purpose of the forecast is to select the most promising stocks rather than to predict absolute returns, the target is usually normalised cross-sectionally, i.e.\ standardised across the stocks of the same day, so that it encodes the \emph{relative} performance of each stock~\cite{li2024master}. For the same reason, forecasts are evaluated with ranking metrics: the information coefficient $\mathrm{IC}_t$ is the Pearson correlation between predictions and realised returns across the stocks of day $t$, the $\mathrm{RankIC}_t$ is the corresponding Spearman correlation, and both are averaged over the test days; their ratios to their standard deviation (ICIR, RankICIR) measure consistency. Forecasts are finally turned into portfolios; the simplest strategy, and the one this thesis focuses on, is a \emph{long-only top-$k$} portfolio that holds, with equal weights, the $k$ stocks with the highest predicted return and is rebalanced every $L$ days.
 
-% --- Formula 2: Discrete Fourier Transform (The Summation) ---
+Financial returns have a low signal-to-noise ratio~\cite{duan2022factorvae}, so correlations between forecasts and realised returns are small, and the ranking of stocks, and hence the composition of a top-$k$ portfolio, can change considerably with small changes in the predictions. This instability motivates the question of \emph{what} the models actually rely on. A relevant precedent comes from empirical asset pricing: comparing linear models, tree ensembles and neural networks trained on the same stock characteristics, Gu et al.~\cite{gu2020empirical} found that all methods agree on a small set of dominant predictive signals, namely variations of momentum, liquidity and volatility. Whether such agreement also holds for recent deep architectures trained on engineered alpha factors is one of the questions addressed in this thesis.
+
+\subsection{Benchmarking: FinBench}
+
+Comparing forecasting models is difficult because published results are often obtained on different markets, periods, features and evaluation protocols. FinBench~\cite{pederzoli2026finbench} re-implements a large set of classification, regression and ranking models under a common protocol and connects their predictions to portfolio construction. Models are evaluated with a rolling scheme of five phases, each with four years of training, one of validation and one of testing, starting with training on 2015--2018, validation on 2019 and testing on 2020, and shifting forward by one year up to a test year of 2024. Three pairs of lookback and horizon are considered, $(T,L) \in \{(5,1), (20,5), (60,20)\}$, corresponding to daily, weekly and monthly investment horizons; for Alpha360 models the effective lookback is a single day, since each feature vector already covers 60 trading days. Every experiment is repeated with three random seeds. This thesis adopts the FinBench protocol and implementations, which makes the models directly comparable in terms of input data and evaluation.
+
+% ===========================================================================
+\section{Forecasting Models}
+\label{sec:rw_models}
+
+This thesis studies six recent regression models that forecast the cross-sectional return of Equation~\ref{eq:rw_return} from alpha features. They form two groups of directly comparable models: MASTER, MATCC and FactorVAE use Alpha158, while HIST, DiscoverPLF and FinFormer use Alpha360. Table~\ref{tab:rw_models} summarises their main characteristics. A common trait is important for explainability: all six are \emph{cross-sectional}, i.e.\ they process all the stocks of a day jointly, so the prediction for one stock also depends on the inputs of the others.
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{@{}p{1.6cm}p{1.5cm}p{2.3cm}p{3.3cm}p{2.1cm}p{3.4cm}@{}}
+        \toprule
+        \textbf{Model} & \textbf{Features} & \textbf{Temporal encoder} & \textbf{Cross-sectional mechanism} & \textbf{Loss} & \textbf{Built-in interpretable signals} \\
+        \midrule
+        MASTER~\cite{li2024master} & Alpha158 + market & Transformer & inter-stock attention per time step & MSE & market-guided feature gate; attention maps \\
+        MATCC~\cite{cao2024matcc} & Alpha158 + market & RWKV & inter-stock attention per time step & MSE & trend vs.\ fluctuation components; attention maps \\
+        FactorVAE~\cite{duan2022factorvae} & Alpha158 & GRU & shared latent factors (global attention) & likelihood + KL & $\hat{y} = \alpha + \beta^{\top} z$; predicted variance \\
+        \midrule
+        HIST~\cite{xu2021hist} & Alpha360 & GRU & predefined and hidden concept graphs & MSE & shared vs.\ individual contributions \\
+        DiscoverPLF~\cite{hou2024discovering} & Alpha360 & latent-factor VAE & concept graphs (HIST-based) & reconstruction + prediction + KL & weights of the latent signal components \\
+        FinFormer~\cite{zu2023finformer} & Alpha360 & GRU & static and dynamic spatial attention & CCC & spatio-temporal fusion gate; attention maps \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{The six forecasting models studied in this thesis. The upper group uses Alpha158 features and the lower group Alpha360 features; losses refer to the original papers (CCC: concordance correlation coefficient).}
+    \label{tab:rw_models}
+\end{table}
+
+\paragraph{MASTER.} The Market-Guided Stock Transformer~\cite{li2024master} targets two limitations of earlier correlation models: stock correlations are momentary and may occur across different time steps, and the effectiveness of features changes with the market state. A vector $m$ describing the market (index price and volume statistics over past windows) is mapped by a \emph{market-guided gate} to one scaling coefficient per feature, $\alpha(m) = F \cdot \mathrm{softmax}\big((W m + b)/\beta\big)$, which rescales the features of all stocks before encoding. The model then alternates intra-stock aggregation (a Transformer encoder~\cite{vaswani2017attention} over the time steps of each stock), inter-stock aggregation (attention across stocks at each time step) and a temporal attention layer that summarises each stock. The gate is particularly interesting here, as it is a learned, market-dependent weighting of the input features.
+
+\paragraph{MATCC.} MATCC~\cite{cao2024matcc} adopts the problem formulation of MASTER and argues that market trends should be modelled explicitly. A depthwise convolution extracts a market-trend representation that is added to every stock's features, and each stock series is decomposed into a smooth trend component and a fluctuation component by moving-average filtering. Cross-time correlations within a stock are modelled with RWKV~\cite{peng2023rwkv}, a recurrent architecture with attention-like, causal token mixing, followed by attention across stocks and temporal aggregation as in MASTER.
+
+\paragraph{FactorVAE.} FactorVAE~\cite{duan2022factorvae} combines a dynamic factor model with a variational autoencoder~\cite{kingma2014auto}. A GRU extracts a latent representation $e_i$ of each stock, from which the model derives an idiosyncratic return $\alpha_i$ and factor exposures $\beta_i$. During training, an encoder with access to future returns infers posterior factors $z$, and a factor predictor, based on attention over all stocks, learns to approximate them from historical data only. At inference time the predicted return is
 \begin{equation}
-    \label{eq:discrete_ft}
-    X_k = \sum_{n=0}^{N-1} x_n \cdot e^{-i \frac{2\pi}{N} k n}
+    \label{eq:rw_factorvae}
+    \hat{y}_i = \alpha_i + \sum_{k=1}^{K} \beta_{i,k}\, z_k ,
 \end{equation}
+with $z$ given by the factor predictor. The model outputs a distribution rather than a point estimate, and Equation~\ref{eq:rw_factorvae} provides an exact decomposition of each prediction into an idiosyncratic part and factor contributions.
 
-\section{Algorithm Example}
-In Algorithm \ref{alg:dijkstra}, one way to compute the shortest path can be seen.
+\paragraph{HIST.} HIST~\cite{xu2021hist} mines information shared among stocks through \emph{concepts}. After a GRU encoder, a predefined-concept module aggregates stocks through given relations (e.g.\ sector and industry, weighted by market capitalisation), a hidden-concept module discovers additional groupings from what remains, and an individual module models the residual stock-specific information. The final forecast is the sum of the outputs of the three modules, so each prediction can be decomposed into shared and stock-specific contributions.
 
-\begin{algorithm}[H] % H forces placement exactly here. Not recommended to always use it.
-\caption{Dijkstra's Algorithm}
-\label{alg:dijkstra}
+\paragraph{DiscoverPLF.} DiscoverPLF~\cite{hou2024discovering} infers latent factors that form several independent and easily predictable signal components, obtained at different temporal scales, forecasts each component, and combines them. In the stock trend experiments of the original paper, as in the implementation used here, the factor module is combined with HIST. The weights of the signal components indicate which temporal scale drives each prediction.
 
-    \begin{algorithmic}[1]
-        
-        \Procedure{Dijkstra}{$G, s$} 
-            
-            \State $dist[] \gets \infty$ \Comment{Initialize distances to infinity}
-            \State $dist[s] \gets 0$     \Comment{Distance to the source is 0}
-            \State $Q \gets V[G]$        \Comment{Add all nodes to the queue}
-            
-            \While{$Q$ is not empty} 
-                \State $u \gets$ vertex in $Q$ with minimum $dist[u]$
-                \State remove $u$ from $Q$
-                
-                \For{each neighbor $v$ of $u$} 
-                    \State $alt \gets dist[u] + length(u, v)$
-                    
-                    \If{$alt < dist[v]$} 
-                        \State $dist[v] \gets alt$
-                        \State $prev[v] \gets u$
-                    \EndIf
-                    
-                \EndFor
-            \EndWhile
-            
-            \State \textbf{return} $dist[], prev[]$
-            
-        \EndProcedure 
-        
-    \end{algorithmic}
-\end{algorithm}
+\paragraph{FinFormer.} FinFormer~\cite{zu2023finformer} combines a GRU temporal encoder with a sparse static--dynamic Transformer that models the relations among stocks, using both predefined (static) relations and relations learned from the data (dynamic). An adaptive gated fusion module mixes the spatial and temporal representations according to the market conditions, and the model is trained to maximise the concordance correlation between predictions and labels.
 
-\section{Code Examples}
-You may also include some code samples, as long as they are not too long. An example can be seen in Code \ref{cod:hello}.
+The models expose different built-in signals (Table~\ref{tab:rw_models}): gate coefficients, attention maps, additive decompositions and fusion weights. These are useful points of comparison for post-hoc explanations, but they are architecture-specific. A framework that compares the models therefore needs model-agnostic explanation methods, which are reviewed next. Implementation details of the reference code that affect this comparison are discussed in the methodology chapter. % TODO: \ref{} the methodology chapter once it exists
 
-\begin{lstlisting}[caption={Example code, taken from helloworldspam.py}, label={cod:hello}]
-print('Starting the ultimate hello world spammer')
-for i in range(10000000):
-    print("Hello, world!")
-\end{lstlisting}
+% ===========================================================================
+\section{Explainable Artificial Intelligence}
+\label{sec:rw_xai}
 
-\section{Bibliography Management}
-All bibliographic references must be inserted into the project’s ``.bib'' file. In this template, the file is ``bibliography.bib''. To cite a reference, use the command ``\textbackslash cite\{<id>\}'', such as \cite{vaswani2017attention}.
+Explainable artificial intelligence aims to make the behaviour of models understandable to humans. Explanations can be \emph{intrinsic}, i.e.\ built into the model structure, or \emph{post-hoc}, i.e.\ computed after training; \emph{local}, i.e.\ referring to a single prediction, or \emph{global}, i.e.\ describing the model as a whole; and \emph{model-agnostic}, i.e.\ treating the model as a black box, or \emph{model-specific}. This thesis relies mainly on post-hoc \emph{feature attribution} methods, which assign to each input feature a score that quantifies its contribution to a prediction. Local attributions can be aggregated over stocks and days to obtain global feature rankings.
+
+\subsection{Perturbation-Based and Surrogate Methods}
+
+The oldest global method is \emph{permutation importance}, introduced for random forests~\cite{breiman2001random}: the importance of a feature is the loss in performance when its values are randomly permuted, which breaks its relation with the target. Fisher et al.~\cite{fisher2019all} formalised it as \emph{model reliance} and extended it to the whole set of models that perform almost equally well. In cross-sectional forecasting, permuting a feature across the stocks of the same day and measuring the drop in RankIC gives an importance measure that is directly tied to the ranking task.
+
+LIME~\cite{ribeiro2016lime} explains a single prediction by sampling perturbed versions of the instance, weighting them by their proximity to it, and fitting an interpretable surrogate, typically a sparse linear model, whose coefficients serve as the explanation. Its explanations depend on the sampling and on the proximity kernel, and can be unstable across runs.
+
+SHAP~\cite{lundberg2017shap} unifies several attribution methods under the framework of \emph{additive feature attribution} and builds on the Shapley value from cooperative game theory~\cite{shapley1953value}. For a model $f$, an instance $x$ and the set $\mathcal{F}$ of features, the attribution of feature $j$ is
+\begin{equation}
+    \label{eq:rw_shapley}
+    \phi_j = \sum_{S \subseteq \mathcal{F} \setminus \{j\}} \frac{|S|!\,\big(|\mathcal{F}| - |S| - 1\big)!}{|\mathcal{F}|!} \Big[ f_x\big(S \cup \{j\}\big) - f_x(S) \Big],
+\end{equation}
+where $f_x(S)$ is the expected output of the model when only the features in $S$ are known. SHAP values satisfy \emph{local accuracy} (the attributions sum to the difference between the prediction and the expected prediction), \emph{missingness} and \emph{consistency}. Their exact computation is exponential in the number of features; KernelSHAP estimates them with a weighted linear regression over sampled coalitions, and model-specific variants exploit the structure of trees or neural networks. For the models of this thesis, whose input per stock contains thousands of entries (e.g.\ 20 days $\times$ 157 features), Shapley-based methods are only practical on groups of features.
+
+\subsection{Gradient-Based Attribution}
+
+For differentiable models, attributions can be computed from gradients. The simplest \emph{saliency} map uses the gradient of the output with respect to the input~\cite{simonyan2014deep}, which describes local sensitivity rather than contribution. \emph{Integrated Gradients}~\cite{sundararajan2017axiomatic} accumulates gradients along the straight path from a baseline $x'$ to the input $x$:
+\begin{equation}
+    \label{eq:rw_ig}
+    \mathrm{IG}_j(x) = (x_j - x'_j) \int_{0}^{1} \frac{\partial f\big(x' + \gamma (x - x')\big)}{\partial x_j} \, d\gamma .
+\end{equation}
+It satisfies \emph{completeness}, i.e.\ the attributions sum to $f(x) - f(x')$, together with the axioms of sensitivity and implementation invariance. DeepLIFT~\cite{shrikumar2017learning} propagates differences from a reference activation through the network with dedicated rules, and Lundberg and Lee~\cite{lundberg2017shap} connected it to Shapley values (DeepSHAP). GradientSHAP, available in the SHAP and Captum libraries, averages gradient-based attributions over baselines sampled from a background distribution. All these methods require a \emph{baseline} that represents the absence of information; its choice affects the result and must be justified in each domain. With the robust z-score normalisation used by the models of this thesis, the zero vector corresponds to the median of the training data, which provides a natural baseline. Gradient-based methods for PyTorch models are available in the Captum library~\cite{kokhlikyan2020captum}.
+
+\subsection{Attention as Explanation}
+
+Many financial models, including MASTER, MATCC and FinFormer, use attention, and their authors visualise attention maps to provide insights into learned correlations. Whether attention weights are explanations is debated. Jain and Wallace~\cite{jain2019attention} showed that attention weights are often poorly correlated with gradient-based importance and that very different attention distributions can yield the same prediction. Wiegreffe and Pinter~\cite{wiegreffe2019attention} replied that the answer depends on the definition of explanation and proposed tests to assess when attention is informative. In this thesis, attention maps and the other built-in signals are therefore treated as complementary evidence, to be validated against post-hoc attributions rather than taken as explanations by themselves.
+
+% ===========================================================================
+\section{Explainability for Time Series}
+\label{sec:rw_xai_ts}
+
+Time series add specific difficulties to feature attribution. Each input is a matrix of time steps and features, the importance of a feature may change over time, observations are strongly dependent, and replacing values with a baseline can produce inputs that never occur in the data. Theissler et al.~\cite{theissler2022explainable} review XAI for time series classification and organise methods by whether they explain through time points, subsequences or whole instances.
+
+Several methods address these difficulties explicitly. Ismail et al.~\cite{ismail2020benchmarking} benchmarked common saliency methods on synthetic time series and found that they often fail to identify the important features at the correct time steps; they proposed \emph{temporal saliency rescaling}, which first scores time steps and then features within each time step. FIT~\cite{tonekaboni2020went} measures the importance of an observation by the shift it causes in the predictive distribution, compared with a counterfactual generated from the past. Dynamask~\cite{crabbe2021explaining} learns a perturbation mask over features and time steps with perturbation operators that respect temporal dependencies. WinIT~\cite{leung2023temporal} extends feature removal to windows of past observations to account for delayed effects. TimeSHAP~\cite{bento2021timeshap} adapts KernelSHAP to sequential models and computes feature-level, event-level and cell-level attributions, pruning distant events to limit the cost.
+
+Two aspects of the present setting are not covered by this literature. First, the two feature sets have different temporal structures: Alpha158 features already summarise windows of up to 60 days, so the lookback axis of Alpha158 models is short and redundant, whereas Alpha360 exposes 60 lags of six raw series. Attributions must therefore be compared at the level of feature families and horizons rather than of individual inputs. Second, the models are cross-sectional: the prediction for one stock depends on the inputs of all the stocks of the same day. The methods above assume independent instances; in this thesis each day is explained as a whole, attributing the output of each stock to its own inputs while the other stocks are held fixed.
+
+% ===========================================================================
+\section{Evaluating Explanations}
+\label{sec:rw_eval}
+
+Explanations have no ground truth, so their quality must be assessed indirectly. \emph{Faithfulness} measures whether the features marked as important really drive the prediction: in deletion (or perturbation) curves the most important features are progressively removed and the change of the output is recorded, summarised by the area over the perturbation curve (AOPC)~\cite{samek2017evaluating}; ROAR~\cite{hooker2019benchmark} retrains the model after removal to avoid out-of-distribution effects. \emph{Robustness} measures whether similar inputs receive similar explanations; Alvarez-Melis and Jaakkola~\cite{alvarezmelis2018robustness} showed that several popular methods are unstable in this sense, and Yeh et al.~\cite{yeh2019fidelity} defined the complementary measures of infidelity and max-sensitivity. \emph{Sanity checks}~\cite{adebayo2018sanity} verify that explanations change when the model parameters are randomised; some methods produce plausible-looking maps that are almost independent of the model.
+
+A second line of work concerns disagreement. Krishna et al.~\cite{krishna2024disagreement} showed that popular explanation methods often disagree on the same prediction and that practitioners resolve these disagreements with ad hoc heuristics. Disagreement also arises across models: Breiman~\cite{breiman2001statistical} called \emph{Rashomon effect} the existence of many models with almost the same accuracy but different internal logic, and Fisher et al.~\cite{fisher2019all} quantified the range of variable importance across such a set of models. This is central to this thesis. If different architectures reach similar performance while relying on different features, the explanation is a property of the model rather than of the data; if they rely on the same features, the data are the likely source of both the signal and its instability. Comparing feature rankings requires rank-similarity measures: besides Spearman and Kendall correlations and top-$k$ overlap, rank-biased overlap~\cite{webber2010similarity} weights the top of the rankings more heavily and handles rankings of different lengths.
+
+% ===========================================================================
+\section{Counterfactual Explanations}
+\label{sec:rw_counterfactual}
+
+A counterfactual explanation describes the smallest change of the input that would have changed the outcome. Wachter et al.~\cite{wachter2018counterfactual} formulated it as the optimisation problem
+\begin{equation}
+    \label{eq:rw_counterfactual}
+    x^{\ast} = \arg\min_{x'} \; \lambda \big(f(x') - y'\big)^2 + d(x, x'),
+\end{equation}
+where $y'$ is the desired outcome and $d$ a distance that keeps $x'$ close to the original input $x$. DiCE~\cite{mothilal2020explaining} generates sets of diverse counterfactuals and emphasises proximity, sparsity and feasibility. For multivariate time series, Ates et al.~\cite{ates2021counterfactual} build counterfactuals by substituting entire variables with those of real training samples, which keeps them plausible.
+
+In finance, plausibility is a strong constraint. Alpha features are deterministic functions of the same few price and volume series and are highly correlated, so changing one feature independently of the others produces inputs that cannot occur. Realistic counterfactuals should therefore perturb the underlying OHLCV series and recompute the features, or respect the dependencies among features. In this thesis the outcome of interest is not a class label but the composition of the top-$k$ portfolio: the counterfactual question becomes how much the inputs, or the predictions, of a stock must change for it to enter or leave the portfolio, which directly measures the robustness of allocation decisions.
+
+% ===========================================================================
+\section{Explainability in Finance}
+\label{sec:rw_finance}
+
+Explainability is increasingly required in finance for trust, risk management and regulatory compliance. Weber et al.~\cite{weber2024applications} reviewed 60 studies from finance, information systems and computer science and found risk management, stock market prediction and portfolio optimisation to be well-covered application areas. {\v{C}}ernevi{\v{c}}ien{\.{e}} and Kaba{\v{s}}inskas~\cite{cerneviciene2024explainable} reviewed 138 articles published between 2005 and 2022 and identified credit management, stock price prediction and fraud detection as the tasks most often addressed with XAI. Focusing on portfolio management, Promkaewngarm and Boonchieng~\cite{promkaewngarm2025explainable} observed that SHAP and LIME dominate both asset price prediction and asset allocation. They also pointed out that post-hoc attributions can be unstable, may not reflect the internal logic of the model, and do not provide causal explanations.
+
+Applications to stock forecasting typically train one model and explain it post hoc. Muhammad et al.~\cite{muhammad2024explainable} trained a deep network to classify five trend patterns and used SHAP and LIME to identify the most influential technical indicators, also using the SHAP ranking to reduce the feature set. Goswami and Uddin~\cite{goswami2026significance} used SHAP to rank 166 stock characteristics proposed in the asset pricing literature and found momentum and trading-based features to be the most predictive, which echoes the cross-model agreement reported by Gu et al.~\cite{gu2020empirical}.
+
+\subsection{Research Gap}
+
+The literature reviewed above leaves four gaps that this thesis addresses:
+\begin{enumerate}[noitemsep]
+    \item Explanations are usually computed for a \textbf{single model}; they are rarely compared across architectures trained on identical data with an identical protocol, which is necessary to tell whether the learned patterns come from the data or from the model design.
+    \item The \textbf{reliability} of the explanations (faithfulness, stability, agreement among methods and among random seeds) is rarely assessed in financial applications, even though the weak signal makes unstable explanations likely.
+    \item Explanations of \textbf{recent cross-sectional deep models} (attention-, factor- and graph-based) trained on alpha factors are largely missing, and their built-in signals have not been systematically compared with post-hoc attributions.
+    \item Attributions are rarely linked to the \textbf{allocation decision} and its stability, i.e.\ to how changes in inputs or predictions alter the composition of a portfolio.
+\end{enumerate}
+The following chapters describe a framework that trains comparable models with the FinBench protocol, computes and evaluates their attributions, compares them across architectures, seeds, periods and universes, and relates them to the stability of long-only top-$k$ portfolios.

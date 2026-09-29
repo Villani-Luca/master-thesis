@@ -42,3 +42,5 @@ docs/OutlineTesi.pdf
 code/finbench/
 
 **/data/*/
+# Python packaging (pip install -e code)
+*.egg-info/
