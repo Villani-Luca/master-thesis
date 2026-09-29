@@ -40,6 +40,9 @@ pyarrow>=17,<26
 jupyter>=1.0,<2
 ipykernel>=6.29,<7
 
+# Testing
+pytest>=8.0,<10
+
 # Utilities
 pyyaml>=6.0,<7
 python-dateutil>=2.9,<3

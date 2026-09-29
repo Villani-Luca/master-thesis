@@ -21,18 +21,31 @@ Step 0.2 of [`THESIS_GUIDE.md`](../THESIS_GUIDE.md). One note per model: what it
 
 ---
 
-## ⚠️ Implementation issues found in FinBench (verify and discuss with the supervisor before Step 2)
+## ⚠️ Implementation issues found in FinBench
 
-These were found by reading the code and, for the layout issue, by applying each model's reshape to the real column names of `dji_alpha360.csv`. They affect how comparable the six models are, so the adapters in Step 2 must deal with them explicitly.
+These were found by reading the code and, for the layout issue, by applying each model's reshape to the real column names of `dji_alpha360.csv`. They affect how comparable the six models are.
+
+**Decision (2026-09-29): train exactly as FinBench does; fix only the prediction readout and file paths**, i.e. everything that doesn't change what the model learns. Fixes live in `xaifin` (FinBench stays read-only) and are covered by `code/tests/`.
+
+| # | Issue | Status |
+|---|---|---|
+| 1 | FactorVAE test predictions use the labels | ✅ fixed: `FactorVAE.predict()` in `xaifin/models/factorvae.py` |
+| 2 | FactorVAE predictions are random samples | ✅ fixed: `predict()` returns the mean |
+| 3 | FactorVAE label uses `seq_len` | ⏸ kept as FinBench (changes training). FactorVAE's target is a T-day return; state it wherever FactorVAE is compared |
+| 4 | Alpha360 column layout | ⏸ kept as FinBench (changes training). Attribute on the original 360 columns; possible *Seconda parte* experiment |
+| 5 | MATCC market-file path | ✅ fixed: `xaifin.data.loading.market_path()` |
+| 6 | FinFormer label ≠ README | ✅ nothing to fix (documentation only) |
+
+Proof that the copied FactorVAE is exact: same `state_dict` keys as FinBench, identical training-forward outputs under the same seed (train and eval mode), and `predict()` equal to FinBench's `prediction()` without the sampling noise (one-off check, 2026-09-29).
 
 1. **FactorVAE test predictions use the future returns (label leakage).** `FactorVAE/model.py:95` calls `factor_model(inputs, label)`, and line 100 stores `rec` as the prediction. `rec` is the **posterior** reconstruction, whose factors the encoder builds from the true returns (`module.py:246–255`). The leak-free path `FactorVAE.prediction(x)` (`module.py:269`) is never called. `validate()` does the same (`model.py:54, 59`). FinBench's FactorVAE test metrics are therefore likely optimistic.
 2. **FactorVAE predictions are random.** `FactorDecoder.forward` returns `self.reparameterize(mu, sigma)` (`module.py:119`), a sample, even in eval mode. For XAI and portfolios, use the deterministic mean `μ = α_μ + β·μ_prior`.
 3. **FactorVAE label horizon uses `seq_len`, not `pred_len`.** `FactorVAE/train.py:87`: `extract_labels(dataset, args, pred_len=args.seq_len)`. With (T=20, L=5) the target becomes a 20-day return while the other models predict 5-day returns.
 4. **The Alpha360 column layout doesn't match the models' reshape.** FinBench's `*_alpha360.csv` is **lag-major**: `CLOSE0, OPEN0, HIGH0, LOW0, VOLUME0, VWAP0, CLOSE1, …` (`Evaluation/features/alpha360.py:40–53`). The models assume Qlib's **feature-major** layout:
-   - HIST (`model.py:78–79`) and DiscoverPLF (`dataloader.py:92`, `factormodel.py:107`) reshape to `[6, 60]`. Model "feature 0" = all six series at lags 0–9, "feature 1" = lags 10–19, and so on.
+   - HIST (`model.py:78–79`) and DiscoverPLF (`dataloader.py:92`, `factormodel.py:107`) reshape to `[6, 60]` and permute to `[60 steps, 6]`. GRU step 0 reads `CLOSE0, CLOSE10, …, CLOSE50`, step 1 reads `OPEN0, OPEN10, …`, step 6 reads `CLOSE1, CLOSE11, …`, and step 59 reads `VWAP9, …, VWAP59`. Each step holds one series at six lags ten days apart, cycling through the series, and the most recent day enters first.
    - FinFormer first **sorts the columns alphabetically** (`load_dataset.py:57`, `Index.difference`), then reshapes to `[60, 6]`. Model "timesteps" 0–9 = CLOSE lags in lexicographic order (`CLOSE0, CLOSE1, CLOSE10, …`), 10–19 = HIGH, and so on.
 
-   The recurrent/attention layers therefore never see a real time series. For XAI, attribute on the **original 360 columns** and map to (series, lag) afterwards. That stays valid, but "temporal" readings of internal attention would not. Fix the order in the adapter, or keep it for faithfulness to FinBench and document it: a decision for the supervisor.
+   The models still receive all 360 values in a consistent order, so they can learn, but not in chronological order: the temporal inductive bias of the GRU/attention layers doesn't apply as designed. For XAI, attribute on the **original 360 columns** and map to (series, lag) afterwards. That stays valid, but "temporal" readings of internal states or attention would not.
 5. **MATCC reads the market file from two different paths**: `train.py:232` uses `{data_path}/{nation}_market.csv`, while `train.py:416` uses `{data_path}/{universe}/{nation}_market.csv`. The local data only has the second.
 6. **FinFormer's label is a cross-sectional z-score**, not CSRank as the FinBench README states (`load_dataset.py:21, 64`).
 

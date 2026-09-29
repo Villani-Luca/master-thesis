@@ -1,4 +1,4 @@
-# OSX 
+# OSX
 .DS_Store
 .Spotlight-V100
 .Trashes
@@ -18,29 +18,34 @@ ENV/
 env.bak/
 venv.bak/
 
-# Latex
+# Python packaging (pip install -e code) and tooling
+*.egg-info/
+.pytest_cache/
 
-thesis/*.synctex.*
-thesis/main.pdf
-thesis/main.aux
-thesis/main.lof
-thesis/main.lol
-thesis/main.out
-thesis/main.bcf
-thesis/main.run.xml
-thesis/main.blg
-thesis/main.bbl
-thesis/main.fdb_latexmk
-thesis/main.fls
-thesis/main.log
-thesis/main.toc
+# Latex build outputs
+latex-thesis/*.synctex.*
+latex-thesis/main.pdf
+latex-thesis/main.aux
+latex-thesis/main.lof
+latex-thesis/main.lol
+latex-thesis/main.out
+latex-thesis/main.bcf
+latex-thesis/main.run.xml
+latex-thesis/main.blg
+latex-thesis/main.bbl
+latex-thesis/main.fdb_latexmk
+latex-thesis/main.fls
+latex-thesis/main.log
+latex-thesis/main.toc
 
 # Docs
 docs/OutlineTesi.pdf
 
-# FinBench Framework
+# FinBench Framework (read-only reference clone)
 code/finbench/
 
-**/data/*/
-# Python packaging (pip install -e code)
-*.egg-info/
+# Local datasets
+code/data/
+
+# Large attribution tensors (global.parquet and metrics stay in git)
+code/results/xai/**/attributions.npz

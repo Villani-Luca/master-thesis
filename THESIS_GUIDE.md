@@ -1,6 +1,6 @@
 # Thesis Implementation Guide: Applying Explainability Methods to Financial Models
 
-This is the working plan for turning [`file-thesis/Outline Tesi.pdf`](file-thesis/Outline%20Tesi.pdf) into code, notebooks, a reusable framework and the final graphical application. Each step says **why** it exists (which part of the outline it serves), **what to build** (notebook, package module, app page), **what it produces** (files), and **when it counts as done**.
+This is the working plan for turning [`docs/papers/Outline Tesi.pdf`](docs/papers/Outline%20Tesi.pdf) into code, notebooks, a reusable framework and the final graphical application. Each step says **why** it exists (which part of the outline it serves), **what to build** (notebook, package module, app page), **what it produces** (files), and **when it counts as done**.
 
 > **Research question.** Stock-prediction models have weak predictive power (accuracy ≈ 50%, IC ≈ 0.0x). That instability carries over into long-only top-k portfolios. *How do input features drive predictions, how does that turn into allocation decisions, and does the instability come from the **data** or from the **model design**?*
 
@@ -55,11 +55,29 @@ OHLCV  ──►  Alpha158 / Alpha360 features  ──►  robust z-score (fit o
 
 ## 2. Target architecture and conventions
 
-### 2.1 Repository layout (to be created)
+### 2.1 Repository layout
+
+The skeleton exists (2026-09-29): every folder and `xaifin` subpackage below is in place, and each `__init__.py` lists its planned modules. The modules themselves are created step by step.
+
+```
+master-thesis/
+├── README.md                   # overview + setup
+├── THESIS_GUIDE.md             # this plan
+├── docs/
+│   ├── papers/                 # the papers + Outline Tesi.pdf
+│   ├── model_groups.md         # FinBench models grouped by input data
+│   └── model_notes.md          # per-model notes + FinBench issues
+├── latex-thesis/               # the thesis
+└── code/                       # everything below
+```
 
 ```
 code/
 ├── pyproject.toml              # makes `xaifin` installable: pip install -e code
+├── requirements.txt
+├── data/                       # local datasets (not in git)
+├── finbench/                   # FinBench clone: read-only reference (not in git)
+├── tests/                      # pytest
 ├── xaifin/                     # the framework ("Prima parte" item 4)
 │   ├── config.py               # paths, universes, model groups, rolling windows, seeds, k
 │   ├── data/
@@ -130,9 +148,9 @@ code/results/
 └── analysis/…                     # cross-model tables, figures exported for the thesis
 ```
 
-> ⚠️ **Existing inconsistency to fix in Step 3.** `code/results/Regression/MASTER/<universe>/sl20_pl5/model.pth` is stored *without* seed/year, so every rolling year overwrites it. Metrics are stored under `<universe>/seed42/y2020/`. Migrate both to the layout above.
+> ✅ **Migrated 2026-09-29.** The first MASTER runs (seed 42, y2020, from the old `master_model.ipynb`) now follow this layout for dji, nasdaq100 and sp500. They have no `config.json`. The sp500 run has only `model.pth`: its test evaluation never completed.
 
-Add to `.gitignore`: `code/results/xai/**/attributions.npz` (large files). Keep `global.parquet` and the metrics under version control.
+`.gitignore` excludes `code/results/xai/**/attributions.npz` (large files). `global.parquet` and the metrics stay under version control.
 
 ### 2.3 The key abstraction: `ModelAdapter`
 
@@ -206,7 +224,7 @@ Points to keep in mind:
 
 ### 0.2 Reading (*Prima parte* 1–3)
 
-The PDFs in `file-thesis/`:
+The PDFs in `docs/papers/`:
 
 | File | Paper | What to extract |
 |---|---|---|
@@ -223,7 +241,7 @@ The PDFs in `file-thesis/`:
 | `1-s2.0-S2405844024161269-main.pdf` | Explainable DL for stock trend | a worked finance XAI example |
 | *(missing)* | Qlib (arXiv 2009.11189) | origin of Alpha158/360. The reference implementation is in `code/finbench/Evaluation/features/alpha158.py` and `alpha360.py` |
 
-- [x] For each model, write a half-page note: **what is predicted** (label = forward L-day return on adj close), **inputs**, **normalizations** (see the FinBench README table), **loss**, **whether it is cross-sectional**, and **which internal signals could be inspected** (attention, factors, concepts). → [`code/model_notes.md`](code/model_notes.md), which also lists **6 FinBench implementation issues** to resolve before Step 2.
+- [x] For each model, write a half-page note: **what is predicted** (label = forward L-day return on adj close), **inputs**, **normalizations** (see the FinBench README table), **loss**, **whether it is cross-sectional**, and **which internal signals could be inspected** (attention, factors, concepts). → [`docs/model_notes.md`](docs/model_notes.md), which also lists **6 FinBench implementation issues** to resolve before Step 2.
 - [x] XAI literature search, focused on **time-series** and, if any exist, **stock-trend** specific methods. Candidates to check: Integrated Gradients, DeepLIFT/DeepSHAP, TimeSHAP, Temporal Saliency Rescaling, Dynamask, FIT, WinIT, the "attention is (not) explanation" debate, Rashomon-set / explanation-disagreement papers, and counterfactual methods (Wachter et al., DiCE). Save the notes to `latex-thesis/chapters/02_second_chapter.tex` (related work) and to `bibliography.bib`. → Chapter 2 drafted ("Background and Related Work"); 46 references, all verified.
 
 **Thesis artefacts:** related-work chapter; one table of the six models (task, inputs, normalization, loss, cross-sectional yes/no).
@@ -234,7 +252,7 @@ The PDFs in `file-thesis/`:
 
 **Why:** explanations can only be compared between models that see the same data under the same protocol.
 
-**Already done:** [`code/note.md`](code/note.md) groups all FinBench models into five groups. The core of the thesis is the two alpha groups, which are exactly the regression models listed in the outline:
+**Already done:** [`docs/model_groups.md`](docs/model_groups.md) groups all FinBench models into five groups. The core of the thesis is the two alpha groups, which are exactly the regression models listed in the outline:
 
 | Group | Feature space | Models | Input per stock |
 |---|---|---|---|
@@ -245,8 +263,8 @@ The PDFs in `file-thesis/`:
 Within a group, compare features one to one. Across groups, compare at the **family** level (Step 5.4).
 
 ### Tasks
-- [ ] `xaifin/config.py`: `UNIVERSES`, `NATION` map (dji/nasdaq100→us, sx5e→eu), `MODEL_GROUPS`, `ROLLING_WINDOWS`, `SEEDS`, `TOP_K` (e.g. 10, and 5 for DJI's ~30 stocks), `DATA_ROOT`, `RESULTS_ROOT`.
-- [ ] `xaifin/data/features.py`: feature names plus a **family mapping**:
+- [x] `xaifin/config.py`: `UNIVERSES`, `NATION` map (dji/nasdaq100→us, sx5e→eu), `MODEL_GROUPS`, `ROLLING_WINDOWS`, `SEEDS`, `TOP_K` (e.g. 10, and 5 for DJI's ~30 stocks), `DATA_ROOT`, `RESULTS_ROOT`. → Also `CORE_UNIVERSES`, `SL_PL_CONFIGS`, `rolling_window(year)`.
+- [x] `xaifin/data/features.py`: feature names plus a **family mapping**. → Done as `catalog(universe)`: family (8), source (5) and horizon (3) per feature; names checked against the CSV headers of all 5 universes. Alpha360 overlaps Alpha158 only on momentum, volume and candle, so compare the groups by source and horizon.
   - Alpha158: `kbar` (KMID, KLEN, KUP, KLOW, KSFT…), `price` (OPEN0, HIGH0, LOW0), and each rolling operator (ROC, MA, STD, BETA, RSQR, RESI, MAX, MIN, QTLU, QTLD, RANK, RSV, IMAX, IMIN, IMXD, CORR, CORD, CNTP/N/D, SUMP/N/D, VMA, VSTD, WVMA, VSUMP/N/D) × window {5,10,20,30,60}.
   - Higher-level **semantic families**, shared across groups: `trend/momentum`, `volatility/range`, `volume`, `price-volume correlation`, `market`. Also horizon buckets `short (≤5d)`, `medium (10–20d)`, `long (30–60d)`.
   - Alpha360: series × lag bucket (lag 0–4 short, 5–19 medium, 20–59 long).
@@ -263,10 +281,10 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 **Why:** training, XAI and the GUI all need to load any model and run it on any day through one interface (§2.3).
 
 ### Tasks
-- [ ] Move the MASTER code from [`master_model.ipynb`](code/notebooks/master_model.ipynb) into the package: `data/loading.py` (constituent filter, market merge, `extract_labels`), `data/normalization.py` (`RobustZScoreNormalization`), `data/datasets.py` (the daily dataset that yields `DayBatch`), `models/master.py`, and `training/metrics.py` (the scipy-free IC/RankIC already written there). Keep `master_model.ipynb` unchanged as the reproduction record.
+- [ ] Move the MASTER code from `master_model.ipynb` into the package. The notebook was deleted from the working tree; read it with `git show 7fcec03:code/notebooks/master_model.ipynb`. Targets: `data/loading.py` (constituent filter, market merge, `extract_labels`; the market path is already done), `data/normalization.py` (`RobustZScoreNormalization`), `data/datasets.py` (the daily dataset that yields `DayBatch`), `models/master.py`, and `training/metrics.py` (the scipy-free IC/RankIC already written there).
 - [ ] Write an adapter for each of the other five models, copying from `code/finbench/Regression/<MODEL>/` (`train.py`, model files, `dataloader`/`load_dataset`). Keep FinBench's preprocessing for each model exactly (see the normalization column of the FinBench README table). Record every deviation in the adapter docstring.
-  - ⚠️ **First resolve the FinBench issues listed in [`code/model_notes.md`](code/model_notes.md)**: FactorVAE label leakage, random predictions and label horizon; the Alpha360 column layout scrambled by HIST/DiscoverPLF/FinFormer; the MATCC market-file path; the FinFormer label. Decide with the supervisor whether to fix each one or reproduce FinBench exactly, and record the decision in the adapter docstring.
-  - FactorVAE: predict through `prediction(x)` with the **mean** `α_μ + β·μ_prior`. Don't use FinBench's `rec`, which uses the future returns, and don't use a random sample.
+  - FinBench issues ([`docs/model_notes.md`](docs/model_notes.md)), decided 2026-09-29: **train exactly as FinBench, fix only readout and paths.** Fixed: FactorVAE leakage and random output (1, 2), MATCC market path (5). Kept and documented: FactorVAE `seq_len` label (3), Alpha360 layout (4). Still to do: tell the supervisor.
+  - [x] FactorVAE: model code + leak-free, deterministic `predict()` in `xaifin/models/factorvae.py` (tests in `code/tests/`). The adapter wrapper comes with the rest of Step 2.
   - HIST/DiscoverPLF: pass `stock2concept` and `market_value` through `extras`.
   - FinFormer: pass the sector/industry adjacency through `extras`. Its label is a daily cross-sectional z-score, not the CSRank the README describes.
   - Alpha360 models: compute attributions on the **original 360 columns**, then map them to (series, lag).
@@ -283,7 +301,7 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 ### Tasks
 - [ ] `training/trainer.py`: a generic loop with early stopping on **valid RankIC** (as in the current notebook), best-state checkpointing, and saving to the §2.2 layout.
 - [ ] `training/rolling.py` + `scripts/train_rolling.py --model MASTER --universe dji --years 2020-2024 --seeds 0 5 42 --sl 20 --pl 5`. Skip runs that already exist (resumable).
-- [ ] Migrate the existing MASTER results to the new layout (see the ⚠️ in §2.2).
+- [x] Migrate the existing MASTER results to the new layout (done 2026-09-29, see §2.2).
 - [ ] Run the grid **in stages**, checking each stage before going on:
   1. MASTER × dji × y2020 × seed 42 (already done, re-run through the package);
   2. all 6 models × dji × y2020 × seed 42 → compare with the FinBench tables (`code/finbench/results.md`). FactorVAE will score lower if its test-time leakage is fixed;
@@ -463,7 +481,7 @@ The pages are added step by step, so the app grows together with the research:
 - [ ] Use `@st.cache_resource` for loaded models and `@st.cache_data` for results-store reads.
 - [ ] Every chart function lives in `xaifin` (e.g. `xaifin/viz.py`) so the notebooks and the app draw identical figures.
 - [ ] "Upload/choose a checkpoint" flow: pick a run directory → the adapter comes from `config.json` → ready to explain.
-- [ ] Short README section on how to launch the app.
+- [x] Short README section on how to launch the app.
 
 **Done when:** a new user can start the app, load any trained model, see its attributions, and compare it with another architecture without touching code.
 
@@ -503,10 +521,10 @@ Build the app page for each step **in the same milestone** as the step, not at t
 
 | Step | Notebook | Package | App page | Status |
 |---|---|---|---|---|
-| 0 Environment & reading | `00_environment_check` | `pyproject.toml` | – | ☐ |
-| 1 Groups & universes | `01_universes_and_data` | `config`, `data/features` | `1_Data` | ☐ (grouping done in `note.md`) |
-| 2 Adapters | `02_model_adapters` | `data/*`, `models/*` | `2_Models` | ☐ (MASTER reproduced in `master_model.ipynb`) |
-| 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ☐ (MASTER y2020 dji/nasdaq100 done) |
+| 0 Environment & reading | `00_environment_check` | `pyproject.toml` | – | ✅ done (model notes + chapter 2 drafted; read the papers yourself too) |
+| 1 Groups & universes | `01_universes_and_data` | `config`, `data/features` | `1_Data` | ◐ `config` and `features` done; notebook and app page to do |
+| 2 Adapters | `02_model_adapters` | `data/*`, `models/*` | `2_Models` | ◐ FactorVAE model with leak-free `predict()` done; MASTER reproduced in `master_model.ipynb` (now only in git history, commit `7fcec03`) |
+| 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ◐ MASTER seed 42 y2020 on dji/nasdaq100 (sp500: checkpoint only); results migrated to the §2.2 layout |
 | 4 Portfolio baseline | `04_portfolio_baseline` | `portfolio/topk`, `backtest` | `6_Portfolio` | ☐ |
 | 5 XAI engine | `05_xai_single_model` | `xai/*`, `scripts/explain` | `3_Explain` | ☐ |
 | 6 XAI evaluation | `06_xai_evaluation` | `xai/evaluation` | `3_Explain` (quality) | ☐ |
@@ -514,5 +532,5 @@ Build the app page for each step **in the same milestone** as the step, not at t
 | 8 Period analysis | `08_period_analysis` | `analysis/regimes` | `5_Over_time` | ☐ |
 | 9 Counterfactuals (opt.) | `09_counterfactual_stability` | `portfolio/counterfactual` | `6_Portfolio` | ☐ |
 | 10 Perturbation tests | `10_perturbation_tests` | `perturb/*` | `4_Compare` | ☐ |
-| 11 Application | – | `viz.py` | `Home` + all pages | ☐ |
+| 11 Application | – | `viz.py` | `Home` + all pages | ◐ `Home.py` lists the trained runs; README explains how to launch it |
 | 12 Thesis | – | – | – | ☐ |

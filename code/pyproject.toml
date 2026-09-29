@@ -13,3 +13,6 @@ requires-python = ">=3.10"
 [tool.setuptools.packages.find]
 # code/ also holds notebooks/, data/, results/, finbench/ ... only ship xaifin.
 include = ["xaifin*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
