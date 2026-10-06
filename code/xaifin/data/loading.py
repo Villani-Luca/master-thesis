@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from xaifin.config import DATA_ROOT, NATION
@@ -44,13 +45,19 @@ def load_info(universe: str) -> pd.DataFrame:
     return pd.read_csv(DATA_ROOT / universe / f"{universe}_info.csv")
 
 
-def load_constituents(universe: str) -> pd.DataFrame:
+def load_constituents(universe: str, source: str = "eodhd") -> pd.DataFrame:
     """Index membership history: ticker (EODHD code), name, start, end (NaT = open-ended).
 
+    `source` 'eodhd' reads code/data/constituents/eodhd/<universe>.csv, the file of most FinBench
+    models; 'universe' reads code/data/<universe>/<universe>_constituents.csv, HIST's file. They
+    are identical except for one nasdaq100 row (Ctrip: TCOM.US vs CTRPX.US in HIST's file).
     The files differ per universe in columns and date format (M/D/YYYY or ISO); all have
     Name, StartDate, EndDate and EODHD.
     """
-    raw = pd.read_csv(DATA_ROOT / "constituents" / "eodhd" / f"{universe}.csv")
+    if source == "eodhd":
+        raw = pd.read_csv(DATA_ROOT / "constituents" / "eodhd" / f"{universe}.csv")
+    else:
+        raw = pd.read_csv(DATA_ROOT / universe / f"{universe}_constituents.csv")
     return pd.DataFrame({
         "ticker": raw["EODHD"],
         "name": raw["Name"],
@@ -64,7 +71,7 @@ def load_alpha(universe: str, kind: str = "alpha158") -> pd.DataFrame:
     return pd.read_csv(alpha_path(universe, kind))
 
 
-def active_tickers(universe: str, on_date: str) -> list[str]:
+def active_tickers(universe: str, on_date: str, source: str = "eodhd") -> list[str]:
     """Tickers that are index members on `on_date`.
 
     Same rule as FinBench's filter_constituents_by_date (Regression/MASTER/utils.py): membership
@@ -72,7 +79,7 @@ def active_tickers(universe: str, on_date: str) -> list[str]:
     as open-ended. FinBench applies it on the first test day, so the model is trained and tested
     on the members of that day (survivorship as in FinBench, kept for comparability).
     """
-    members = load_constituents(universe)
+    members = load_constituents(universe, source)
     day = pd.Timestamp(on_date)
     start = members["start"].fillna(pd.Timestamp.min)
     end = members["end"].fillna(pd.Timestamp.max)
@@ -97,17 +104,41 @@ def select_valid_tickers(df: pd.DataFrame, start_date: str, end_date: str) -> pd
     return df[df["instrument"].isin(in_window["instrument"].unique())]
 
 
-def alpha158_frame(universe: str, window, pred_len: int, market: bool = True) -> pd.DataFrame:
-    """The input table of the Alpha158 models for one rolling window, built as FinBench's train.py.
+def alpha_frame(universe: str, window, pred_len: int, kind: str = "alpha158", market: bool = False,
+                constituents: str = "eodhd") -> pd.DataFrame:
+    """The input table of the FinBench models for one rolling window, built as their train.py.
 
-    Columns: instrument, date, the 157 Alpha158 features, the market gate features (if `market`,
-    for MASTER and MATCC), Label. Steps: keep the members on the first test day, merge the market
+    Columns: instrument, date, the features of `kind` ('alpha158': 157, 'alpha360': 360), the
+    market gate features (if `market`, for MASTER and MATCC), Label. Steps: keep the members on
+    the first test day (from the `constituents` file, see load_constituents), merge the market
     features by date, add the label, keep the tickers with data in the training period.
     `window` is a config.RollingWindow. Dates stay ISO strings, as in FinBench.
     """
-    df = load_alpha(universe, "alpha158")
-    df = df[df["instrument"].isin(active_tickers(universe, window.start_test_date))]
+    df = load_alpha(universe, kind)
+    df = df[df["instrument"].isin(active_tickers(universe, window.start_test_date, constituents))]
     if market:
         df = df.merge(load_market(universe), how="left", on="date")
     df = add_labels(df, universe, pred_len)
     return select_valid_tickers(df, window.start_date, window.end_train_date)
+
+
+def load_concepts(universe: str) -> tuple[np.ndarray, list[str]]:
+    """Stock -> concept incidence matrix [tickers, concepts] of HIST and DiscoverPLF (<universe>_inc_matrix.npz)."""
+    z = np.load(DATA_ROOT / universe / f"{universe}_inc_matrix.npz")
+    return z["inc_matrix"], z["tickers"].tolist()
+
+
+def load_market_cap(universe: str) -> pd.DataFrame:
+    """Market capitalization in $bn: instrument, date, market_value (<universe>_market_cap.csv / 1e9, as FinBench)."""
+    df = pd.read_csv(DATA_ROOT / universe / f"{universe}_market_cap.csv", usecols=["instrument", "date", "market_cap"])
+    return df.assign(market_value=df.pop("market_cap") / 1000000000)
+
+
+def load_sector_graph(universe: str) -> tuple[np.ndarray, list[str]]:
+    """FinFormer's static stock graph [tickers, tickers]: 1 where two stocks share one of the first 11 relations.
+
+    As FinFormer/train.py:22, 122-124: the first 11 matrices of <universe>_sector_industry_matrix.npz,
+    collapsed with max > 0.
+    """
+    z = np.load(DATA_ROOT / universe / f"{universe}_sector_industry_matrix.npz")
+    return (z["adj_matrix"][:11].max(axis=0) > 0).astype(np.float32), z["tickers"].tolist()

@@ -6,7 +6,8 @@ Training, XAI, portfolios and the app only talk to adapters. An adapter owns one
 - how FinBench builds its data (`day_batches`, `target`),
 - its prediction as a differentiable [N, T, F] -> [N] map (`forward`), which XAI explains,
 - how FinBench trains it (`training_loss`, `configure_optimizer`, and the loop settings in
-  `hparams`: n_epochs, grad_clip, scheduler_step), which the Step 3 trainer runs.
+  `hparams`: n_epochs, grad_clip, scheduler_step and, where FinBench uses them, early_stop,
+  smooth_steps, eval_from_epoch), which the Step 3 trainer runs.
 """
 
 import json
@@ -99,15 +100,27 @@ class ModelAdapter(ABC):
         """{'train', 'valid', 'test'} -> dataset of DayBatch, built as FinBench builds this model's data."""
 
     @abstractmethod
-    def forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
-        """Predictions [N] for one day's inputs [N, T, F]: deterministic and differentiable.
+    def model_forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
+        """The model's prediction [N] for one day's inputs [N, T, F]; `x` is moved to the adapter's device."""
 
-        Call model.eval() first (see predict). `x` is moved to the adapter's device.
+    def forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
+        """Predictions [N] for one day's inputs [N, T, F]: deterministic and differentiable w.r.t. x.
+
+        Call model.eval() first (see predict). When gradients are on, cuDNN is turned off for the
+        call: its GRU kernels cannot backpropagate in eval mode, and XAI needs gradients of the
+        eval-mode model. PyTorch's own kernels then run instead (same function, rounding aside).
         """
+        if torch.is_grad_enabled():
+            with torch.backends.cudnn.flags(enabled=False):
+                return self.model_forward(x, extras)
+        return self.model_forward(x, extras)
 
     @abstractmethod
-    def training_loss(self, batch: DayBatch) -> torch.Tensor:
-        """FinBench's training loss on one day, label preprocessing included. Model in train mode."""
+    def training_loss(self, batch: DayBatch, epoch: int) -> torch.Tensor:
+        """FinBench's training loss on one day, label preprocessing included. Model in train mode.
+
+        `epoch` (from 0) is used only by losses that change during training (DiscoverPLF).
+        """
 
     @abstractmethod
     def configure_optimizer(self) -> tuple[torch.optim.Optimizer, object | None]:

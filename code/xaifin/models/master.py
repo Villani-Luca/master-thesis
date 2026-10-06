@@ -265,10 +265,10 @@ class MASTERAdapter(ModelAdapter):
         c = self.cfg
         return alpha158_splits(c.universe, c.test_year, c.seq_len, c.pred_len, market=True, clean=c.clean)
 
-    def forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
+    def model_forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
         return self.model(x.to(self.device))
 
-    def training_loss(self, batch: DayBatch) -> torch.Tensor:
+    def training_loss(self, batch: DayBatch, epoch: int) -> torch.Tensor:
         mask, label = drop_extreme(batch.y.to(self.device))
         label = cs_zscore(label)
         pred = self.model(batch.x.to(self.device)[mask])

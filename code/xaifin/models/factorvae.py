@@ -274,10 +274,10 @@ class FactorVAEAdapter(ModelAdapter):
     def load_splits(self) -> dict:
         return factorvae_splits(self.cfg.universe, self.cfg.test_year, self.cfg.seq_len, clean=self.cfg.clean)
 
-    def forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
+    def model_forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
         return self.model.predict(x.to(self.device))
 
-    def training_loss(self, batch: DayBatch) -> torch.Tensor:
+    def training_loss(self, batch: DayBatch, epoch: int) -> torch.Tensor:
         return self.model(batch.x.to(self.device), batch.y.to(self.device).reshape(-1, 1))[0]
 
     def configure_optimizer(self):
