@@ -9,6 +9,7 @@ from a DataFrame that should be shown next to it as the table view.
 
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from xaifin.config import STUDY_END, STUDY_START, UNIVERSE_NAMES
 from xaifin.data.features import FAMILIES
@@ -162,3 +163,59 @@ def volatility_chart(volatility: pd.DataFrame, universe: str, dark: bool = False
     fig.update_yaxes(title_text="Annualized volatility", tickformat=".0%", hoverformat=".1%", rangemode="tozero")
     return _style(fig, f"{UNIVERSE_NAMES[universe]}: 20-day realized volatility of the market indexes", dark,
                   right_margin=110)
+
+
+def training_chart(history: pd.DataFrame, title: str, best_epoch: int | None = None, dark: bool = False) -> go.Figure:
+    """Training loss (top) and validation IC / RankIC (bottom) per epoch; `history` has epoch, train_loss, IC, RankIC."""
+    t = THEMES[dark]
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.08)
+    fig.add_trace(go.Scatter(x=history["epoch"], y=history["train_loss"].round(5), name="training loss",
+                             mode="lines", line=dict(color=t["series"][0], width=2)), row=1, col=1)
+    for name, color in (("IC", t["series"][1]), ("RankIC", t["series"][2])):
+        if name in history:
+            fig.add_trace(go.Scatter(x=history["epoch"], y=history[name].round(5), name=f"validation {name}",
+                                     mode="lines", line=dict(color=color, width=2)), row=2, col=1)
+    fig.add_hline(y=0, line=dict(color=t["axis"], width=1), row=2, col=1)
+    if best_epoch is not None:
+        fig.add_vline(x=best_epoch, line=dict(color=t["muted"], width=1, dash="dot"))
+        fig.add_annotation(x=best_epoch, y=1, yref="paper", text="kept epoch", showarrow=False, xanchor="left",
+                           xshift=4, yanchor="top", font=dict(size=11, color=t["muted"]))
+    fig.update_layout(hovermode="x unified")
+    fig.update_yaxes(title_text="Loss", row=1, col=1)
+    fig.update_yaxes(title_text="Validation", hoverformat=".4f", row=2, col=1)
+    fig.update_xaxes(title_text="Epoch", row=2, col=1)
+    return _style(fig, title, dark, height=480)
+
+
+def daily_ic_chart(daily: pd.DataFrame, title: str, window: int = 20, dark: bool = False) -> go.Figure:
+    """Daily RankIC of the test year (bars) and its `window`-day rolling mean (line); `daily` has date, RankIC."""
+    t = THEMES[dark]
+    x = _days(daily["date"])
+    fig = go.Figure(go.Bar(x=x, y=daily["RankIC"].round(4), name="daily RankIC", marker_color=t["ramp"][2],
+                           marker_line_width=0))
+    fig.add_trace(go.Scatter(x=x, y=daily["RankIC"].rolling(window, min_periods=1).mean().round(4),
+                             name=f"{window}-day mean", mode="lines", line=dict(color=t["series"][1], width=2)))
+    fig.add_hline(y=0, line=dict(color=t["axis"], width=1))
+    fig.update_layout(hovermode="x unified", bargap=0.1)
+    fig.update_yaxes(title_text="RankIC", hoverformat=".3f")
+    return _style(fig, title, dark)
+
+
+def prediction_scatter(day: pd.DataFrame, title: str, k: int, dark: bool = False) -> go.Figure:
+    """Prediction vs label of the stocks of one day; the k highest predictions (the top-k portfolio) are highlighted.
+
+    `day` has ticker, prediction, label.
+    """
+    t = THEMES[dark]
+    top = day["prediction"].rank(ascending=False, method="first") <= k
+    fig = go.Figure()
+    for name, mask, color, size in ((f"top {k} by prediction", top, t["series"][1], 10),
+                                    ("other stocks", ~top, t["series"][0], 8)):
+        d = day[mask]
+        fig.add_trace(go.Scatter(x=d["prediction"].round(4), y=d["label"].round(4), name=name, mode="markers",
+                                 text=d["ticker"], marker=dict(color=color, size=size, line=dict(width=0)),
+                                 hovertemplate="%{text}<br>prediction %{x:.3f}<br>label %{y:.3f}<extra></extra>"))
+    fig.add_hline(y=0, line=dict(color=t["axis"], width=1))
+    fig.update_xaxes(title_text="Prediction", zeroline=False)
+    fig.update_yaxes(title_text="Label (daily z-score)")
+    return _style(fig, title, dark)
