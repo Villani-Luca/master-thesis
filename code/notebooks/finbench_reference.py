@@ -467,3 +467,40 @@ class FinFormerReference:
 
     def state(self):
         return self.wrapper.finformer.state_dict()
+
+
+# ------------------------------------------------------------------ portfolio (Step 4)
+
+class _AnyAttribute(type(sys)):
+    """Stands in for a library that a FinBench module imports but the functions used here never call."""
+
+    def __getattr__(self, name):
+        return None
+
+
+def finbench_portfolio(prediction_paths: list, top_k: int, start_date: str, end_date: str, pred_len: int,
+                       universe: str):
+    """FinBench's long-only top-k backtest (Evaluation/evaluation.py): holdings, daily returns, quantstats.
+
+    Calls create_long_short_portfolio_history (short_k = 0) and portfolio_daily_returns, with the
+    prices read from code/data/<universe>/<universe>.csv. pypfopt, tabulate and seaborn (imported by
+    modules on the way, not used by these functions) are replaced by empty stand-ins if missing.
+    Returns (portfolio history, daily returns, the quantstats module).
+    """
+    evaluation = CODE / "finbench" / "Evaluation"
+    for missing in ("pypfopt", "tabulate", "seaborn", "yfinance"):
+        if importlib.util.find_spec(missing) is None:
+            sys.modules[missing] = _AnyAttribute(missing)
+    sys.path.insert(0, str(evaluation))
+    try:
+        from portfolio.returns import portfolio_daily_returns
+        from portfolio.transforms import create_long_short_portfolio_history
+        import quantstats
+    finally:
+        sys.path.remove(str(evaluation))
+    history = create_long_short_portfolio_history([str(p) for p in prediction_paths], top_k=top_k, short_k=0,
+                                                  start_date=start_date, end_date=end_date, freq=f"{pred_len}B")
+    prices = pd.read_csv(DATA / universe / f"{universe}.csv", usecols=["instrument", "date", "adj_close", "adj_open"])
+    prices["date"] = pd.to_datetime(prices["date"])
+    prices = {t: g.drop(columns="instrument").set_index("date").sort_index() for t, g in prices.groupby("instrument")}
+    return history, portfolio_daily_returns(history, prices), quantstats

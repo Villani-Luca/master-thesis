@@ -270,3 +270,78 @@ def metric_by_year_chart(table: pd.DataFrame, metric: str, title: str, dark: boo
     fig.update_xaxes(title_text="Test year", type="category")
     fig.update_yaxes(title_text=metric, hoverformat="+.4f")
     return _style(fig, title, dark, right_margin=110)
+
+
+BENCHMARK_STYLE = {"equal weight": "dash", "index": "dot"}
+
+
+def equity_chart(curves: pd.DataFrame, title: str, dark: bool = False) -> go.Figure:
+    """Growth of 1 invested, one line per column of `curves` (index = date).
+
+    Model columns take their fixed color (MODEL_ORDER); the benchmarks 'equal weight' and 'index'
+    are neutral, dashed and dotted.
+    """
+    t = THEMES[dark]
+    fig = go.Figure()
+    ends, x = [], _days(pd.Series(curves.index))
+    for column in curves.columns:
+        if column in MODEL_ORDER:
+            line = dict(color=t["series"][MODEL_ORDER.index(column)], width=2)
+        else:
+            line = dict(color=t["text2"] if column == "index" else t["muted"], width=2,
+                        dash=BENCHMARK_STYLE.get(column, "solid"))
+        y = curves[column].round(4)
+        fig.add_trace(go.Scatter(x=x, y=y, name=column, mode="lines", line=line))
+        ends.append((x.iloc[-1], y.iloc[-1], column))
+    _end_labels(fig, ends, float(curves.max().max() - curves.min().min()) or 1.0, dark)
+    fig.add_hline(y=1, line=dict(color=t["axis"], width=1))
+    fig.update_layout(hovermode="x unified")
+    fig.update_yaxes(title_text="Value of 1 invested", hoverformat=".3f")
+    return _style(fig, title, dark, right_margin=120)
+
+
+def holdings_map(holdings: pd.DataFrame, title: str, dark: bool = False) -> go.Figure:
+    """Which stocks the portfolio held in each period: one row per stock (most often held on top), one column per rebalance."""
+    t = THEMES[dark]
+    held = holdings.pivot_table(index="ticker", columns="start", values="held", aggfunc="max", fill_value=False)
+    held = held.loc[held.sum(axis=1).sort_values(ascending=False).index]
+    rank = holdings.pivot_table(index="ticker", columns="start", values="rank").reindex(index=held.index, columns=held.columns)
+    fig = go.Figure(go.Heatmap(
+        z=held.astype(int).values, x=_days(pd.Series(held.columns)), y=list(held.index), customdata=rank.values,
+        colorscale=[[0, t["surface"]], [0.5, t["surface"]], [0.5, t["series"][0]], [1, t["series"][0]]], zmin=0, zmax=1,
+        showscale=False, xgap=1, ygap=1,
+        hovertemplate="%{y}, period from %{x}<br>rank %{customdata}<extra></extra>",
+    ))
+    fig.update_yaxes(autorange="reversed", showgrid=False, tickfont=dict(size=10))
+    fig.update_xaxes(showgrid=False)
+    return _style(fig, title, dark, height=max(320, 60 + 14 * len(held)))
+
+
+def margin_histogram(holdings: pd.DataFrame, title: str, dark: bool = False) -> go.Figure:
+    """Distribution of the held stocks' margin to the k-boundary, in cross-sectional standard deviations of the scores."""
+    t = THEMES[dark]
+    margins = holdings.loc[holdings["held"], "margin_z"]
+    fig = go.Figure(go.Histogram(x=margins.round(4), nbinsx=40, marker=dict(color=t["series"][0], line=dict(width=0)),
+                                 name="held stocks", hovertemplate="margin %{x}<br>%{y} holdings<extra></extra>"))
+    fig.update_layout(bargap=0.08)
+    fig.update_xaxes(title_text="Margin to the k-boundary (score standard deviations of the day)")
+    fig.update_yaxes(title_text="Holdings (stock x period)")
+    return _style(fig, title, dark)
+
+
+def overlap_heatmap(matrix: pd.DataFrame, title: str, dark: bool = False) -> go.Figure:
+    """Average overlap (0-1) of the stocks held by pairs of portfolios: one-hue scale, value in each cell."""
+    t = THEMES[dark]
+    steps = t["ramp"] if not dark else t["ramp"][::-1]
+    fig = go.Figure(go.Heatmap(
+        z=matrix.values.round(3), x=list(matrix.columns), y=list(matrix.index), zmin=0, zmax=1,
+        colorscale=[[i / (len(steps) - 1), c] for i, c in enumerate(steps)],
+        text=matrix.map(lambda v: "" if pd.isna(v) else f"{v:.2f}").values, texttemplate="%{text}",
+        textfont=dict(size=12), xgap=2, ygap=2,
+        colorbar=dict(title=dict(text="overlap", font=dict(color=t["text2"])), tickfont=dict(color=t["muted"]),
+                      outlinewidth=0, thickness=12),
+        hovertemplate="%{y} vs %{x}<br>overlap %{z:.3f}<extra></extra>",
+    ))
+    fig.update_yaxes(autorange="reversed", showgrid=False)
+    fig.update_xaxes(showgrid=False)
+    return _style(fig, title, dark, height=80 + 52 * len(matrix))
