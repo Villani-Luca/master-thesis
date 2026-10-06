@@ -17,6 +17,11 @@ from torch.nn.modules.dropout import Dropout
 from torch.nn.modules.linear import Linear
 from torch.nn.modules.normalization import LayerNorm
 
+from xaifin.data.datasets import DayBatch, alpha158_splits
+from xaifin.data.features import alpha158_names, market_names
+from xaifin.data.normalization import cs_zscore, drop_extreme
+from xaifin.models.base import ModelAdapter
+
 N_ALPHA = 157  # FinBench --gate_input_start_index
 
 
@@ -226,3 +231,52 @@ def build_master(n_market: int, d_model=256, t_nhead=4, s_nhead=2, dropout=0.5, 
     return MASTER(d_feat=N_ALPHA, d_model=d_model, t_nhead=t_nhead, s_nhead=s_nhead, T_dropout_rate=dropout,
                   S_dropout_rate=dropout, gate_input_start_index=N_ALPHA,
                   gate_input_end_index=N_ALPHA + n_market, beta=beta)
+
+
+class MASTERAdapter(ModelAdapter):
+    """MASTER as FinBench trains it (Regression/MASTER/train.py, base_model.py).
+
+    Data: Alpha158 + market features, own-row windows (data.datasets.alpha158_splits); batch.y is
+    the raw forward return over pred_len days. Training: drop the 2.5% label tails, z-score the
+    rest, MSE; Adam, no scheduler, gradients clipped at 3. Scored against the daily z-score of the
+    labels, without dropping tails. FinBench stops when the training loss falls below
+    `train_stop_loss_thred` and keeps the last epoch; the Step 3 trainer decides the stopping rule.
+    FinBench never passes --seed to MASTERModel (train.py:176), so its runs are not seeded at all;
+    the adapter seeds every generator.
+    """
+
+    name = "MASTER"
+    group = "alpha158"
+    HPARAMS = {
+        "d_model": 256, "t_nhead": 4, "s_nhead": 2, "dropout": 0.5, "beta": 5,
+        "lr": 1e-5, "n_epochs": 40, "grad_clip": 3.0, "scheduler_step": None, "train_stop_loss_thred": 0.95,
+    }
+
+    @property
+    def feature_names(self) -> list[str]:
+        return alpha158_names() + market_names(self.cfg.universe)
+
+    def build_model(self) -> nn.Module:
+        h = self.hparams
+        return build_master(len(market_names(self.cfg.universe)), h["d_model"], h["t_nhead"], h["s_nhead"],
+                            h["dropout"], h["beta"])
+
+    def load_splits(self) -> dict:
+        c = self.cfg
+        return alpha158_splits(c.universe, c.test_year, c.seq_len, c.pred_len, market=True, clean=c.clean)
+
+    def forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
+        return self.model(x.to(self.device))
+
+    def training_loss(self, batch: DayBatch) -> torch.Tensor:
+        mask, label = drop_extreme(batch.y.to(self.device))
+        label = cs_zscore(label)
+        pred = self.model(batch.x.to(self.device)[mask])
+        keep = ~torch.isnan(label)
+        return torch.mean((pred[keep] - label[keep]) ** 2)
+
+    def configure_optimizer(self):
+        return torch.optim.Adam(self.model.parameters(), lr=self.hparams["lr"]), None
+
+    def target(self, batch: DayBatch) -> torch.Tensor:
+        return cs_zscore(batch.y)

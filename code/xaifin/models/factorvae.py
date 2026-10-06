@@ -14,11 +14,17 @@ behaves exactly as in FinBench and FinBench state_dicts load as is. Changes (doc
 
 Not changed here (it requires retraining): FinBench builds the label with the lookback length
 instead of the horizon (issue 3, FactorVAE/train.py:87).
+
+FactorVAEAdapter (end of the module) wraps the model behind the ModelAdapter interface.
 """
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from xaifin.data.datasets import DayBatch, factorvae_splits
+from xaifin.data.features import alpha158_names
+from xaifin.models.base import ModelAdapter
 
 
 class FeatureExtractor(nn.Module):
@@ -237,3 +243,44 @@ def build_factorvae(num_latent=157, hidden_size=64, num_factor=96, num_portfolio
     factor_decoder = FactorDecoder(AlphaLayer(hidden_size), BetaLayer(hidden_size, num_factor))
     factor_predictor = FactorPredictor(hidden_size, num_factor)
     return FactorVAE(feature_extractor, factor_encoder, factor_decoder, factor_predictor)
+
+
+class FactorVAEAdapter(ModelAdapter):
+    """FactorVAE as FinBench trains it (Regression/FactorVAE/train.py, model.py), with the leak-free readout.
+
+    Data: Alpha158 without market features, calendar windows with filled gaps
+    (data.datasets.factorvae_splits); batch.y is the daily z-score of the forward return over
+    seq_len days (issue 3), clipped to [-3, 3]. Training: the VAE loss (reconstruction MSE + KL of
+    posterior vs prior factors), which needs the labels; Adam with cosine annealing stepped once
+    per day (batch), no gradient clipping, 30 epochs. FinBench keeps the epoch with the lowest
+    validation loss. Predictions and XAI use predict() (issues 1 and 2).
+    """
+
+    name = "FactorVAE"
+    group = "alpha158"
+    HPARAMS = {
+        "num_latent": 157, "hidden_size": 64, "num_factor": 96, "num_portfolio": 128,
+        "lr": 1e-4, "n_epochs": 30, "grad_clip": None, "scheduler_step": "batch",
+    }
+
+    @property
+    def feature_names(self) -> list[str]:
+        return alpha158_names()
+
+    def build_model(self) -> nn.Module:
+        h = self.hparams
+        return build_factorvae(h["num_latent"], h["hidden_size"], h["num_factor"], h["num_portfolio"])
+
+    def load_splits(self) -> dict:
+        return factorvae_splits(self.cfg.universe, self.cfg.test_year, self.cfg.seq_len, clean=self.cfg.clean)
+
+    def forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor:
+        return self.model.predict(x.to(self.device))
+
+    def training_loss(self, batch: DayBatch) -> torch.Tensor:
+        return self.model(batch.x.to(self.device), batch.y.to(self.device).reshape(-1, 1))[0]
+
+    def configure_optimizer(self):
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.hparams["lr"])
+        t_max = len(self.splits()["train"]) * self.hparams["n_epochs"]
+        return optimizer, torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=t_max)

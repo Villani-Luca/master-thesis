@@ -35,6 +35,8 @@ These were found by reading the code and, for the layout issue, by applying each
 | 4 | Alpha360 column layout | ⏸ kept as FinBench (changes training). Attribute on the original 360 columns; possible *Seconda parte* experiment |
 | 5 | MATCC market-file path | ✅ fixed: `xaifin.data.loading.market_path()` |
 | 6 | FinFormer label ≠ README | ✅ nothing to fix (documentation only) |
+| 7 | FactorVAE leaves KMID and KLEN unnormalized | ⏸ kept as FinBench (changes training). Found 2026-10-06 |
+| 8 | MASTER and MATCC runs are not seeded | ⏸ the adapters seed every generator (no effect on what is learned). Found 2026-10-06 |
 
 Proof that the copied FactorVAE is exact: same `state_dict` keys as FinBench, identical training-forward outputs under the same seed (train and eval mode), and `predict()` equal to FinBench's `prediction()` without the sampling noise (one-off check, 2026-09-29).
 
@@ -48,6 +50,8 @@ Proof that the copied FactorVAE is exact: same `state_dict` keys as FinBench, id
    The models still receive all 360 values in a consistent order, so they can learn, but not in chronological order: the temporal inductive bias of the GRU/attention layers doesn't apply as designed. For XAI, attribute on the **original 360 columns** and map to (series, lag) afterwards. That stays valid, but "temporal" readings of internal states or attention would not.
 5. **MATCC reads the market file from two different paths**: `train.py:232` uses `{data_path}/{nation}_market.csv`, while `train.py:416` uses `{data_path}/{universe}/{nation}_market.csv`. The local data only has the second.
 6. **FinFormer's label is a cross-sectional z-score**, not CSRank as the FinBench README states (`load_dataset.py:21, 64`).
+7. **FactorVAE doesn't normalize its first two features.** `FactorVAE/train.py:102` moves `datetime` and `instrument` into the index before building `RobustZScoreNormalization`, which still takes `df.columns[2:-1]` (`dataset.py:32`), so the z-score skips KMID and KLEN instead of the two key columns. They enter the model raw (KMID ranges from −0.31 to 1.55 in dji's y2020 training data, while the normalized features are clipped to [−3, 3]). Checked on dji y2020.
+8. **FinBench's MASTER and MATCC runs are not seeded.** MASTER's `train.py:176` never passes `--seed` to `MASTERModel`, so `SequenceModel` gets `seed=None` and seeds nothing; the seed only names the output folder. MATCC only calls `torch.cuda.manual_seed` (`train.py:424`), so its initial weights (built on the CPU) and the shuffling of the training days are not reproducible. FinBench's seed-to-seed spread for these two models is therefore uncontrolled randomness, and the Step 2 equivalence test can't expect identical training runs for them.
 
 ---
 

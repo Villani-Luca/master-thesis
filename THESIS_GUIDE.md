@@ -179,6 +179,8 @@ class ModelAdapter(Protocol):
     def forward(self, x: torch.Tensor, extras: dict) -> torch.Tensor   # [N,T,F] -> [N], differentiable, eval mode
 ```
 
+As implemented (`xaifin/models/base.py`): the adapter is built from a `RunConfig` (model, universe, test year, seed, T, L, `clean`, hyper-parameter overrides), which replaces `build(cfg)`. It also carries how FinBench trains the model, so the Step 3 trainer stays generic: `training_loss(batch)`, `configure_optimizer()`, `target(batch)` (the labels the predictions are scored against) and the loop settings in `hparams` (`n_epochs`, `grad_clip`, `scheduler_step`). `DayBatch.y` is the label as the model's training loss receives it (raw return for MASTER/MATCC, clipped daily z-score for FactorVAE).
+
 Points to keep in mind:
 - **Cross-sectional models.** MASTER, MATCC, FactorVAE, HIST and FinFormer mix information *across stocks* on the same day, so stock *i*'s prediction depends on the other stocks' inputs. Always explain a **whole day** (`x` = `[N,T,F]`) and attribute stock *i*'s output to *its own* inputs by default, holding the others fixed. Cross-stock attribution (how much stock *j* influences *i*) is an optional extra.
 - **Non-feature inputs** (`extras`): HIST and DiscoverPLF also consume `<universe>_inc_matrix.npz` (stock→concept) and `<universe>_market_cap.csv`. Hold these fixed during XAI and document it.
@@ -289,6 +291,8 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 - [ ] Write an adapter for each of the other five models, copying from `code/finbench/Regression/<MODEL>/` (`train.py`, model files, `dataloader`/`load_dataset`). Keep FinBench's preprocessing for each model exactly (see the normalization column of the FinBench README table). Record every deviation in the adapter docstring.
   - FinBench issues ([`docs/model_notes.md`](docs/model_notes.md)), decided 2026-09-29: **train exactly as FinBench, fix only readout and paths.** Fixed: FactorVAE leakage and random output (1, 2), MATCC market path (5). Kept and documented: FactorVAE `seq_len` label (3), Alpha360 layout (4). Still to do: tell the supervisor, together with the data issues of notebook 01 (*Observations* 3-6) and the data-quality filter.
   - [x] FactorVAE: model code + leak-free, deterministic `predict()` in `xaifin/models/factorvae.py` (tests in `code/tests/`). The adapter wrapper comes with the rest of Step 2.
+  - [x] **Alpha158 group** (2026-10-06): `models/base.py` (`RunConfig`, `ModelAdapter`), `MASTERAdapter`, `MATCCAdapter` (+ `models/matcc.py`, `training/lr_scheduler.py`), `FactorVAEAdapter` (+ `data.datasets.factorvae_splits`, Qlib's calendar windows with filled gaps). Checked on dji y2020: FactorVAE's train/valid/test samples identical to FinBench's `TSDataSampler`; MATCC's outputs and learning-rate schedule identical to FinBench's; the MASTER checkpoint gives its stored test metrics through the adapter; 30 training days run for each adapter. Two new FinBench findings: issues 7 (FactorVAE leaves KMID/KLEN unnormalized) and 8 (MASTER/MATCC runs not seeded) in `model_notes.md`.
+  - [ ] **Alpha360 group**: HIST, DiscoverPLF, FinFormer.
   - HIST/DiscoverPLF: pass `stock2concept` and `market_value` through `extras`.
   - FinFormer: pass the sector/industry adjacency through `extras`. Its label is a daily cross-sectional z-score, not the CSRank the README describes.
   - Alpha360 models: compute attributions on the **original 360 columns**, then map them to (series, lag).
@@ -527,7 +531,7 @@ Build the app page for each step **in the same milestone** as the step, not at t
 |---|---|---|---|---|
 | 0 Environment & reading | `00_environment_check` | `pyproject.toml` | – | ✅ done (model notes + chapter 2 drafted; read the papers yourself too) |
 | 1 Groups & universes | `01_universes_and_data` | `config`, `data/features` | `1_Data` | ✅ done |
-| 2 Adapters | `02_model_adapters` | `data/*`, `models/*` | `2_Models` | ◐ FactorVAE model with leak-free `predict()` done; MASTER model, data pipeline (`loading`, `normalization`, `datasets`) and `training/metrics` in the package, verified against FinBench |
+| 2 Adapters | `02_model_adapters` | `data/*`, `models/*` | `2_Models` | ◐ data pipeline, `training/metrics` and the Alpha158 adapters (MASTER, MATCC, FactorVAE) done and checked against FinBench; Alpha360 adapters, registry, equivalence test and app page to do |
 | 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ◐ MASTER seed 42 y2020 on dji/nasdaq100 (sp500: checkpoint only); results migrated to the §2.2 layout |
 | 4 Portfolio baseline | `04_portfolio_baseline` | `portfolio/topk`, `backtest` | `6_Portfolio` | ☐ |
 | 5 XAI engine | `05_xai_single_model` | `xai/*`, `scripts/explain` | `3_Explain` | ☐ |
