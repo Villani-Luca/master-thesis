@@ -120,11 +120,11 @@ _ALPHA360_CONSTANT = {"CLOSE0", "VOLUME0"}
 
 # Market statistics, one per index (and per window except price_change).
 MARKET_STATS = {
-    "price_change": "index price change on the day",
-    "mean_price_change": "mean index price change over the window (market trend)",
-    "std_price_change": "std of index price changes over the window (market volatility)",
-    "mean_vol": "mean index volume over the window",
-    "std_vol": "std of index volume over the window",
+    "price_change": "daily index return (adj close / previous - 1)",
+    "mean_price_change": "mean daily index return over the window (market trend)",
+    "std_price_change": "std of daily index returns over the window (market volatility)",
+    "mean_vol": "mean index volume over the window / today's volume",
+    "std_vol": "std of index volume over the window / today's volume",
 }
 _MARKET_NAME = re.compile(r"^((?:mean|std)_)?(price_change|vol)(?:_(\d+))?_(.+)$")
 

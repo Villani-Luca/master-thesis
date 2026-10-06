@@ -84,7 +84,9 @@ code/
 │   │   ├── loading.py          # read alpha158/360, market, constituents, labels
 │   │   ├── normalization.py    # RobustZScore (fit on train only), cross-sectional z-score
 │   │   ├── datasets.py         # daily cross-sectional datasets -> DayBatch
-│   │   └── features.py         # feature names + feature FAMILY mapping (Alpha158/360/market)
+│   │   ├── features.py         # feature names + feature FAMILY mapping (Alpha158/360/market)
+│   │   ├── quality.py          # samples with unusable prices, discarded when config.CLEAN_DATA
+│   │   └── summary.py          # Step 1 data summaries, cached in results/data_summary/
 │   ├── models/
 │   │   ├── base.py             # ModelAdapter protocol (see 2.3)
 │   │   ├── master.py  matcc.py  factorvae.py        # Alpha158 group
@@ -113,7 +115,8 @@ code/
 │   │   ├── variance.py         # seed vs model vs year vs universe decomposition
 │   │   └── regimes.py          # volatility regimes from market index data
 │   ├── perturb/                # Step 10: OHLCV noise, ablations, shifts
-│   └── store.py                # read/write the results store (2.2); single source of truth
+│   ├── store.py                # read/write the results store (2.2); single source of truth
+│   └── viz.py                  # plotly figures shared by notebooks and app
 ├── scripts/                    # CLI entry points for batch runs (grid over models/years/seeds)
 │   ├── train_rolling.py
 │   ├── run_portfolio.py
@@ -186,6 +189,7 @@ Points to keep in mind:
 
 - `code/finbench/` is a **read-only reference** (it is gitignored). Copy code out of it, never import from it or edit it. This is the convention already used in [`master_model.ipynb`](code/notebooks/master_model.ipynb).
 - All paths come from `xaifin.config`. Nothing is hard-coded in notebooks.
+- **Data-quality filter** (decided 2026-09-29): samples whose input or label reads a ticker of the wrong company, a stale price, a price below 0.01 or a one-day jump beyond ×3 are discarded in training, validation and test (`xaifin/data/quality.py`, `config.CLEAN_DATA = True`). It removes 0.07–0.9% of the samples (2.3% for DJI, all of them `PRG.US`). FinBench keeps them, so the filter is turned off only to reproduce FinBench in the Step 2 equivalence test.
 - Every run writes `config.json` with seed, dates, hyper-parameters and `git rev-parse HEAD`.
 - Seeds: `0, 5, 42`, the same three as the FinBench paper (§4.1). Three seeds are needed to separate seed noise from model differences in Step 7.
 - Default horizon: **T=20, L=5** (FinBench's "weekly" configuration). Alpha360 models use an effective lookback of **T=1**: one 360-vector per day, which already covers 60 days × 6 series. Optional extras: (T=5, L=1) and (T=60, L=20).
@@ -268,8 +272,8 @@ Within a group, compare features one to one. Across groups, compare at the **fam
   - Alpha158: `kbar` (KMID, KLEN, KUP, KLOW, KSFT…), `price` (OPEN0, HIGH0, LOW0), and each rolling operator (ROC, MA, STD, BETA, RSQR, RESI, MAX, MIN, QTLU, QTLD, RANK, RSV, IMAX, IMIN, IMXD, CORR, CORD, CNTP/N/D, SUMP/N/D, VMA, VSTD, WVMA, VSUMP/N/D) × window {5,10,20,30,60}.
   - Higher-level **semantic families**, shared across groups: `trend/momentum`, `volatility/range`, `volume`, `price-volume correlation`, `market`. Also horizon buckets `short (≤5d)`, `medium (10–20d)`, `long (30–60d)`.
   - Alpha360: series × lag bucket (lag 0–4 short, 5–19 medium, 20–59 long).
-- [ ] **Notebook `01_universes_and_data.ipynb`**: for each universe, show tickers over time (constituents), date coverage, NaN rates per feature, label distribution per year, correlation clusters among the Alpha158 features (many are near-duplicates, which matters for SHAP and for counterfactuals), and index realized volatility per year (input for Step 8).
-- [ ] **App page `1_Data.py`**: pick a universe → coverage chart, feature table with family, correlation heatmap, volatility timeline.
+- [x] **Notebook `01_universes_and_data.ipynb`**: for each universe, show tickers over time (constituents), date coverage, NaN rates per feature, label distribution per year, correlation clusters among the Alpha158 features (many are near-duplicates, which matters for SHAP and for counterfactuals), and index realized volatility per year (input for Step 8). → Done for all five universes, with the thesis tables of groups and universes and a data-quality section (extreme labels, tickers mapped to the wrong company). Summaries are cached by `xaifin.data.summary` in `results/data_summary/`, charts are in `xaifin/viz.py`. Key findings in the notebook's *Observations*: the EU membership history starts on 2020-09-30 (so there is no 2020 test year for SX5E/SXXP); DJI's "Procter & Gamble" (`PRG.US`) is PROG Holdings in every test year; wrong tickers and bad prices in SXXP and SP500, now discarded by the data-quality filter (§2.4); 20 exactly redundant Alpha158 features (SUMP/N/D, VSUMP/N/D).
+- [x] **App page `1_Data.py`**: pick a universe → coverage chart, feature table with family, correlation heatmap, volatility timeline. → Tabs: Coverage, Features, Labels, Redundancy, Market volatility, each with its table. Uncached universes get a "Compute summary" button.
 
 **Done when:** the config and family mapping exist, the notebook renders every universe, and the app page works.
 **Thesis artefacts:** table of groups; table of universes (N stocks, period, noise/volatility); feature-correlation figure.
@@ -281,15 +285,15 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 **Why:** training, XAI and the GUI all need to load any model and run it on any day through one interface (§2.3).
 
 ### Tasks
-- [ ] Move the MASTER code from `master_model.ipynb` into the package. The notebook was deleted from the working tree; read it with `git show 7fcec03:code/notebooks/master_model.ipynb`. Targets: `data/loading.py` (constituent filter, market merge, `extract_labels`; the market path is already done), `data/normalization.py` (`RobustZScoreNormalization`), `data/datasets.py` (the daily dataset that yields `DayBatch`), `models/master.py`, and `training/metrics.py` (the scipy-free IC/RankIC already written there).
+- [ ] Move the MASTER code from `master_model.ipynb` into the package. The notebook was deleted from the working tree; read it with `git show 7fcec03:code/notebooks/master_model.ipynb`. Targets: `data/loading.py` (constituent filter, market merge, `extract_labels`; the market path is already done), `data/normalization.py` (`RobustZScoreNormalization`), `data/datasets.py` (the daily dataset that yields `DayBatch`; it drops the samples of `quality.discarded_samples` after building the input sequences when `config.CLEAN_DATA`), `models/master.py`, and `training/metrics.py` (the scipy-free IC/RankIC already written there).
 - [ ] Write an adapter for each of the other five models, copying from `code/finbench/Regression/<MODEL>/` (`train.py`, model files, `dataloader`/`load_dataset`). Keep FinBench's preprocessing for each model exactly (see the normalization column of the FinBench README table). Record every deviation in the adapter docstring.
-  - FinBench issues ([`docs/model_notes.md`](docs/model_notes.md)), decided 2026-09-29: **train exactly as FinBench, fix only readout and paths.** Fixed: FactorVAE leakage and random output (1, 2), MATCC market path (5). Kept and documented: FactorVAE `seq_len` label (3), Alpha360 layout (4). Still to do: tell the supervisor.
+  - FinBench issues ([`docs/model_notes.md`](docs/model_notes.md)), decided 2026-09-29: **train exactly as FinBench, fix only readout and paths.** Fixed: FactorVAE leakage and random output (1, 2), MATCC market path (5). Kept and documented: FactorVAE `seq_len` label (3), Alpha360 layout (4). Still to do: tell the supervisor, together with the data issues of notebook 01 (*Observations* 3-6) and the data-quality filter.
   - [x] FactorVAE: model code + leak-free, deterministic `predict()` in `xaifin/models/factorvae.py` (tests in `code/tests/`). The adapter wrapper comes with the rest of Step 2.
   - HIST/DiscoverPLF: pass `stock2concept` and `market_value` through `extras`.
   - FinFormer: pass the sector/industry adjacency through `extras`. Its label is a daily cross-sectional z-score, not the CSRank the README describes.
   - Alpha360 models: compute attributions on the **original 360 columns**, then map them to (series, lag).
 - [ ] `models/registry.py`: `get_adapter("HIST")`.
-- [ ] **Equivalence test:** for each model, train briefly on `dji` y2020 with the FinBench script *and* with the adapter using the same seed, then check that predictions and metrics match within tolerance (except where an issue from `model_notes.md` was deliberately fixed). Put this in **notebook `02_model_adapters.ipynb`** (one section per model).
+- [ ] **Equivalence test:** for each model, train briefly on `dji` y2020 with the FinBench script *and* with the adapter using the same seed, then check that predictions and metrics match within tolerance (except where an issue from `model_notes.md` was deliberately fixed). Run it with `CLEAN_DATA = False`, since FinBench keeps the bad prices. Put this in **notebook `02_model_adapters.ipynb`** (one section per model).
 - [ ] **App page `2_Models.py`**: pick model / universe / year / seed → load the checkpoint, show config, training curve, test metrics, and the prediction-vs-label scatter for a chosen date.
 
 **Done when:** all six adapters pass the equivalence check and `adapter.forward(x, extras)` returns `[N]` on a `DayBatch` for each model.
@@ -305,7 +309,7 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 - [ ] Run the grid **in stages**, checking each stage before going on:
   1. MASTER × dji × y2020 × seed 42 (already done, re-run through the package);
   2. all 6 models × dji × y2020 × seed 42 → compare with the FinBench tables (`code/finbench/results.md`). FactorVAE will score lower if its test-time leakage is fixed;
-  3. all 6 models × {dji, nasdaq100, sx5e} × 2020–2024 × seed 42;
+  3. all 6 models × {dji, nasdaq100, sx5e} × 2020–2024 × seed 42. SX5E only has 2021–2024: its membership history starts on 2020-09-30, so the 2020 universe is empty (notebook 01);
   4. add seeds 0 and 5. The full grid is 6 × 3 × 5 × 3 = **270 runs**, so estimate the time per run first.
 - [ ] **Notebook `03_rolling_training.ipynb`**: tables of IC, RankIC, ICIR and MSE per model × universe × year (mean ± std over seeds). Sanity-check that the numbers are in the FinBench range. This notebook also documents *how weak the signal is*, which is the starting point of the thesis.
 - [ ] **App page `2_Models.py`** (extended): a metrics grid (heatmap model × year) for the selected universe.
@@ -522,7 +526,7 @@ Build the app page for each step **in the same milestone** as the step, not at t
 | Step | Notebook | Package | App page | Status |
 |---|---|---|---|---|
 | 0 Environment & reading | `00_environment_check` | `pyproject.toml` | – | ✅ done (model notes + chapter 2 drafted; read the papers yourself too) |
-| 1 Groups & universes | `01_universes_and_data` | `config`, `data/features` | `1_Data` | ◐ `config` and `features` done; notebook and app page to do |
+| 1 Groups & universes | `01_universes_and_data` | `config`, `data/features` | `1_Data` | ✅ done |
 | 2 Adapters | `02_model_adapters` | `data/*`, `models/*` | `2_Models` | ◐ FactorVAE model with leak-free `predict()` done; MASTER reproduced in `master_model.ipynb` (now only in git history, commit `7fcec03`) |
 | 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ◐ MASTER seed 42 y2020 on dji/nasdaq100 (sp500: checkpoint only); results migrated to the §2.2 layout |
 | 4 Portfolio baseline | `04_portfolio_baseline` | `portfolio/topk`, `backtest` | `6_Portfolio` | ☐ |
