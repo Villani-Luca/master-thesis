@@ -312,8 +312,10 @@ class FinFormerAdapter(ModelAdapter):
     def build_model(self) -> nn.Module:
         h = self.hparams
         model = Finformer(d_feat=h["d_feat"], hidden_size=h["hidden_size"], temporal_dropout=h["temporal_dropout"],
-                          snum_head=h["snum_head"])
-        for n in model.modules():  # Finformer_Model.__init__ (finformer.py)
+                          snum_head=h["snum_head"]).to(self.device)
+        # Finformer_Model.__init__ (finformer.py) moves the model to the device first, so on a GPU the
+        # xavier weights come from the CUDA generator: the initial weights depend on the device.
+        for n in model.modules():
             if isinstance(n, nn.Linear):
                 n.weight = nn.init.xavier_normal_(n.weight, gain=1.)
         return model

@@ -4,7 +4,7 @@ Every topic the work so far supports or the plan will produce, grouped by the ch
 
 **Status:** ✅ material ready · ◐ partly done · ☐ planned (step of [`THESIS_GUIDE.md`](../THESIS_GUIDE.md)) · ⭘ optional
 
-Last updated: 2026-10-06 (end of Step 2, adapters).
+Last updated: 2026-10-06 (Step 2, equivalence test).
 
 ---
 
@@ -87,7 +87,9 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 | Explaining cross-sectional models: explain a whole day, attribute stock *i* to its own inputs, hold extras (concepts, market cap, graph) fixed | ✅ design | guide §2.3 | method paragraph |
 | Gradients in eval mode need cuDNN off for GRUs (engineering note) | ✅ | `ModelAdapter.forward` | footnote |
 | Faster, memory-light dataset construction (array indexing vs per-day scans) | ✅ | `datasets.py` | footnote / appendix |
-| Equivalence test: adapters vs FinBench scripts, same seed | ☐ | Step 2, notebook 02 | **equivalence table** |
+| Equivalence test: adapters vs FinBench's own code, same seed, day order and random state; all six pass | ✅ | notebook 02 | **equivalence table** (initial weights, weights after one epoch, test predictions, metrics) |
+| FactorVAE: FinBench's `test()` is leaky and random (two calls, two RankICs for the same weights); the leak-free readout equals its `prediction()` without sampling | ✅ | notebook 02 §3 | small table |
+| FinFormer's MSE is not comparable (−CCC loss ignores scale): compare it on IC/RankIC | ✅ | notebook 02 obs. 5 | footnote |
 
 ## 5. Explainability methodology
 
@@ -171,4 +173,6 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 
 Ready now: universes table · rolling-window table · model-groups table · six-models summary table · feature catalog · feature-correlation figure · label distribution · volatility timeline · data-error table · data-filter before/after · FinBench issues table · training-loop differences table.
 
-Planned: performance table · IC per year · equivalence table · XAI methods table · XAI evaluation table · top-feature tables · family-importance figure · local heatmap · agreement heatmaps · variance decomposition · dominant features · regime timeline · portfolio table · seed-overlap figure · margin/fragility distribution · counterfactual distributions · app screenshots · framework diagram.
+Ready since Step 2: equivalence table.
+
+Planned: performance table · IC per year · XAI methods table · XAI evaluation table · top-feature tables · family-importance figure · local heatmap · agreement heatmaps · variance decomposition · dominant features · regime timeline · portfolio table · seed-overlap figure · margin/fragility distribution · counterfactual distributions · app screenshots · framework diagram.
