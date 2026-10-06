@@ -302,7 +302,8 @@ class FinFormerAdapter(ModelAdapter):
     group = "alpha360"
     HPARAMS = {
         "d_feat": 6, "hidden_size": 64, "temporal_dropout": 0.4, "snum_head": 4,
-        "lr": 2e-4, "n_epochs": 200, "grad_clip": None, "scheduler_step": None, "early_stop": 10,
+        "lr": 2e-4, "n_epochs": 200, "grad_clip": None, "scheduler_step": None,
+        "selection": "pooled_valid_ic", "early_stop": 10,
     }
 
     @property

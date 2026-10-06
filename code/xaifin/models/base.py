@@ -6,8 +6,9 @@ Training, XAI, portfolios and the app only talk to adapters. An adapter owns one
 - how FinBench builds its data (`day_batches`, `target`),
 - its prediction as a differentiable [N, T, F] -> [N] map (`forward`), which XAI explains,
 - how FinBench trains it (`training_loss`, `configure_optimizer`, and the loop settings in
-  `hparams`: n_epochs, grad_clip, scheduler_step and, where FinBench uses them, early_stop,
-  smooth_steps, eval_from_epoch), which the Step 3 trainer runs.
+  `hparams`: n_epochs, grad_clip, scheduler_step, the rule that picks the final weights
+  (`selection`, see xaifin.training.trainer.fit) and, where FinBench uses them, early_stop,
+  smooth_steps, eval_from_epoch, train_stop_loss_thred), which the Step 3 trainer runs.
 """
 
 import json
@@ -85,6 +86,11 @@ class ModelAdapter(ABC):
     @property
     def seq_len(self) -> int:
         return self.cfg.seq_len
+
+    @property
+    def label_horizon(self) -> int:
+        """Trading days between the last input day and the day the label is realized."""
+        return self.cfg.pred_len
 
     @property
     @abstractmethod

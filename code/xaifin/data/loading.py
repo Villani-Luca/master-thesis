@@ -1,5 +1,6 @@
 """Readers for the files under code/data/<universe>/."""
 
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -142,3 +143,9 @@ def load_sector_graph(universe: str) -> tuple[np.ndarray, list[str]]:
     """
     z = np.load(DATA_ROOT / universe / f"{universe}_sector_industry_matrix.npz")
     return (z["adj_matrix"][:11].max(axis=0) > 0).astype(np.float32), z["tickers"].tolist()
+
+
+@lru_cache(maxsize=None)
+def trading_days(universe: str) -> tuple[str, ...]:
+    """Every date of the universe's price file (ISO strings, sorted): its trading calendar."""
+    return tuple(sorted(pd.read_csv(prices_path(universe), usecols=["date"])["date"].unique()))

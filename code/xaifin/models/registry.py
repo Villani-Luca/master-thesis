@@ -24,8 +24,8 @@ ADAPTERS: dict[str, type[ModelAdapter]] = {
     a.name: a for a in (MASTERAdapter, MATCCAdapter, FactorVAEAdapter, HISTAdapter, DiscoverPLFAdapter, FinFormerAdapter)
 }
 
-# Regression/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/y<YEAR>
-_RUN_PATH = re.compile(r"^Regression/(?P<model>[^/]+)/(?P<universe>[^/]+)/sl(?P<seq_len>\d+)_pl(?P<pred_len>\d+)/"
+# .../<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/y<YEAR>, under Regression/ or results/legacy/
+_RUN_PATH = re.compile(r"(?:^|/)(?P<model>[^/]+)/(?P<universe>[^/]+)/sl(?P<seq_len>\d+)_pl(?P<pred_len>\d+)/"
                        r"seed(?P<seed>\d+)/y(?P<test_year>\d+)$")
 
 
@@ -41,7 +41,7 @@ def run_config(run_dir: Path) -> tuple[RunConfig, bool]:
     """The RunConfig of a trained run, and whether it was read from config.json.
 
     Runs saved by ModelAdapter.save have a config.json. Older runs (the first MASTER runs of
-    master_model.ipynb, migrated 2026-09-29) have none: their configuration is read from the
+    master_model.ipynb, now in results/legacy/) have none: their configuration is read from the
     folder names, with FinBench's hyper-parameters and clean=False, because they were trained
     before the data-quality filter existed.
     """
@@ -51,7 +51,7 @@ def run_config(run_dir: Path) -> tuple[RunConfig, bool]:
         c = json.loads(config_file.read_text())
         fields = {k: c[k] for k in ("model", "universe", "test_year", "seed", "seq_len", "pred_len", "clean")}
         return RunConfig(**fields, hparams=c.get("hparams", {})), True
-    match = _RUN_PATH.match(run_dir.resolve().relative_to(RESULTS_ROOT.resolve()).as_posix())
+    match = _RUN_PATH.search(run_dir.resolve().as_posix())
     if match is None:
         raise ValueError(f"{run_dir} has no config.json and is not a results-store run folder")
     g = match.groupdict()

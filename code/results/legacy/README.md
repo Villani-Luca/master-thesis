@@ -1,0 +1,3 @@
+# Legacy runs
+
+The first MASTER runs (seed 42, test year 2020; dji and nasdaq100), trained by the old `master_model.ipynb` (git commit `7fcec03`) and migrated to the results layout on 2026-09-29. They predate the package: no data-quality filter (`clean=False`), and a different rule for the kept epoch (best validation RankIC, patience 10) from FinBench's (stop when the training loss falls below 0.95, keep the last weights), which Step 3 uses. Moved here on 2026-10-06 so that Step 3's runs can take their place in `Regression/`; kept for reference. `xaifin.models.registry.load_run` can still open them.

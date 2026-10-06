@@ -174,7 +174,7 @@ class HISTAdapter(ModelAdapter):
     HPARAMS = {
         "d_feat": 6, "hidden_size": 64, "num_layers": 2, "K": 1,
         "lr": 2e-4, "n_epochs": 200, "grad_clip": 3.0, "scheduler_step": None,
-        "early_stop": 30, "smooth_steps": 5, "eval_from_epoch": 0,
+        "selection": "smoothed_valid_ic", "early_stop": 30, "smooth_steps": 5, "eval_from_epoch": 0,
     }
 
     @property

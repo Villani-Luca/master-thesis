@@ -249,7 +249,8 @@ class MASTERAdapter(ModelAdapter):
     group = "alpha158"
     HPARAMS = {
         "d_model": 256, "t_nhead": 4, "s_nhead": 2, "dropout": 0.5, "beta": 5,
-        "lr": 1e-5, "n_epochs": 40, "grad_clip": 3.0, "scheduler_step": None, "train_stop_loss_thred": 0.95,
+        "lr": 1e-5, "n_epochs": 40, "grad_clip": 3.0, "scheduler_step": None,
+        "selection": "train_loss_threshold", "train_stop_loss_thred": 0.95,
     }
 
     @property

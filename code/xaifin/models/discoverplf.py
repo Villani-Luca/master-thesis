@@ -470,7 +470,7 @@ class DiscoverPLFAdapter(ModelAdapter):
     HPARAMS = {
         "d_feat": 6, "hidden_size": 128, "num_layers": 1, "K": 1, "dilations": [1, 2, 5], "num_days": 60,
         "lr": 2e-4, "n_epochs": 50, "grad_clip": 3.0, "scheduler_step": None, "vae_weight": 5e-2,
-        "early_stop": 25, "smooth_steps": 5, "eval_from_epoch": 20,
+        "selection": "smoothed_valid_ic", "early_stop": 25, "smooth_steps": 5, "eval_from_epoch": 20,
     }
 
     @property

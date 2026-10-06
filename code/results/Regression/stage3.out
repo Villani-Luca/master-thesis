@@ -1,0 +1,186 @@
+train_rolling: models=['MASTER', 'MATCC', 'HIST', 'DiscoverPLF', 'FinFormer'] universes=['dji', 'nasdaq100', 'sx5e'] years=[2020, 2021, 2022, 2023, 2024] seeds=[42] T=20 L=5 clean=True
+[1/75] done already: D:\CodeProjects\master-thesis\code\results\Regression\MASTER\dji\sl20_pl5\seed42\y2020
+[2/75]
+MASTER dji y2021 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 982, 'valid': 253, 'test': 252}
+  epoch   0  train loss 1.1012  valid IC -0.0102  RankIC -0.0089  (8s)
+  epoch   1  train loss 1.0219  valid IC -0.0007  RankIC +0.0039  (8s)
+  epoch   2  train loss 0.9953  valid IC +0.0146  RankIC +0.0196  (8s)
+  epoch   3  train loss 0.9819  valid IC +0.0254  RankIC +0.0307  (8s)
+  epoch   4  train loss 0.9652  valid IC +0.0178  RankIC +0.0234  (8s)
+  epoch   5  train loss 0.9540  valid IC +0.0259  RankIC +0.0319  (8s)
+  epoch   6  train loss 0.9480  valid IC +0.0333  RankIC +0.0387  (8s)
+  kept epoch 6 of 7; test IC -0.0067 RankIC -0.0109 MSE 0.9832 (62s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\dji\sl20_pl5\seed42\y2021
+[3/75]
+MASTER dji y2022 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 983, 'valid': 252, 'test': 251}
+  epoch   0  train loss 1.1054  valid IC -0.0319  RankIC -0.0342  (8s)
+  epoch   1  train loss 1.0260  valid IC -0.0175  RankIC -0.0210  (8s)
+  epoch   2  train loss 0.9946  valid IC -0.0194  RankIC -0.0247  (8s)
+  epoch   3  train loss 0.9803  valid IC -0.0276  RankIC -0.0312  (8s)
+  epoch   4  train loss 0.9665  valid IC -0.0139  RankIC -0.0148  (8s)
+  epoch   5  train loss 0.9598  valid IC -0.0290  RankIC -0.0294  (8s)
+  epoch   6  train loss 0.9508  valid IC -0.0297  RankIC -0.0314  (8s)
+  epoch   7  train loss 0.9408  valid IC -0.0279  RankIC -0.0284  (8s)
+  kept epoch 7 of 8; test IC +0.0017 RankIC -0.0002 MSE 0.9889 (69s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\dji\sl20_pl5\seed42\y2022
+[4/75]
+MASTER dji y2023 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 984, 'valid': 251, 'test': 250}
+  epoch   0  train loss 1.1028  valid IC -0.0119  RankIC -0.0147  (8s)
+  epoch   1  train loss 1.0235  valid IC -0.0103  RankIC -0.0104  (8s)
+  epoch   2  train loss 0.9943  valid IC -0.0135  RankIC -0.0163  (8s)
+  epoch   3  train loss 0.9803  valid IC -0.0215  RankIC -0.0195  (8s)
+  epoch   4  train loss 0.9682  valid IC -0.0164  RankIC -0.0153  (8s)
+  epoch   5  train loss 0.9582  valid IC -0.0209  RankIC -0.0179  (8s)
+  epoch   6  train loss 0.9479  valid IC -0.0128  RankIC -0.0089  (8s)
+  kept epoch 6 of 7; test IC +0.0142 RankIC +0.0060 MSE 0.9796 (61s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\dji\sl20_pl5\seed42\y2023
+[5/75]
+MASTER dji y2024 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 984, 'valid': 250, 'test': 252}
+  epoch   0  train loss 1.1019  valid IC -0.0041  RankIC -0.0044  (8s)
+  epoch   1  train loss 1.0236  valid IC -0.0045  RankIC +0.0007  (8s)
+  epoch   2  train loss 0.9935  valid IC -0.0085  RankIC -0.0082  (8s)
+  epoch   3  train loss 0.9820  valid IC -0.0010  RankIC +0.0003  (8s)
+  epoch   4  train loss 0.9716  valid IC +0.0040  RankIC +0.0025  (8s)
+  epoch   5  train loss 0.9604  valid IC -0.0045  RankIC +0.0008  (8s)
+  epoch   6  train loss 0.9523  valid IC -0.0067  RankIC +0.0002  (8s)
+  epoch   7  train loss 0.9426  valid IC -0.0043  RankIC -0.0060  (8s)
+  kept epoch 7 of 8; test IC +0.0264 RankIC +0.0201 MSE 0.9745 (71s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\dji\sl20_pl5\seed42\y2024
+[6/75]
+MASTER nasdaq100 y2020 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 982, 'valid': 252, 'test': 253}
+  epoch   0  train loss 1.0996  valid IC -0.0163  RankIC -0.0170  (8s)
+  epoch   1  train loss 1.0276  valid IC -0.0027  RankIC -0.0074  (9s)
+  epoch   2  train loss 1.0079  valid IC +0.0190  RankIC +0.0095  (8s)
+  epoch   3  train loss 0.9965  valid IC +0.0065  RankIC -0.0040  (8s)
+  epoch   4  train loss 0.9902  valid IC +0.0182  RankIC +0.0122  (8s)
+  epoch   5  train loss 0.9859  valid IC +0.0065  RankIC +0.0008  (8s)
+  epoch   6  train loss 0.9824  valid IC +0.0219  RankIC +0.0164  (8s)
+  epoch   7  train loss 0.9789  valid IC +0.0219  RankIC +0.0166  (8s)
+  epoch   8  train loss 0.9763  valid IC +0.0232  RankIC +0.0195  (9s)
+  epoch   9  train loss 0.9719  valid IC +0.0250  RankIC +0.0196  (8s)
+  epoch  10  train loss 0.9687  valid IC +0.0328  RankIC +0.0256  (8s)
+  epoch  11  train loss 0.9655  valid IC +0.0295  RankIC +0.0236  (8s)
+  epoch  12  train loss 0.9621  valid IC +0.0201  RankIC +0.0167  (9s)
+  epoch  13  train loss 0.9590  valid IC +0.0264  RankIC +0.0199  (8s)
+  epoch  14  train loss 0.9555  valid IC +0.0306  RankIC +0.0239  (8s)
+  epoch  15  train loss 0.9517  valid IC +0.0183  RankIC +0.0156  (9s)
+  epoch  16  train loss 0.9486  valid IC +0.0344  RankIC +0.0241  (9s)
+  kept epoch 16 of 17; test IC +0.0282 RankIC +0.0390 MSE 1.0105 (159s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\nasdaq100\sl20_pl5\seed42\y2020
+[7/75]
+MASTER nasdaq100 y2021 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 982, 'valid': 253, 'test': 252}
+  epoch   0  train loss 1.1005  valid IC +0.0215  RankIC +0.0161  (9s)
+  epoch   1  train loss 1.0296  valid IC +0.0416  RankIC +0.0291  (8s)
+  epoch   2  train loss 1.0081  valid IC +0.0386  RankIC +0.0365  (8s)
+  epoch   3  train loss 0.9986  valid IC +0.0396  RankIC +0.0372  (9s)
+  epoch   4  train loss 0.9915  valid IC +0.0580  RankIC +0.0485  (8s)
+  epoch   5  train loss 0.9847  valid IC +0.0562  RankIC +0.0494  (8s)
+  epoch   6  train loss 0.9804  valid IC +0.0600  RankIC +0.0479  (8s)
+  epoch   7  train loss 0.9771  valid IC +0.0714  RankIC +0.0587  (9s)
+  epoch   8  train loss 0.9744  valid IC +0.0693  RankIC +0.0586  (8s)
+  epoch   9  train loss 0.9710  valid IC +0.0675  RankIC +0.0600  (8s)
+  epoch  10  train loss 0.9684  valid IC +0.0694  RankIC +0.0607  (9s)
+  epoch  11  train loss 0.9649  valid IC +0.0701  RankIC +0.0641  (9s)
+  epoch  12  train loss 0.9595  valid IC +0.0772  RankIC +0.0687  (8s)
+  epoch  13  train loss 0.9571  valid IC +0.0662  RankIC +0.0639  (8s)
+  epoch  14  train loss 0.9529  valid IC +0.0718  RankIC +0.0655  (9s)
+  epoch  15  train loss 0.9493  valid IC +0.0712  RankIC +0.0639  (8s)
+  kept epoch 15 of 16; test IC +0.0137 RankIC +0.0110 MSE 1.0117 (150s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\nasdaq100\sl20_pl5\seed42\y2021
+[8/75]
+MASTER nasdaq100 y2022 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 983, 'valid': 252, 'test': 251}
+  epoch   0  train loss 1.1038  valid IC -0.0036  RankIC -0.0063  (9s)
+  epoch   1  train loss 1.0311  valid IC -0.0109  RankIC -0.0117  (8s)
+  epoch   2  train loss 1.0065  valid IC +0.0014  RankIC +0.0002  (8s)
+  epoch   3  train loss 0.9956  valid IC +0.0021  RankIC +0.0073  (8s)
+  epoch   4  train loss 0.9883  valid IC -0.0100  RankIC -0.0053  (8s)
+  epoch   5  train loss 0.9828  valid IC +0.0001  RankIC +0.0071  (8s)
+  epoch   6  train loss 0.9797  valid IC -0.0008  RankIC +0.0010  (8s)
+  epoch   7  train loss 0.9754  valid IC +0.0052  RankIC +0.0096  (8s)
+  epoch   8  train loss 0.9723  valid IC +0.0060  RankIC +0.0059  (8s)
+  epoch   9  train loss 0.9680  valid IC +0.0071  RankIC +0.0059  (8s)
+  epoch  10  train loss 0.9635  valid IC +0.0057  RankIC +0.0046  (8s)
+  epoch  11  train loss 0.9581  valid IC +0.0022  RankIC +0.0037  (9s)
+  epoch  12  train loss 0.9555  valid IC -0.0013  RankIC +0.0010  (8s)
+  epoch  13  train loss 0.9517  valid IC +0.0019  RankIC -0.0019  (8s)
+  epoch  14  train loss 0.9477  valid IC +0.0040  RankIC +0.0036  (9s)
+  kept epoch 14 of 15; test IC +0.0155 RankIC +0.0102 MSE 1.0237 (142s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\nasdaq100\sl20_pl5\seed42\y2022
+[9/75]
+MASTER nasdaq100 y2023 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 984, 'valid': 251, 'test': 250}
+  epoch   0  train loss 1.1019  valid IC +0.0042  RankIC -0.0057  (8s)
+  epoch   1  train loss 1.0326  valid IC +0.0086  RankIC +0.0038  (9s)
+  epoch   2  train loss 1.0108  valid IC +0.0015  RankIC -0.0029  (8s)
+  epoch   3  train loss 0.9962  valid IC -0.0210  RankIC -0.0286  (8s)
+  epoch   4  train loss 0.9904  valid IC -0.0129  RankIC -0.0166  (8s)
+  epoch   5  train loss 0.9846  valid IC -0.0216  RankIC -0.0262  (8s)
+  epoch   6  train loss 0.9811  valid IC -0.0017  RankIC -0.0013  (8s)
+  epoch   7  train loss 0.9767  valid IC -0.0024  RankIC -0.0033  (8s)
+  epoch   8  train loss 0.9731  valid IC -0.0014  RankIC +0.0025  (9s)
+  epoch   9  train loss 0.9700  valid IC -0.0111  RankIC -0.0062  (9s)
+  epoch  10  train loss 0.9641  valid IC -0.0068  RankIC -0.0068  (9s)
+  epoch  11  train loss 0.9614  valid IC -0.0048  RankIC +0.0019  (9s)
+  epoch  12  train loss 0.9560  valid IC +0.0031  RankIC +0.0114  (8s)
+  epoch  13  train loss 0.9530  valid IC -0.0120  RankIC -0.0071  (8s)
+  epoch  14  train loss 0.9497  valid IC -0.0026  RankIC +0.0018  (8s)
+  kept epoch 14 of 15; test IC -0.0002 RankIC +0.0070 MSE 1.0100 (140s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\nasdaq100\sl20_pl5\seed42\y2023
+[10/75]
+MASTER nasdaq100 y2024 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 984, 'valid': 250, 'test': 252}
+  epoch   0  train loss 1.1030  valid IC +0.0052  RankIC +0.0053  (8s)
+  epoch   1  train loss 1.0327  valid IC -0.0047  RankIC -0.0001  (8s)
+  epoch   2  train loss 1.0107  valid IC -0.0009  RankIC +0.0006  (10s)
+  epoch   3  train loss 0.9980  valid IC +0.0009  RankIC +0.0026  (10s)
+  epoch   4  train loss 0.9909  valid IC -0.0054  RankIC +0.0014  (11s)
+  epoch   5  train loss 0.9864  valid IC -0.0180  RankIC -0.0092  (11s)
+  epoch   6  train loss 0.9815  valid IC +0.0007  RankIC +0.0033  (11s)
+  epoch   7  train loss 0.9779  valid IC -0.0111  RankIC -0.0023  (12s)
+  epoch   8  train loss 0.9735  valid IC -0.0050  RankIC +0.0008  (11s)
+  epoch   9  train loss 0.9695  valid IC -0.0040  RankIC +0.0007  (11s)
+  epoch  10  train loss 0.9641  valid IC -0.0039  RankIC +0.0032  (12s)
+  epoch  11  train loss 0.9606  valid IC -0.0080  RankIC -0.0056  (12s)
+  epoch  12  train loss 0.9567  valid IC -0.0081  RankIC -0.0057  (11s)
+  epoch  13  train loss 0.9529  valid IC -0.0181  RankIC -0.0138  (11s)
+  epoch  14  train loss 0.9488  valid IC -0.0082  RankIC -0.0049  (13s)
+  kept epoch 14 of 15; test IC -0.0017 RankIC +0.0091 MSE 1.0137 (179s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\nasdaq100\sl20_pl5\seed42\y2024
+[11/75] skipped: no sx5e index members at the start of 2020
+[12/75]
+MASTER sx5e y2021 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 1001, 'valid': 258, 'test': 258}
+  epoch   0  train loss 1.0841  valid IC +0.0009  RankIC -0.0133  (11s)
+  epoch   1  train loss 1.0270  valid IC +0.0105  RankIC -0.0008  (11s)
+  epoch   2  train loss 0.9968  valid IC +0.0103  RankIC -0.0024  (11s)
+  epoch   3  train loss 0.9869  valid IC +0.0161  RankIC +0.0034  (12s)
+  epoch   4  train loss 0.9774  valid IC +0.0182  RankIC +0.0043  (11s)
+  epoch   5  train loss 0.9704  valid IC +0.0240  RankIC +0.0061  (12s)
+  epoch   6  train loss 0.9661  valid IC +0.0288  RankIC +0.0118  (11s)
+  epoch   7  train loss 0.9600  valid IC +0.0481  RankIC +0.0321  (11s)
+  epoch   8  train loss 0.9562  valid IC +0.0308  RankIC +0.0148  (11s)
+  epoch   9  train loss 0.9522  valid IC +0.0322  RankIC +0.0139  (11s)
+  epoch  10  train loss 0.9449  valid IC +0.0360  RankIC +0.0166  (11s)
+  kept epoch 10 of 11; test IC +0.0253 RankIC +0.0214 MSE 0.9970 (130s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\sx5e\sl20_pl5\seed42\y2021
+[13/75]
+MASTER sx5e y2022 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 1001, 'valid': 258, 'test': 257}
+  epoch   0  train loss 1.0895  valid IC -0.0056  RankIC -0.0025  (11s)
+  epoch   1  train loss 1.0238  valid IC +0.0112  RankIC +0.0157  (11s)
+  epoch   2  train loss 0.9992  valid IC +0.0269  RankIC +0.0242  (10s)
+  epoch   3  train loss 0.9859  valid IC +0.0259  RankIC +0.0222  (11s)
+  epoch   4  train loss 0.9792  valid IC +0.0250  RankIC +0.0200  (11s)
+  epoch   5  train loss 0.9697  valid IC +0.0296  RankIC +0.0239  (11s)
+  epoch   6  train loss 0.9651  valid IC +0.0241  RankIC +0.0221  (11s)
+  epoch   7  train loss 0.9597  valid IC +0.0233  RankIC +0.0157  (11s)
+  epoch   8  train loss 0.9533  valid IC +0.0289  RankIC +0.0221  (11s)
+  epoch   9  train loss 0.9487  valid IC +0.0341  RankIC +0.0276  (11s)
+  kept epoch 9 of 10; test IC -0.0071 RankIC -0.0129 MSE 1.0088 (117s) -> D:\CodeProjects\master-thesis\code\results\Regression\MASTER\sx5e\sl20_pl5\seed42\y2022
+[14/75]
+MASTER sx5e y2023 seed 42 (T=20, L=5, clean=True) on cuda: MASTER (base_model.py fit): stop after the first epoch whose training loss is at most train_stop_loss_thred, keep the last weights
+  days: {'train': 1004, 'valid': 257, 'test': 255}
+  epoch   0  train loss 1.0938  valid IC -0.0170  RankIC -0.0249  (11s)
+  epoch   1  train loss 1.0240  valid IC -0.0148  RankIC -0.0167  (11s)
+  epoch   2  train loss 0.9967  valid IC -0.0157  RankIC -0.0133  (11s)
+  epoch   3  train loss 0.9851  valid IC -0.0066  RankIC -0.0039  (11s)
+  epoch   4  train loss 0.9748  valid IC -0.0143  RankIC -0.0109  (11s)
+  epoch   5  train loss 0.9702  valid IC -0.0031  RankIC +0.0003  (11s)
+  epoch   6  train loss 0.9632  valid IC -0.0013  RankIC +0.0039  (11s)

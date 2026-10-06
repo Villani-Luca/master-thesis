@@ -1,8 +1,10 @@
 """Plotly figures shared by the notebooks and the Streamlit app, so both draw identical charts
 (THESIS_GUIDE.md Step 11).
 
-Colors follow the dataviz reference palette: categorical slots in fixed order (validated for up to
-3 series in light and dark mode), a single-hue blue ramp for magnitudes, recessive hairline axes.
+Colors follow the dataviz reference palette: categorical slots in fixed order (the first 6 validated
+as adjacent series in light and dark mode; slots 4-6 and two of the first three are below 3:1 on the
+light surface, so charts that use them carry direct labels and a table view), a single-hue blue ramp
+for magnitudes, a blue-red diverging scale with a gray midpoint for signed values, recessive axes.
 `dark=True` selects the dark-mode steps; it is not an automatic inversion. Every figure is drawn
 from a DataFrame that should be shown next to it as the table view.
 """
@@ -14,19 +16,24 @@ from plotly.subplots import make_subplots
 from xaifin.config import STUDY_END, STUDY_START, UNIVERSE_NAMES
 from xaifin.data.features import FAMILIES
 
+# Fixed color slot of each model: the color follows the model on every chart, whatever is filtered.
+MODEL_ORDER = ["MASTER", "MATCC", "FactorVAE", "HIST", "DiscoverPLF", "FinFormer"]
+
 FONT = 'system-ui, -apple-system, "Segoe UI", sans-serif'
 THEMES = {
     False: {
         "surface": "#fcfcfb", "text": "#0b0b0b", "text2": "#52514e", "muted": "#898781",
         "grid": "#e1e0d9", "axis": "#c3c2b7", "band": "rgba(11,11,11,0.05)",
-        "series": ["#2a78d6", "#eb6834", "#1baf7a"],
+        "series": ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"],
         "ramp": ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"],
+        "diverging": ["#e34948", "#f0efec", "#2a78d6"],
     },
     True: {
         "surface": "#1a1a19", "text": "#ffffff", "text2": "#c3c2b7", "muted": "#898781",
         "grid": "#2c2c2a", "axis": "#383835", "band": "rgba(255,255,255,0.06)",
-        "series": ["#3987e5", "#d95926", "#199e70"],
+        "series": ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181", "#008300"],
         "ramp": ["#0d366b", "#184f95", "#256abf", "#3987e5", "#6da7ec", "#9ec5f4", "#cde2fb"],
+        "diverging": ["#e66767", "#383835", "#3987e5"],
     },
 }
 
@@ -219,3 +226,47 @@ def prediction_scatter(day: pd.DataFrame, title: str, k: int, dark: bool = False
     fig.update_xaxes(title_text="Prediction", zeroline=False)
     fig.update_yaxes(title_text="Label (daily z-score)")
     return _style(fig, title, dark)
+
+
+def metric_heatmap(table: pd.DataFrame, metric: str, title: str, dark: bool = False) -> go.Figure:
+    """Model x test year grid of a signed metric (IC, RankIC, ...): blue above 0, red below, gray at 0.
+
+    `table` has model, test_year and `metric` (one row per cell, e.g. the mean over seeds).
+    """
+    t = THEMES[dark]
+    grid = table.pivot(index="model", columns="test_year", values=metric)
+    grid = grid.reindex([m for m in MODEL_ORDER if m in grid.index])
+    limit = float(abs(grid).max().max()) or 1.0
+    fig = go.Figure(go.Heatmap(
+        z=grid.values.round(4), x=[str(y) for y in grid.columns], y=list(grid.index), zmid=0, zmin=-limit, zmax=limit,
+        colorscale=[[0, t["diverging"][0]], [0.5, t["diverging"][1]], [1, t["diverging"][2]]],
+        text=grid.map(lambda v: "" if pd.isna(v) else f"{v:+.3f}").values, texttemplate="%{text}",
+        textfont=dict(size=12, color=t["text"]), xgap=2, ygap=2,
+        colorbar=dict(title=dict(text=metric, font=dict(color=t["text2"])), tickfont=dict(color=t["muted"]),
+                      outlinewidth=0, thickness=12),
+        hovertemplate="%{y}, %{x}<br>" + metric + " %{z:+.4f}<extra></extra>",
+    ))
+    fig.update_xaxes(title_text="Test year", type="category", showline=False)
+    fig.update_yaxes(autorange="reversed", showgrid=False)
+    return _style(fig, title, dark, height=80 + 52 * len(grid))
+
+
+def metric_by_year_chart(table: pd.DataFrame, metric: str, title: str, dark: bool = False) -> go.Figure:
+    """One line per model across test years; `table` has model, test_year, `metric` (optional `metric`_std band)."""
+    t = THEMES[dark]
+    fig = go.Figure()
+    ends = []
+    for model in [m for m in MODEL_ORDER if m in set(table["model"])]:
+        d = table[table["model"] == model].sort_values("test_year")
+        color = t["series"][MODEL_ORDER.index(model)]
+        x, y = d["test_year"].astype(str), d[metric].round(4)
+        fig.add_trace(go.Scatter(x=x, y=y, name=model, mode="lines+markers", line=dict(color=color, width=2),
+                                 marker=dict(size=8, color=color, line=dict(color=t["surface"], width=2))))
+        ends.append((x.iloc[-1], y.iloc[-1], model))
+    span = float(table[metric].max() - table[metric].min()) or 1.0
+    _end_labels(fig, ends, span, dark)
+    fig.add_hline(y=0, line=dict(color=t["axis"], width=1))
+    fig.update_layout(hovermode="x unified")
+    fig.update_xaxes(title_text="Test year", type="category")
+    fig.update_yaxes(title_text=metric, hoverformat="+.4f")
+    return _style(fig, title, dark, right_margin=110)

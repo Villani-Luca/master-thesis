@@ -13,6 +13,7 @@ from xaifin import viz
 from xaifin.config import TOP_K, UNIVERSE_NAMES
 from xaifin.models.registry import find_runs, load_run, run_config
 from xaifin.training.metrics import daily_ic, summary
+from xaifin.training.rolling import collect_results
 
 st.set_page_config(page_title="Models", layout="wide")
 dark = st.context.theme.type == "dark"
@@ -27,6 +28,11 @@ st.caption(
 @st.cache_data(show_spinner=False)
 def runs() -> pd.DataFrame:
     return find_runs()
+
+
+@st.cache_data(show_spinner=False)
+def results() -> pd.DataFrame:
+    return collect_results()
 
 
 @st.cache_resource(show_spinner=False)
@@ -54,6 +60,32 @@ if table.empty:
 
 with st.expander(f"All runs ({len(table)})"):
     st.dataframe(table.drop(columns="path"), hide_index=True)
+
+st.subheader("Test metrics: model × test year")
+done = results()
+if done.empty:
+    st.info("No finished run has a config.json yet.")
+else:
+    left, middle, right = st.columns(3)
+    grid_universe = left.selectbox("Universe", sorted(done["universe"].unique()), format_func=UNIVERSE_NAMES.get,
+                                  key="grid_universe")
+    metric = middle.selectbox("Metric", ["RankIC", "IC", "RankICIR", "ICIR", "IC_pooled"], key="grid_metric")
+    horizons = sorted(done[["seq_len", "pred_len"]].drop_duplicates().itertuples(index=False, name=None))
+    seq_len, pred_len = right.selectbox("T, L", horizons, format_func=lambda h: f"T={h[0]}, L={h[1]}")
+    cells = done[(done["universe"] == grid_universe) & (done["seq_len"] == seq_len) & (done["pred_len"] == pred_len)]
+    grid = cells.groupby(["model", "test_year"])[metric].agg(["mean", "std", "count"]).reset_index()
+    grid = grid.rename(columns={"mean": metric, "std": f"{metric} std", "count": "seeds"})
+    title = f"{UNIVERSE_NAMES[grid_universe]}: test {metric} by model and test year"
+    st.plotly_chart(viz.metric_heatmap(grid, metric, title, dark), theme=None, width="stretch")
+    st.caption(
+        f"Mean over the seeds trained so far (column 'seeds' below). Blue: {metric} above 0, red: below. "
+        "Each model keeps its weights with FinBench's own rule (THESIS_GUIDE.md Step 3)."
+    )
+    st.dataframe(grid.pivot(index="model", columns="test_year", values=metric).style.format("{:+.4f}", na_rep="–"))
+    with st.expander("Cells with seed counts and standard deviations"):
+        st.dataframe(grid, hide_index=True)
+
+st.subheader("One run")
 
 columns = st.columns(5)
 choice = table

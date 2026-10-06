@@ -260,12 +260,16 @@ class FactorVAEAdapter(ModelAdapter):
     group = "alpha158"
     HPARAMS = {
         "num_latent": 157, "hidden_size": 64, "num_factor": 96, "num_portfolio": 128,
-        "lr": 1e-4, "n_epochs": 30, "grad_clip": None, "scheduler_step": "batch",
+        "lr": 1e-4, "n_epochs": 30, "grad_clip": None, "scheduler_step": "batch", "selection": "min_valid_loss",
     }
 
     @property
     def feature_names(self) -> list[str]:
         return alpha158_names()
+
+    @property
+    def label_horizon(self) -> int:
+        return self.cfg.seq_len  # issue 3: FinBench builds FactorVAE's label over seq_len days
 
     def build_model(self) -> nn.Module:
         h = self.hparams

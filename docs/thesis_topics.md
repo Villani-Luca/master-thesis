@@ -43,7 +43,7 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 | Topic still to add | Status | Material |
 |---|---|---|
 | Qlib's Alpha158/Alpha360 (paper missing from `docs/papers/`, arXiv 2009.11189) | ☐ | `finbench/Evaluation/features/` |
-| FinBench as benchmark and reproducibility context | ◐ | FinBench paper §4.1, `model_notes.md` |
+| FinBench as the benchmark the models and protocol come from | ◐ | FinBench paper §4.1 |
 | Resolve the `% TODO` reference to the methodology chapter | ☐ | `02_second_chapter.tex:88` |
 
 ## 3. Data
@@ -59,7 +59,7 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 | Feature families, sources and horizons as the common language between the two groups (overlap only on momentum, volume, candle) | ✅ | notebook 01 obs. 1 | table + paragraph; basis for cross-group comparison |
 | Alpha158 redundancy: 103–105 correlation groups, 27–29 near-duplicate groups, 20 exactly redundant features (SUMP/N/D, VSUMP/N/D) | ✅ | notebook 01 §7, obs. 9 | **feature-correlation figure**; consequence for SHAP and counterfactuals |
 | Missing values negligible (<0.8%; CORD up to 3–4.8%) and filled with 0 = training median | ✅ | notebook 01 §4, obs. 7 | one paragraph |
-| **Data-quality audit**: wrong-company tickers (DJI `PRG.US` = PROG Holdings, not P&G, in every DJI test year; `TEN.US`, `TOM.F`), stale prices (`SAABY.US`), near-zero prices (`ORRON.ST`, `DISH.US`), unadjusted corporate actions (`VIV.PA`) | ✅ | notebook 01 §5, obs. 4–5 | **table of data errors**; strong finding about a public benchmark |
+| **Data quality**: wrong-company tickers (DJI `PRG.US` = PROG Holdings, not P&G, in every DJI test year; `TEN.US`, `TOM.F`), stale prices (`SAABY.US`), near-zero prices (`ORRON.ST`, `DISH.US`), unadjusted corporate actions (`VIV.PA`) | ✅ | notebook 01 §5, obs. 4–5 | **table of data errors** (what the filter removes and why) |
 | Data-quality filter: what it discards (0.07–0.9% of samples, 2.3–3.5% for DJI), how it is applied to samples rather than rows, and its effect on label volatility (e.g. STOXX Europe 600 2024: 30% → 4.4%) | ✅ | `data/quality.py`, notebook 01 obs. 6, guide §2.4 | method paragraph + before/after table |
 | Volatility regimes: 2020 stressed, 2022 second (peak for NASDAQ-100), 2017 calmest | ✅ | notebook 01 §8, obs. 10 | **volatility timeline**; input for the period chapter |
 | STOXX Europe 600 calendar and listing mix (partial cross-sections) | ✅ | notebook 01 obs. 11 | paragraph (why it is not a core universe) |
@@ -70,17 +70,12 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 |---|---|---|---|
 | Two comparable groups: Alpha158 (MASTER, MATCC, FactorVAE), Alpha360 (HIST, DiscoverPLF, FinFormer); optional LightGBM reference | ✅ | `docs/model_groups.md` | **table of model groups** |
 | One page per model: target, inputs, normalization, loss, cross-sectional mixing, built-in explanation signals | ✅ | `docs/model_notes.md` | **summary table of the six models** (already in `model_notes.md`) |
-| **Reproducibility audit of FinBench (10 issues)** | ✅ | `model_notes.md` issues 1–10 | **table of issues + status**; a contribution on its own |
-| — 1–2: FactorVAE test predictions use the true labels (posterior path) and are random samples → leak-free, deterministic `predict()` | ✅ | `models/factorvae.py` | paragraph + before/after metrics (after Step 3) |
-| — 3: FactorVAE's label horizon is `seq_len` (20-day return, not 5) | ✅ kept | | caveat in every comparison |
-| — 4: Alpha360 column layout doesn't match the models' reshape (time steps mix series and lags) | ✅ kept | | figure of the actual layout; why "temporal" readings of Alpha360 internals are not meaningful |
-| — 5: MATCC reads the market file from two paths | ✅ fixed | `loading.market_path` | footnote |
-| — 6: FinFormer's label is a z-score, not CSRank | ✅ | | footnote |
-| — 7: FactorVAE leaves KMID and KLEN unnormalized | ✅ kept | | paragraph |
-| — 8: MASTER, MATCC and FinFormer runs are not seeded → FinBench's seed spread is uncontrolled | ✅ | | paragraph; matters for the seed-vs-model analysis |
-| — 9: HIST and DiscoverPLF run only on a GPU | ✅ fixed | | footnote |
-| — 10: each model has its own training loop, loss, selection rule and data details | ✅ | | **table: loss, optimizer, epochs, selection rule per model** |
-| Decision "train exactly as FinBench, fix only the readout and paths", and why | ✅ | `model_notes.md` | paragraph (methodological choice) |
+| Implementation choices that change the results, stated briefly in the methodology (not a thesis topic in themselves; background in `model_notes.md`) | ✅ | | one paragraph or a short table |
+| — FactorVAE is scored with the mean of its prior path (the prediction it would make without seeing the labels), and its target is a 20-day return | ✅ | `models/factorvae.py` | sentence + caveat wherever FactorVAE is compared |
+| — Each model keeps its weights with its original training and selection rule | ✅ | `training/trainer.py` | **table: loss, optimizer, epochs, selection rule per model** |
+| — The Alpha360 models read their 360 columns in an order that mixes series and lags, so attributions are reported on the original columns, not on the models' internal time steps | ✅ | `models/finformer.py` (`FINBENCH_ORDER`) | sentence; relevant for the temporal XAI analysis |
+| — All runs are seeded (seeds 0, 5, 42), so seed-to-seed differences are controlled | ✅ | `models/base.py` | sentence; matters for the seed-vs-model analysis |
+| Decision to train the models as in their reference code (FinBench), and why: results comparable with published numbers | ✅ | guide Step 3 | paragraph (methodological choice) |
 | The `xaifin` framework: `ModelAdapter` interface, `DayBatch`, `RunConfig`, results-store layout | ✅ | `models/base.py`, guide §2.2–2.3 | **architecture diagram** (data → adapter → XAI / portfolio / app) |
 | Data pipelines reproduced exactly (three ways FinBench builds inputs: own-row windows, Qlib calendar windows with fill, single Alpha360 rows) and verified sample by sample | ✅ | `data/datasets.py`; check scripts | paragraph + "verification" table |
 | One input space per group: Alpha360 adapters take the 360 original columns and apply each model's reshape inside → attributions comparable across HIST, DiscoverPLF, FinFormer | ✅ | `models/finformer.py` (`FINBENCH_ORDER`) | paragraph |
@@ -88,7 +83,6 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 | Gradients in eval mode need cuDNN off for GRUs (engineering note) | ✅ | `ModelAdapter.forward` | footnote |
 | Faster, memory-light dataset construction (array indexing vs per-day scans) | ✅ | `datasets.py` | footnote / appendix |
 | Equivalence test: adapters vs FinBench's own code, same seed, day order and random state; all six pass | ✅ | notebook 02 | **equivalence table** (initial weights, weights after one epoch, test predictions, metrics) |
-| FactorVAE: FinBench's `test()` is leaky and random (two calls, two RankICs for the same weights); the leak-free readout equals its `prediction()` without sampling | ✅ | notebook 02 §3 | small table |
 | FinFormer's MSE is not comparable (−CCC loss ignores scale): compare it on IC/RankIC | ✅ | notebook 02 obs. 5 | footnote |
 
 ## 5. Explainability methodology
@@ -110,7 +104,6 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 |---|---|---|---|
 | Predictive performance: IC, RankIC, ICIR, MSE per model × universe × year (mean ± std over seeds), compared with the FinBench tables | ◐ | Step 3; first MASTER runs (dji, nasdaq100 y2020) | **performance table**, **IC-per-year plot** |
 | How weak the signal is (starting point of the thesis) | ◐ | Step 3, notebook 01 obs. 8 | paragraph |
-| Effect of the fixes on FactorVAE (leaky vs leak-free test metrics) | ☐ | Step 3 | small table |
 | Effect of the data-quality filter on metrics (`CLEAN_DATA` on/off) | ☐ | Step 3 | small table |
 | Top features per model; family-importance profile; lag profile; example local explanation | ☐ | Step 5 | **top-feature tables**, **family figure**, **heatmap T×F** |
 | Post-hoc vs intrinsic importance (e.g. MASTER gate vs IG) | ☐ | Step 5 | figure |
@@ -139,7 +132,7 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 | OHLCV noise injection → Δ IC, Δ portfolio, Δ attributions | ☐ | Step 10 | figure |
 | Family ablation with retraining (stronger test of importance than masking) | ☐ | Step 10 | table |
 | Delayed data, missing days, universe swap | ⭘ | Step 10 | table |
-| Retraining with the Alpha360 layout fixed (issue 4): does chronological input change accuracy or explanations? | ⭘ | `model_notes.md` issue 4 | experiment |
+| Retraining the Alpha360 models with chronologically ordered inputs: does it change accuracy or explanations? | ⭘ | `model_notes.md` | experiment |
 | Effect of the data errors themselves (`CLEAN_DATA` off vs on) on explanations | ⭘ | Step 10 | figure |
 
 ## 9. The application
@@ -155,8 +148,8 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 | Topic | Status | Material |
 |---|---|---|
 | Answer to each research question; the data-vs-model verdict | ☐ | Step 7 |
-| **Limitations:** survivorship bias of the constituent rule; FinBench quirks kept on purpose (issues 3, 4, 7, 10); FactorVAE predicts a 20-day return; unseeded FinBench baselines; remaining data errors after the filter (`ORRON.ST`, Signature Bank); attributions on correlated features; no EU 2020 test year; single horizon (T=20, L=5) | ◐ | `model_notes.md`, notebook 01 |
-| **Future work:** fix issues 3–4 and retrain; other horizons (5/1, 60/20); backfilled EU membership; cross-stock attribution (how stock *j* influences *i*); more universes | ☐ | – |
+| **Limitations:** survivorship bias of the constituent rule; implementation choices kept from the reference code (FactorVAE's 20-day target, the Alpha360 input order, per-model selection rules); remaining data errors after the filter (`ORRON.ST`, Signature Bank); attributions on correlated features; no EU 2020 test year; single horizon (T=20, L=5) | ◐ | `model_notes.md`, notebook 01 |
+| **Future work:** retrain with a common target horizon and chronological Alpha360 inputs; other horizons (5/1, 60/20); backfilled EU membership; cross-stock attribution (how stock *j* influences *i*); more universes | ☐ | – |
 | Reproducibility statement: code, seeds, git hash in every `config.json`, results-store layout | ◐ | guide §2.2, §2.4 |
 
 ---
@@ -164,14 +157,13 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 ## Contributions (draft)
 
 1. **A unified, verified framework** (`xaifin`) that wraps six heterogeneous stock-ranking models behind one interface and reproduces FinBench's data pipelines exactly, so that explanations can be computed and compared across architectures.
-2. **A reproducibility and data audit of a public benchmark**: ten implementation issues in FinBench (including label leakage in FactorVAE's test predictions) and data errors in the price files (wrong-company tickers, stale and near-zero prices), with a documented filter.
-3. **A systematic comparison of explanations** across models, seeds, periods and universes, with evaluated XAI methods, and a diagnosis of whether instability comes from the data or the architecture. *(Steps 5–7)*
-4. **A link from explanations to allocation**: attributions of portfolio membership, margins and counterfactual fragility of top-k portfolios. *(Steps 4, 7, 9)*
-5. **An interactive application** to load models, inspect attributions and compare architectures. *(Step 11)*
+2. **A systematic comparison of explanations** across models, seeds, periods and universes, with evaluated XAI methods, and a diagnosis of whether instability comes from the data or the architecture. *(Steps 5–7)*
+3. **A link from explanations to allocation**: attributions of portfolio membership, margins and counterfactual fragility of top-k portfolios. *(Steps 4, 7, 9)*
+4. **An interactive application** to load models, inspect attributions and compare architectures. *(Step 11)*
 
 ## Figures and tables checklist
 
-Ready now: universes table · rolling-window table · model-groups table · six-models summary table · feature catalog · feature-correlation figure · label distribution · volatility timeline · data-error table · data-filter before/after · FinBench issues table · training-loop differences table.
+Ready now: universes table · rolling-window table · model-groups table · six-models summary table · feature catalog · feature-correlation figure · label distribution · volatility timeline · data-error table · data-filter before/after · training-setup table (loss, optimizer, selection rule per model).
 
 Ready since Step 2: equivalence table.
 

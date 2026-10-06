@@ -1,0 +1,8 @@
+train_rolling: models=['FactorVAE'] universes=['dji', 'nasdaq100', 'sx5e'] years=[2020, 2021, 2022, 2023, 2024] seeds=[42] T=20 L=5 clean=True
+[1/15] done already: D:\CodeProjects\master-thesis\code\results\Regression\FactorVAE\dji\sl20_pl5\seed42\y2020
+[2/15]
+FactorVAE dji y2021 seed 42 (T=20, L=5, clean=True) on cuda: FactorVAE (train.py main): keep the weights of the lowest validation loss (the VAE loss)
+  days: {'train': 1006, 'valid': 253, 'test': 252}
+  epoch   0  train loss 1.2328  valid IC +0.0502  RankIC +0.0281  *  (156s)
+  epoch   1  train loss 0.9022  valid IC +0.0480  RankIC +0.0420  *  (148s)
+  epoch   2  train loss 0.8664  valid IC +0.0207  RankIC +0.0206  (149s)

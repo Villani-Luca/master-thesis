@@ -456,7 +456,7 @@ class MATCCAdapter(MASTERAdapter):
     name = "MATCC"
     HPARAMS = {
         "d_model": 256, "n_head": 4, "dropout": 0.5,
-        "lr": 3e-4, "weight_decay": 1e-3, "n_epochs": 70, "grad_clip": 3.0, "scheduler_step": "epoch",
+        "lr": 3e-4, "weight_decay": 1e-3, "n_epochs": 70, "grad_clip": 3.0, "scheduler_step": "epoch", "selection": "last",
         "warmup_epochs": 10, "T_0": 15, "T_mult": 1, "eta_min": 2e-5, "gamma": 1.0, "coef": 1.0,
         "cosine_period": 4, "step_size": 3,
     }

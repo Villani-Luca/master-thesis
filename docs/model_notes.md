@@ -38,7 +38,7 @@ These were found by reading the code and, for the layout issue, by applying each
 | 7 | FactorVAE leaves KMID and KLEN unnormalized | ⏸ kept as FinBench (changes training). Found 2026-10-06 |
 | 8 | MASTER, MATCC and FinFormer runs are not seeded | ⏸ the adapters seed every generator (no effect on what is learned). Found 2026-10-06 |
 | 9 | HIST and DiscoverPLF run only on a GPU | ✅ fixed: `x.device` in `xaifin/models/hist.py`, `discoverplf.py`. Found 2026-10-06 |
-| 10 | Training-loop differences across models | ⏸ documented in each adapter; the Step 3 trainer decides. Found 2026-10-06 |
+| 10 | Training-loop differences across models | ⏸ kept: decided 2026-10-06 (Option A), every model trains and keeps its weights as in FinBench (`training/trainer.py`). Found 2026-10-06 |
 
 Proof that the copied FactorVAE is exact: same `state_dict` keys as FinBench, identical training-forward outputs under the same seed (train and eval mode), and `predict()` equal to FinBench's `prediction()` without the sampling noise (one-off check, 2026-09-29).
 

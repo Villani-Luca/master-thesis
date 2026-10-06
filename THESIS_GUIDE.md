@@ -151,7 +151,7 @@ code/results/
 └── analysis/…                     # cross-model tables, figures exported for the thesis
 ```
 
-> ✅ **Migrated 2026-09-29.** The first MASTER runs (seed 42, y2020, from the old `master_model.ipynb`) now follow this layout for dji, nasdaq100 and sp500. They have no `config.json`. The sp500 run has only `model.pth`: its test evaluation never completed.
+> ✅ **Migrated 2026-09-29.** The first MASTER runs (seed 42, y2020, from the old `master_model.ipynb`) followed this layout for dji, nasdaq100 and sp500. They have no `config.json`. The sp500 run had only `model.pth`: its test evaluation never completed. **Moved to `results/legacy/` on 2026-10-06** (other selection rule, no data-quality filter); Step 3 retrains them.
 
 `.gitignore` excludes `code/results/xai/**/attributions.npz` (large files). `global.parquet` and the metrics stay under version control.
 
@@ -306,17 +306,20 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 
 ## Step 3: Rolling-window training and checkpoints (Outline Step 2, *Prima parte* 5)
 
+**Decision (2026-10-06): Option A, every model keeps FinBench's own training and selection rule** (`docs/model_notes.md` issue 10), so the results stay comparable with FinBench's tables: MASTER stops when the training loss falls below 0.95 and keeps the last weights; MATCC keeps the last of 70 epochs; FactorVAE keeps the lowest validation loss; HIST and DiscoverPLF keep the best validation IC of the weights averaged over the last 5 epochs (DiscoverPLF from epoch 20), with early stopping; FinFormer keeps the best validation IC pooled over all stock-days, with early stopping. The rule is `hparams["selection"]` of each adapter. Every run still logs the validation metrics of every epoch (`train_history.csv`), so other rules can be studied later without retraining.
+
 ### Tasks
-- [ ] `training/trainer.py`: a generic loop with early stopping on **valid RankIC** (as in the current notebook), best-state checkpointing, and saving to the §2.2 layout.
-- [ ] `training/rolling.py` + `scripts/train_rolling.py --model MASTER --universe dji --years 2020-2024 --seeds 0 5 42 --sl 20 --pl 5`. Skip runs that already exist (resumable).
-- [x] Migrate the existing MASTER results to the new layout (done 2026-09-29, see §2.2).
+- [x] `training/trainer.py`: a generic loop with ~~early stopping on valid RankIC~~ each model's FinBench selection rule (`fit`, `SELECTION_RULES`), plus `train_epoch`, `evaluate`, `validation_loss`, `average_params`.
+- [x] `training/rolling.py` + `scripts/train_rolling.py --models MASTER --universes dji --years 2020-2024 --seeds 0 5 42 --sl 20 --pl 5`. Skips runs that already exist (resumable); `--models all`; logs to `results/Regression/train_rolling.log`. Each run writes `model.pth`, `config.json` (with a `training` section: rule, kept epoch, validation metrics, time, device), `metrics.json`, `train_history.csv` and FinBench's `results_sl<T>_pl<L>.pkl`.
+- [x] Migrate the existing MASTER results to the new layout (done 2026-09-29, see §2.2). → Moved to `results/legacy/` on 2026-10-06: they used another selection rule and no data-quality filter.
+- [x] FinBench's published numbers: `results/analysis/finbench_table2.csv` (Table 2: MSE and MAE only; FinBench reports no IC for these six models).
 - [ ] Run the grid **in stages**, checking each stage before going on:
-  1. MASTER × dji × y2020 × seed 42 (already done, re-run through the package);
-  2. all 6 models × dji × y2020 × seed 42 → compare with the FinBench tables (`code/finbench/results.md`). FactorVAE will score lower if its test-time leakage is fixed;
+  1. MASTER × dji × y2020 × seed 42 (already done, re-run through the package); → ✅ 2026-10-06: stopped at epoch 6 (training loss 0.947), test IC 0.044, RankIC 0.053, MSE 0.977; 1 minute on the RTX 5090;
+  2. all 6 models × dji × y2020 × seed 42 → compare with the FinBench tables (`code/finbench/results.md`). FactorVAE will score lower if its test-time leakage is fixed; → ✅ 2026-10-06. Test RankIC 0.009 (DiscoverPLF) to 0.053 (MASTER); MSE in FinBench's range for HIST (0.963 vs 0.997) and DiscoverPLF (1.176 vs 1.211), higher for MATCC (1.60 vs 1.13) and FinFormer (2.93 vs 1.66, scale-free loss), lower for MASTER (0.98 vs 1.25); one year and one seed against FinBench's averages, so indicative only. Validation IC at the kept epoch is often ≤ 0: the selection rules pick on noise. FactorVAE keeps epoch 1 of 30 (lowest validation VAE loss). Times: MASTER 1 min, FinFormer 3, HIST 6, MATCC 13, DiscoverPLF 17, FactorVAE 50;
   3. all 6 models × {dji, nasdaq100, sx5e} × 2020–2024 × seed 42. SX5E only has 2021–2024: its membership history starts on 2020-09-30, so the 2020 universe is empty (notebook 01);
-  4. add seeds 0 and 5. The full grid is 6 × 3 × 5 × 3 = **270 runs**, so estimate the time per run first.
-- [ ] **Notebook `03_rolling_training.ipynb`**: tables of IC, RankIC, ICIR and MSE per model × universe × year (mean ± std over seeds). Sanity-check that the numbers are in the FinBench range. This notebook also documents *how weak the signal is*, which is the starting point of the thesis.
-- [ ] **App page `2_Models.py`** (extended): a metrics grid (heatmap model × year) for the selected universe.
+  4. add seeds 0 and 5. The full grid is 6 × 3 × 5 × 3 = **270 runs**, so estimate the time per run first. First timings (dji, GPU): about 8-10 s per epoch for MASTER, MATCC, HIST, FinFormer, 22 s for DiscoverPLF, **100 s for FactorVAE** (its 96 attention layers run one after another for every day), i.e. about 50 minutes per FactorVAE run.
+- [ ] **Notebook `03_rolling_training.ipynb`** (◐ written and tested on the partial grid: grid coverage and timing, RankIC/IC per model × year per universe, averages vs FinBench's Table 2, how weak the signal is (share of positive RankIC, t-statistic adjusted for overlapping labels), the selection rules (validation vs test IC), `metrics_summary.csv`; final run and observations once stage 3 is complete; results from `training.rolling.collect_results`): tables of IC, RankIC, ICIR and MSE per model × universe × year (mean ± std over seeds). Sanity-check that the numbers are in the FinBench range. This notebook also documents *how weak the signal is*, which is the starting point of the thesis.
+- [x] **App page `2_Models.py`** (extended): a metrics grid (heatmap model × year) for the selected universe. → Universe, metric and (T, L) selectors; mean over seeds with counts and standard deviations; `viz.metric_heatmap` (blue-red diverging around 0) and `viz.metric_by_year_chart`. The six models have fixed colors (`viz.MODEL_ORDER`, palette validated for colorblind safety in both modes).
 
 **Done when:** a checkpoint exists for every cell of the chosen grid, and the metrics summary table is saved to `results/analysis/metrics_summary.csv`.
 **Thesis artefacts:** model-performance table; IC-per-year plot.
@@ -532,7 +535,7 @@ Build the app page for each step **in the same milestone** as the step, not at t
 | 0 Environment & reading | `00_environment_check` | `pyproject.toml` | – | ✅ done (model notes + chapter 2 drafted; read the papers yourself too) |
 | 1 Groups & universes | `01_universes_and_data` | `config`, `data/features` | `1_Data` | ✅ done |
 | 2 Adapters | `02_model_adapters` | `data/*`, `models/*` | `2_Models` | ✅ done: data pipelines, six adapters (equivalence test: all pass), registry, app page |
-| 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ◐ MASTER seed 42 y2020 on dji/nasdaq100 (sp500: checkpoint only); results migrated to the §2.2 layout |
+| 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ◐ trainer (FinBench selection rules) and resumable script done; stages 1-2 done; stage 3 running (two processes: five models, and FactorVAE, kept as FinBench's code, about 15-17 h); notebook 03 and the app heatmap ready |
 | 4 Portfolio baseline | `04_portfolio_baseline` | `portfolio/topk`, `backtest` | `6_Portfolio` | ☐ |
 | 5 XAI engine | `05_xai_single_model` | `xai/*`, `scripts/explain` | `3_Explain` | ☐ |
 | 6 XAI evaluation | `06_xai_evaluation` | `xai/evaluation` | `3_Explain` (quality) | ☐ |

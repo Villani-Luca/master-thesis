@@ -6,6 +6,8 @@ Source: code/finbench/Regression/MASTER/base_model.py (calc_ic, predict). Change
   method='spearman' computes, without needing scipy.
 - R2 is r2_score(labels, preds). FinBench calls r2_score(preds, labels), with the arguments swapped.
 - ICIR and RankICIR (mean / sample std of the daily values, as Qlib) are added.
+- IC_pooled: the Pearson correlation over all stock-days at once, FinFormer's validation score
+  (FinFormer/finformer.py, metric_fn_2).
 """
 
 import numpy as np
@@ -40,4 +42,5 @@ def summary(preds: list[np.ndarray], labels: list[np.ndarray]) -> dict[str, floa
         "RankIC": float(daily["RankIC"].mean()),
         "ICIR": float(daily["IC"].mean() / daily["IC"].std()),
         "RankICIR": float(daily["RankIC"].mean() / daily["RankIC"].std()),
+        "IC_pooled": float(pd.Series(pred).corr(pd.Series(label))),
     }
