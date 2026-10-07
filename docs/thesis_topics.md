@@ -102,8 +102,8 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 
 | Topic | Status | Material | Artefact |
 |---|---|---|---|
-| Predictive performance: IC, RankIC, ICIR, MSE per model × universe × year (mean ± std over seeds), compared with the FinBench tables | ◐ | Step 3; first MASTER runs (dji, nasdaq100 y2020) | **performance table**, **IC-per-year plot** |
-| How weak the signal is (starting point of the thesis) | ◐ | Step 3, notebook 01 obs. 8 | paragraph |
+| Predictive performance: IC, RankIC, ICIR, MSE per model × universe × year (mean ± std over seeds), compared with the FinBench tables | ✅ seed 42 (notebook 03) | Step 3; first MASTER runs (dji, nasdaq100 y2020) | **performance table**, **IC-per-year plot** |
+| How weak the signal is (starting point of the thesis): mean RankIC −0.006 to 0.013 per model, sign changing by year and universe, validation IC barely predicting test IC | ✅ notebook 03 obs. 2-6 | Step 3, notebook 01 obs. 8 | paragraph |
 | Effect of the data-quality filter on metrics (`CLEAN_DATA` on/off) | ☐ | Step 3 | small table |
 | Top features per model; family-importance profile; lag profile; example local explanation | ☐ | Step 5 | **top-feature tables**, **family figure**, **heatmap T×F** |
 | Post-hoc vs intrinsic importance (e.g. MASTER gate vs IG) | ☐ | Step 5 | figure |
@@ -119,9 +119,10 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 
 | Topic | Status | Material | Artefact |
 |---|---|---|---|
-| Long-only top-k baseline (k = 5 for DJI, 10 otherwise; rebalance every 5 days): CAGR, Sharpe, Sortino, MaxDD, volatility, turnover vs equal-weight and index | ☐ | Step 4 | **portfolio table**, equity curves |
+| Long-only top-k baseline (k = 5 for DJI, 10 otherwise; rebalance every 5 days): CAGR, Sharpe, Sortino, MaxDD, volatility, turnover vs equal-weight and index | ✅ notebook 04 | Step 4 | **portfolio table**, equity curves |
 | Seed instability of holdings (Jaccard overlap, turnover between seed portfolios) | ☐ | Step 4 | **seed-overlap figure** |
-| Margins to the k-boundary and **decision fragility** (holdings whose margin is below the seed noise) | ☐ | Steps 4, 9.1 | distribution figure |
+| Models pick different stocks: two models' portfolios share 10-27% of their stocks (chance: 5-11%); the closest pairs share their feature set (MASTER-FactorVAE, HIST-DiscoverPLF/FinFormer), a first hint that the input data shapes the choices | ✅ notebook 04 obs. 7 | **model-overlap heatmaps** |
+| Margins to the k-boundary and **decision fragility** (12-18% of holdings within 0.1 score standard deviations of the cut; seed-noise comparison after stage 4) | ◐ notebook 04 | Steps 4, 9.1 | distribution figure |
 | Counterfactuals in feature space (Wachter-style, constraints: z-range, immutable market features, correlated groups) | ⭘ | Step 9.2 A | table of minimal perturbations |
 | Counterfactuals in OHLCV space (perturb prices, recompute features): minimal price move that flips membership | ⭘ | Step 9.2 B | distribution per model |
 

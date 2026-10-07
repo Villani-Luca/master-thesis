@@ -125,6 +125,9 @@ def run_portfolio(run_dirs: list[Path], model: str, universe: str, seq_len: int,
         raise ValueError(f"test years must be consecutive, got {years}")
     predictions = load_predictions(run_dirs)
     periods = rebalance_periods(f"{years[0]}-01-01", f"{years[-1]}-12-31", pred_len)
+    # FactorVAE's first prediction is on the first test day, so its portfolio starts one period later;
+    # the other models predict from a few days before the test year.
+    periods = [p for p in periods if p[0] > predictions["date"].min()]
     holdings = topk_holdings(predictions, periods, k)
     rets, otc = returns or asset_returns(universe)
 
@@ -178,7 +181,11 @@ def run_portfolio_grid(results: pd.DataFrame, k: int | None = None, partial: boo
         if universe not in cache:
             cache[universe] = asset_returns(universe)
         dirs = [g.loc[g["test_year"] == y, "path"].iloc[0] for y in run]
-        m = run_portfolio(dirs, model, universe, seq_len, pred_len, seed, kk, cache[universe])
+        try:
+            m = run_portfolio(dirs, model, universe, seq_len, pred_len, seed, kk, cache[universe])
+        except ValueError as error:
+            log(f"{model} {universe} seed {seed}: FAILED: {error}")
+            continue
         log(f"{model} {universe} seed {seed} top{kk} {run[0]}-{run[-1]}: CAGR {m['portfolio']['CAGR']:+.2%} "
             f"(equal weight {m['equal_weight']['CAGR']:+.2%}, index {m['index']['CAGR']:+.2%}), "
             f"Sharpe {m['portfolio']['Sharpe']:.2f}, turnover {m['portfolio']['turnover']:.0%}")

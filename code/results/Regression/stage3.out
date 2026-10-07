@@ -2286,3 +2286,392 @@ DiscoverPLF sx5e y2021 seed 42 (T=20, L=5, clean=True) on cuda: HIST, DiscoverPL
   epoch  45  train loss 0.5615  valid IC -0.0017  RankIC +0.0037  (31s)
   epoch  46  train loss 0.5539  valid IC +0.0039  RankIC +0.0073  (31s)
   epoch  47  train loss 0.5395  valid IC +0.0031  RankIC +0.0075  (31s)
+  epoch  48  train loss 0.5322  valid IC +0.0060  RankIC +0.0095  *  (31s)
+  epoch  49  train loss 0.5181  valid IC +0.0029  RankIC +0.0052  (31s)
+  kept epoch 48 of 50; test IC +0.0236 RankIC +0.0175 MSE 1.3150 (1500s) -> D:\CodeProjects\master-thesis\code\results\Regression\DiscoverPLF\sx5e\sl20_pl5\seed42\y2021
+[58/75]
+DiscoverPLF sx5e y2022 seed 42 (T=20, L=5, clean=True) on cuda: HIST, DiscoverPLF (train.py main): from eval_from_epoch on, evaluate the average of the last smooth_steps epochs' weights; keep the average with the best validation IC (daily mean); stop after early_stop epochs without improvement
+  days: {'train': 1017, 'valid': 258, 'test': 257}
+  epoch  20  train loss 0.9473  valid IC +0.0106  RankIC -0.0065  *  (31s)
+  epoch  21  train loss 0.9354  valid IC +0.0070  RankIC -0.0108  (30s)
+  epoch  22  train loss 0.9246  valid IC +0.0093  RankIC -0.0080  (31s)
+  epoch  23  train loss 0.9137  valid IC +0.0088  RankIC -0.0086  (31s)
+  epoch  24  train loss 0.9128  valid IC +0.0059  RankIC -0.0102  (31s)
+  epoch  25  train loss 0.8888  valid IC +0.0087  RankIC -0.0052  (31s)
+  epoch  26  train loss 0.8959  valid IC +0.0096  RankIC -0.0053  (30s)
+  epoch  27  train loss 0.8749  valid IC +0.0112  RankIC -0.0037  *  (31s)
+  epoch  28  train loss 0.8553  valid IC +0.0126  RankIC -0.0041  *  (31s)
+  epoch  29  train loss 0.8417  valid IC +0.0182  RankIC -0.0020  *  (31s)
+  epoch  30  train loss 0.8646  valid IC +0.0161  RankIC -0.0042  (30s)
+  epoch  31  train loss 0.8502  valid IC +0.0201  RankIC +0.0007  *  (30s)
+  epoch  32  train loss 0.8394  valid IC +0.0211  RankIC -0.0006  *  (31s)
+  epoch  33  train loss 0.8220  valid IC +0.0239  RankIC -0.0002  *  (31s)
+  epoch  34  train loss 0.8080  valid IC +0.0237  RankIC +0.0009  (31s)
+  epoch  35  train loss 0.7915  valid IC +0.0287  RankIC +0.0040  *  (30s)
+  epoch  36  train loss 0.7820  valid IC +0.0278  RankIC +0.0049  (33s)
+  epoch  37  train loss 0.7667  valid IC +0.0262  RankIC +0.0026  (32s)
+  epoch  38  train loss 0.7536  valid IC +0.0275  RankIC +0.0049  (34s)
+  epoch  39  train loss 0.7490  valid IC +0.0287  RankIC +0.0078  *  (31s)
+  epoch  40  train loss 0.7249  valid IC +0.0278  RankIC +0.0072  (31s)
+  epoch  41  train loss 0.7238  valid IC +0.0317  RankIC +0.0123  *  (31s)
+  epoch  42  train loss 0.7047  valid IC +0.0349  RankIC +0.0189  *  (31s)
+  epoch  43  train loss 0.6951  valid IC +0.0341  RankIC +0.0165  (31s)
+  epoch  44  train loss 0.6747  valid IC +0.0328  RankIC +0.0143  (31s)
+  epoch  45  train loss 0.6705  valid IC +0.0355  RankIC +0.0180  *  (31s)
+  epoch  46  train loss 0.6562  valid IC +0.0330  RankIC +0.0155  (31s)
+  epoch  47  train loss 0.6384  valid IC +0.0338  RankIC +0.0155  (32s)
+  epoch  48  train loss 0.6291  valid IC +0.0348  RankIC +0.0175  (32s)
+  epoch  49  train loss 0.6199  valid IC +0.0371  RankIC +0.0222  *  (31s)
+  kept epoch 49 of 50; test IC +0.0207 RankIC +0.0135 MSE 1.3547 (1517s) -> D:\CodeProjects\master-thesis\code\results\Regression\DiscoverPLF\sx5e\sl20_pl5\seed42\y2022
+[59/75]
+DiscoverPLF sx5e y2023 seed 42 (T=20, L=5, clean=True) on cuda: HIST, DiscoverPLF (train.py main): from eval_from_epoch on, evaluate the average of the last smooth_steps epochs' weights; keep the average with the best validation IC (daily mean); stop after early_stop epochs without improvement
+  days: {'train': 1020, 'valid': 257, 'test': 255}
+  epoch  20  train loss 0.9322  valid IC +0.0193  RankIC +0.0216  *  (31s)
+  epoch  21  train loss 0.9230  valid IC +0.0183  RankIC +0.0215  (31s)
+  epoch  22  train loss 0.9090  valid IC +0.0168  RankIC +0.0191  (31s)
+  epoch  23  train loss 0.8943  valid IC +0.0196  RankIC +0.0241  *  (31s)
+  epoch  24  train loss 0.8853  valid IC +0.0170  RankIC +0.0206  (30s)
+  epoch  25  train loss 0.8766  valid IC +0.0113  RankIC +0.0156  (31s)
+  epoch  26  train loss 0.8629  valid IC +0.0093  RankIC +0.0137  (31s)
+  epoch  27  train loss 0.8502  valid IC +0.0104  RankIC +0.0158  (31s)
+  epoch  28  train loss 0.8324  valid IC +0.0095  RankIC +0.0156  (31s)
+  epoch  29  train loss 0.8157  valid IC +0.0097  RankIC +0.0179  (31s)
+  epoch  30  train loss 0.8364  valid IC +0.0076  RankIC +0.0159  (32s)
+  epoch  31  train loss 0.8239  valid IC +0.0042  RankIC +0.0142  (34s)
+  epoch  32  train loss 0.8096  valid IC -0.0012  RankIC +0.0083  (31s)
+  epoch  33  train loss 0.8004  valid IC -0.0053  RankIC +0.0073  (30s)
+  epoch  34  train loss 0.7794  valid IC -0.0072  RankIC +0.0086  (31s)
+  epoch  35  train loss 0.7736  valid IC -0.0057  RankIC +0.0086  (31s)
+  epoch  36  train loss 0.7593  valid IC -0.0070  RankIC +0.0081  (31s)
+  epoch  37  train loss 0.7496  valid IC -0.0098  RankIC +0.0043  (31s)
+  epoch  38  train loss 0.7363  valid IC -0.0102  RankIC +0.0023  (30s)
+  epoch  39  train loss 0.7249  valid IC -0.0113  RankIC +0.0037  (31s)
+  epoch  40  train loss 0.7182  valid IC -0.0082  RankIC +0.0062  (31s)
+  epoch  41  train loss 0.6997  valid IC -0.0062  RankIC +0.0089  (31s)
+  epoch  42  train loss 0.6906  valid IC -0.0009  RankIC +0.0138  (30s)
+  epoch  43  train loss 0.6933  valid IC -0.0012  RankIC +0.0136  (30s)
+  epoch  44  train loss 0.6734  valid IC -0.0008  RankIC +0.0130  (31s)
+  epoch  45  train loss 0.6525  valid IC -0.0084  RankIC +0.0051  (31s)
+  epoch  46  train loss 0.7194  valid IC -0.0062  RankIC +0.0088  (31s)
+  epoch  47  train loss 0.6283  valid IC -0.0077  RankIC +0.0088  (30s)
+  epoch  48  train loss 0.6228  valid IC -0.0103  RankIC +0.0060  (31s)
+  early stop: 25 epochs without improvement
+  kept epoch 23 of 49; test IC +0.0148 RankIC +0.0172 MSE 1.0475 (1482s) -> D:\CodeProjects\master-thesis\code\results\Regression\DiscoverPLF\sx5e\sl20_pl5\seed42\y2023
+[60/75]
+DiscoverPLF sx5e y2024 seed 42 (T=20, L=5, clean=True) on cuda: HIST, DiscoverPLF (train.py main): from eval_from_epoch on, evaluate the average of the last smooth_steps epochs' weights; keep the average with the best validation IC (daily mean); stop after early_stop epochs without improvement
+  days: {'train': 1022, 'valid': 255, 'test': 256}
+  epoch  20  train loss 0.9329  valid IC +0.0139  RankIC +0.0134  *  (31s)
+  epoch  21  train loss 0.9142  valid IC +0.0169  RankIC +0.0153  *  (31s)
+  epoch  22  train loss 0.9082  valid IC +0.0233  RankIC +0.0201  *  (30s)
+  epoch  23  train loss 0.9006  valid IC +0.0319  RankIC +0.0326  *  (31s)
+  epoch  24  train loss 0.8887  valid IC +0.0324  RankIC +0.0362  *  (31s)
+  epoch  25  train loss 0.8800  valid IC +0.0363  RankIC +0.0402  *  (31s)
+  epoch  26  train loss 0.8625  valid IC +0.0371  RankIC +0.0395  *  (31s)
+  epoch  27  train loss 0.8592  valid IC +0.0354  RankIC +0.0391  (30s)
+  epoch  28  train loss 0.8502  valid IC +0.0294  RankIC +0.0355  (31s)
+  epoch  29  train loss 0.8281  valid IC +0.0294  RankIC +0.0362  (31s)
+  epoch  30  train loss 0.8507  valid IC +0.0250  RankIC +0.0347  (31s)
+  epoch  31  train loss 0.8386  valid IC +0.0214  RankIC +0.0324  (30s)
+  epoch  32  train loss 0.8304  valid IC +0.0237  RankIC +0.0291  (31s)
+  epoch  33  train loss 0.8305  valid IC +0.0239  RankIC +0.0323  (31s)
+  epoch  34  train loss 0.8147  valid IC +0.0206  RankIC +0.0270  (31s)
+  epoch  35  train loss 0.7939  valid IC +0.0228  RankIC +0.0308  (31s)
+  epoch  36  train loss 0.7851  valid IC +0.0223  RankIC +0.0297  (30s)
+  epoch  37  train loss 0.7766  valid IC +0.0230  RankIC +0.0315  (31s)
+  epoch  38  train loss 0.7648  valid IC +0.0254  RankIC +0.0303  (31s)
+  epoch  39  train loss 0.7528  valid IC +0.0251  RankIC +0.0317  (31s)
+  epoch  40  train loss 0.7397  valid IC +0.0260  RankIC +0.0321  (31s)
+  epoch  41  train loss 0.7305  valid IC +0.0253  RankIC +0.0307  (30s)
+  epoch  42  train loss 0.7288  valid IC +0.0203  RankIC +0.0286  (31s)
+  epoch  43  train loss 0.7204  valid IC +0.0196  RankIC +0.0298  (31s)
+  epoch  44  train loss 0.6955  valid IC +0.0224  RankIC +0.0339  (31s)
+  epoch  45  train loss 0.6815  valid IC +0.0259  RankIC +0.0380  (30s)
+  epoch  46  train loss 0.6827  valid IC +0.0288  RankIC +0.0387  (31s)
+  epoch  47  train loss 0.6917  valid IC +0.0305  RankIC +0.0401  (31s)
+  epoch  48  train loss 0.6484  valid IC +0.0312  RankIC +0.0419  (31s)
+  epoch  49  train loss 0.6492  valid IC +0.0278  RankIC +0.0384  (31s)
+  kept epoch 26 of 50; test IC -0.0479 RankIC -0.0486 MSE 1.1105 (1511s) -> D:\CodeProjects\master-thesis\code\results\Regression\DiscoverPLF\sx5e\sl20_pl5\seed42\y2024
+[61/75] done already: D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\dji\sl20_pl5\seed42\y2020
+[62/75]
+FinFormer dji y2021 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1001, 'valid': 253, 'test': 252}
+  epoch   0  train loss -0.0032  valid IC +0.0288  RankIC +0.0371  *  (12s)
+  epoch   1  train loss -0.0147  valid IC +0.0242  RankIC +0.0373  (12s)
+  epoch   2  train loss -0.0222  valid IC +0.0286  RankIC +0.0473  (12s)
+  epoch   3  train loss -0.0460  valid IC +0.0305  RankIC +0.0449  (12s)
+  epoch   4  train loss -0.0556  valid IC +0.0197  RankIC +0.0409  (12s)
+  epoch   5  train loss -0.0685  valid IC +0.0341  RankIC +0.0463  (12s)
+  epoch   6  train loss -0.0780  valid IC +0.0299  RankIC +0.0548  (12s)
+  epoch   7  train loss -0.0932  valid IC +0.0105  RankIC +0.0324  (12s)
+  epoch   8  train loss -0.1024  valid IC +0.0157  RankIC +0.0431  (12s)
+  epoch   9  train loss -0.1113  valid IC +0.0151  RankIC +0.0368  (12s)
+  epoch  10  train loss -0.1236  valid IC +0.0092  RankIC +0.0288  (12s)
+  early stop: 10 epochs without improvement
+  kept epoch 0 of 11; test IC +0.0374 RankIC +0.0409 MSE 4.9468 (143s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\dji\sl20_pl5\seed42\y2021
+[63/75]
+FinFormer dji y2022 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1002, 'valid': 252, 'test': 251}
+  epoch   0  train loss -0.0096  valid IC +0.0315  RankIC +0.0378  *  (12s)
+  epoch   1  train loss -0.0212  valid IC +0.0308  RankIC +0.0447  (12s)
+  epoch   2  train loss -0.0436  valid IC +0.0311  RankIC +0.0403  (12s)
+  epoch   3  train loss -0.0593  valid IC +0.0272  RankIC +0.0340  (12s)
+  epoch   4  train loss -0.0724  valid IC +0.0496  RankIC +0.0502  *  (12s)
+  epoch   5  train loss -0.0799  valid IC +0.0427  RankIC +0.0458  (12s)
+  epoch   6  train loss -0.0912  valid IC +0.0235  RankIC +0.0151  (12s)
+  epoch   7  train loss -0.1001  valid IC +0.0308  RankIC +0.0244  (12s)
+  epoch   8  train loss -0.1051  valid IC +0.0517  RankIC +0.0435  (12s)
+  epoch   9  train loss -0.1230  valid IC +0.0426  RankIC +0.0382  (11s)
+  epoch  10  train loss -0.1276  valid IC +0.0357  RankIC +0.0307  (11s)
+  epoch  11  train loss -0.1391  valid IC +0.0299  RankIC +0.0274  (12s)
+  epoch  12  train loss -0.1534  valid IC +0.0294  RankIC +0.0250  (12s)
+  epoch  13  train loss -0.1638  valid IC +0.0336  RankIC +0.0273  (12s)
+  epoch  14  train loss -0.1727  valid IC +0.0320  RankIC +0.0314  (12s)
+  early stop: 10 epochs without improvement
+  kept epoch 4 of 15; test IC +0.0111 RankIC +0.0129 MSE 2.8081 (190s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\dji\sl20_pl5\seed42\y2022
+[64/75]
+FinFormer dji y2023 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1003, 'valid': 251, 'test': 250}
+  epoch   0  train loss -0.0144  valid IC -0.0103  RankIC -0.0103  *  (12s)
+  epoch   1  train loss -0.0251  valid IC -0.0046  RankIC -0.0035  *  (12s)
+  epoch   2  train loss -0.0485  valid IC +0.0120  RankIC +0.0206  *  (12s)
+  epoch   3  train loss -0.0622  valid IC +0.0052  RankIC -0.0044  *  (12s)
+  epoch   4  train loss -0.0865  valid IC +0.0108  RankIC -0.0014  *  (12s)
+  epoch   5  train loss -0.0985  valid IC -0.0062  RankIC -0.0058  (11s)
+  epoch   6  train loss -0.1142  valid IC +0.0017  RankIC +0.0022  (12s)
+  epoch   7  train loss -0.1278  valid IC -0.0075  RankIC -0.0141  (12s)
+  epoch   8  train loss -0.1384  valid IC -0.0015  RankIC -0.0122  (12s)
+  epoch   9  train loss -0.1452  valid IC +0.0038  RankIC -0.0069  (12s)
+  epoch  10  train loss -0.1560  valid IC +0.0102  RankIC +0.0056  (12s)
+  epoch  11  train loss -0.1693  valid IC -0.0121  RankIC -0.0183  (12s)
+  epoch  12  train loss -0.1805  valid IC -0.0157  RankIC -0.0261  (12s)
+  epoch  13  train loss -0.1883  valid IC -0.0058  RankIC -0.0182  (12s)
+  epoch  14  train loss -0.1976  valid IC -0.0095  RankIC -0.0200  (12s)
+  early stop: 10 epochs without improvement
+  kept epoch 4 of 15; test IC -0.0089 RankIC -0.0035 MSE 2.2464 (190s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\dji\sl20_pl5\seed42\y2023
+[65/75]
+FinFormer dji y2024 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1003, 'valid': 250, 'test': 252}
+  epoch   0  train loss -0.0056  valid IC +0.0416  RankIC +0.0460  *  (11s)
+  epoch   1  train loss -0.0108  valid IC -0.0405  RankIC -0.0488  (11s)
+  epoch   2  train loss -0.0299  valid IC -0.0043  RankIC +0.0100  (12s)
+  epoch   3  train loss -0.0432  valid IC -0.0239  RankIC -0.0122  (12s)
+  epoch   4  train loss -0.0654  valid IC +0.0109  RankIC +0.0186  (12s)
+  epoch   5  train loss -0.0797  valid IC +0.0022  RankIC +0.0140  (12s)
+  epoch   6  train loss -0.0893  valid IC +0.0185  RankIC +0.0215  (12s)
+  epoch   7  train loss -0.0876  valid IC -0.0044  RankIC +0.0057  (12s)
+  epoch   8  train loss -0.1064  valid IC +0.0005  RankIC +0.0140  (12s)
+  epoch   9  train loss -0.1132  valid IC -0.0031  RankIC +0.0068  (12s)
+  epoch  10  train loss -0.1227  valid IC -0.0032  RankIC +0.0046  (12s)
+  early stop: 10 epochs without improvement
+  kept epoch 0 of 11; test IC -0.0038 RankIC +0.0188 MSE 1.5913 (142s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\dji\sl20_pl5\seed42\y2024
+[66/75]
+FinFormer nasdaq100 y2020 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1001, 'valid': 252, 'test': 253}
+  epoch   0  train loss -0.0166  valid IC +0.0320  RankIC +0.0233  *  (27s)
+  epoch   1  train loss -0.0297  valid IC +0.0262  RankIC +0.0179  (27s)
+  epoch   2  train loss -0.0447  valid IC +0.0270  RankIC +0.0225  (27s)
+  epoch   3  train loss -0.0522  valid IC +0.0266  RankIC +0.0189  (27s)
+  epoch   4  train loss -0.0628  valid IC +0.0191  RankIC +0.0147  (27s)
+  epoch   5  train loss -0.0735  valid IC +0.0050  RankIC +0.0072  (27s)
+  epoch   6  train loss -0.0756  valid IC +0.0084  RankIC +0.0079  (27s)
+  epoch   7  train loss -0.0826  valid IC +0.0124  RankIC +0.0119  (27s)
+  epoch   8  train loss -0.0850  valid IC +0.0200  RankIC +0.0184  (27s)
+  epoch   9  train loss -0.0932  valid IC +0.0164  RankIC +0.0131  (27s)
+  epoch  10  train loss -0.0979  valid IC +0.0154  RankIC +0.0137  (27s)
+  early stop: 10 epochs without improvement
+  kept epoch 0 of 11; test IC +0.0344 RankIC +0.0479 MSE 1.8311 (349s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\nasdaq100\sl20_pl5\seed42\y2020
+[67/75]
+FinFormer nasdaq100 y2021 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1001, 'valid': 253, 'test': 252}
+  epoch   0  train loss -0.0145  valid IC +0.0006  RankIC +0.0049  *  (27s)
+  epoch   1  train loss -0.0299  valid IC +0.0123  RankIC +0.0185  *  (27s)
+  epoch   2  train loss -0.0403  valid IC +0.0126  RankIC +0.0151  (27s)
+  epoch   3  train loss -0.0516  valid IC +0.0302  RankIC +0.0247  *  (27s)
+  epoch   4  train loss -0.0623  valid IC +0.0533  RankIC +0.0317  *  (27s)
+  epoch   5  train loss -0.0682  valid IC +0.0512  RankIC +0.0356  (27s)
+  epoch   6  train loss -0.0732  valid IC +0.0451  RankIC +0.0260  (27s)
+  epoch   7  train loss -0.0780  valid IC +0.0609  RankIC +0.0408  *  (27s)
+  epoch   8  train loss -0.0839  valid IC +0.0171  RankIC +0.0114  (26s)
+  epoch   9  train loss -0.0908  valid IC +0.0243  RankIC +0.0166  (27s)
+  epoch  10  train loss -0.0951  valid IC +0.0332  RankIC +0.0249  (27s)
+  epoch  11  train loss -0.1015  valid IC +0.0401  RankIC +0.0303  (27s)
+  epoch  12  train loss -0.1097  valid IC +0.0174  RankIC +0.0168  (27s)
+  epoch  13  train loss -0.1107  valid IC +0.0365  RankIC +0.0341  (27s)
+  epoch  14  train loss -0.1197  valid IC +0.0020  RankIC +0.0089  (25s)
+  epoch  15  train loss -0.1215  valid IC +0.0339  RankIC +0.0293  (27s)
+  epoch  16  train loss -0.1313  valid IC +0.0444  RankIC +0.0321  (27s)
+  epoch  17  train loss -0.1342  valid IC +0.0388  RankIC +0.0341  (27s)
+  early stop: 10 epochs without improvement
+  kept epoch 7 of 18; test IC +0.0069 RankIC +0.0042 MSE 2.3887 (533s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\nasdaq100\sl20_pl5\seed42\y2021
+[68/75]
+FinFormer nasdaq100 y2022 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1002, 'valid': 252, 'test': 251}
+  epoch   0  train loss -0.0102  valid IC +0.0016  RankIC -0.0007  *  (27s)
+  epoch   1  train loss -0.0351  valid IC -0.0096  RankIC -0.0215  (27s)
+  epoch   2  train loss -0.0510  valid IC -0.0128  RankIC -0.0188  (27s)
+  epoch   3  train loss -0.0545  valid IC -0.0104  RankIC -0.0170  (27s)
+  epoch   4  train loss -0.0655  valid IC -0.0111  RankIC -0.0217  (27s)
+  epoch   5  train loss -0.0689  valid IC -0.0285  RankIC -0.0416  (27s)
+  epoch   6  train loss -0.0773  valid IC -0.0251  RankIC -0.0269  (27s)
+  epoch   7  train loss -0.0868  valid IC -0.0280  RankIC -0.0263  (27s)
+  epoch   8  train loss -0.0944  valid IC -0.0290  RankIC -0.0393  (27s)
+  epoch   9  train loss -0.0997  valid IC -0.0201  RankIC -0.0293  (27s)
+  epoch  10  train loss -0.1085  valid IC -0.0079  RankIC -0.0157  (27s)
+  early stop: 10 epochs without improvement
+  kept epoch 0 of 11; test IC -0.0096 RankIC -0.0151 MSE 2.8406 (349s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\nasdaq100\sl20_pl5\seed42\y2022
+[69/75]
+FinFormer nasdaq100 y2023 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1003, 'valid': 251, 'test': 250}
+  epoch   0  train loss -0.0048  valid IC -0.0129  RankIC -0.0064  *  (25s)
+  epoch   1  train loss -0.0355  valid IC -0.0174  RankIC -0.0247  (25s)
+  epoch   2  train loss -0.0599  valid IC -0.0017  RankIC -0.0051  *  (25s)
+  epoch   3  train loss -0.0708  valid IC -0.0056  RankIC -0.0127  (25s)
+  epoch   4  train loss -0.0785  valid IC +0.0029  RankIC -0.0024  *  (25s)
+  epoch   5  train loss -0.0886  valid IC -0.0067  RankIC -0.0127  (25s)
+  epoch   6  train loss -0.0986  valid IC -0.0026  RankIC +0.0035  (25s)
+  epoch   7  train loss -0.1020  valid IC -0.0107  RankIC -0.0046  (25s)
+  epoch   8  train loss -0.1113  valid IC -0.0064  RankIC +0.0012  (25s)
+  epoch   9  train loss -0.1202  valid IC +0.0003  RankIC +0.0082  (25s)
+  epoch  10  train loss -0.1268  valid IC -0.0037  RankIC +0.0122  (25s)
+  epoch  11  train loss -0.1325  valid IC +0.0016  RankIC +0.0104  (25s)
+  epoch  12  train loss -0.1419  valid IC -0.0131  RankIC -0.0059  (25s)
+  epoch  13  train loss -0.1461  valid IC -0.0105  RankIC +0.0033  (25s)
+  epoch  14  train loss -0.1517  valid IC -0.0005  RankIC +0.0027  (25s)
+  early stop: 10 epochs without improvement
+  kept epoch 4 of 15; test IC -0.0038 RankIC -0.0041 MSE 2.4501 (427s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\nasdaq100\sl20_pl5\seed42\y2023
+[70/75]
+FinFormer nasdaq100 y2024 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1003, 'valid': 250, 'test': 252}
+  epoch   0  train loss -0.0040  valid IC +0.0261  RankIC +0.0083  *  (27s)
+  epoch   1  train loss -0.0137  valid IC +0.0279  RankIC +0.0173  *  (26s)
+  epoch   2  train loss -0.0268  valid IC +0.0190  RankIC +0.0115  (27s)
+  epoch   3  train loss -0.0368  valid IC +0.0115  RankIC +0.0067  (27s)
+  epoch   4  train loss -0.0566  valid IC -0.0023  RankIC -0.0046  (27s)
+  epoch   5  train loss -0.0543  valid IC +0.0134  RankIC +0.0113  (27s)
+  epoch   6  train loss -0.0639  valid IC +0.0269  RankIC +0.0237  (26s)
+  epoch   7  train loss -0.0732  valid IC -0.0029  RankIC -0.0104  (27s)
+  epoch   8  train loss -0.0794  valid IC +0.0063  RankIC +0.0089  (27s)
+  epoch   9  train loss -0.0838  valid IC -0.0220  RankIC -0.0123  (27s)
+  epoch  10  train loss -0.0934  valid IC -0.0080  RankIC -0.0080  (26s)
+  epoch  11  train loss -0.0988  valid IC +0.0023  RankIC +0.0061  (26s)
+  early stop: 10 epochs without improvement
+  kept epoch 1 of 12; test IC -0.0160 RankIC -0.0187 MSE 3.5020 (368s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\nasdaq100\sl20_pl5\seed42\y2024
+[71/75] skipped: no sx5e index members at the start of 2020
+[72/75]
+FinFormer sx5e y2021 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1020, 'valid': 258, 'test': 258}
+  epoch   0  train loss -0.0200  valid IC -0.0194  RankIC -0.0326  *  (14s)
+  epoch   1  train loss -0.0268  valid IC -0.0064  RankIC -0.0207  *  (14s)
+  epoch   2  train loss -0.0388  valid IC -0.0114  RankIC -0.0316  *  (14s)
+  epoch   3  train loss -0.0429  valid IC -0.0231  RankIC -0.0384  (14s)
+  epoch   4  train loss -0.0550  valid IC -0.0177  RankIC -0.0249  (14s)
+  epoch   5  train loss -0.0614  valid IC -0.0036  RankIC -0.0093  *  (13s)
+  epoch   6  train loss -0.0702  valid IC -0.0184  RankIC -0.0218  (13s)
+  epoch   7  train loss -0.0816  valid IC -0.0131  RankIC -0.0147  (14s)
+  epoch   8  train loss -0.0934  valid IC -0.0098  RankIC -0.0097  (14s)
+  epoch   9  train loss -0.0987  valid IC +0.0031  RankIC -0.0074  *  (14s)
+  epoch  10  train loss -0.1030  valid IC -0.0031  RankIC -0.0112  (14s)
+  epoch  11  train loss -0.1157  valid IC -0.0162  RankIC -0.0139  (14s)
+  epoch  12  train loss -0.1182  valid IC +0.0052  RankIC +0.0028  (14s)
+  epoch  13  train loss -0.1258  valid IC -0.0092  RankIC -0.0176  (14s)
+  epoch  14  train loss -0.1348  valid IC +0.0072  RankIC +0.0038  *  (14s)
+  epoch  15  train loss -0.1379  valid IC +0.0089  RankIC +0.0052  (13s)
+  epoch  16  train loss -0.1474  valid IC +0.0011  RankIC -0.0069  (13s)
+  epoch  17  train loss -0.1593  valid IC -0.0036  RankIC -0.0045  (13s)
+  epoch  18  train loss -0.1579  valid IC +0.0273  RankIC +0.0239  *  (14s)
+  epoch  19  train loss -0.1670  valid IC +0.0144  RankIC +0.0112  (14s)
+  epoch  20  train loss -0.1733  valid IC +0.0147  RankIC +0.0147  (14s)
+  epoch  21  train loss -0.1840  valid IC +0.0137  RankIC +0.0127  (14s)
+  epoch  22  train loss -0.1865  valid IC +0.0135  RankIC +0.0180  (14s)
+  epoch  23  train loss -0.1900  valid IC +0.0123  RankIC +0.0169  (14s)
+  epoch  24  train loss -0.2025  valid IC +0.0182  RankIC +0.0198  (14s)
+  epoch  25  train loss -0.2081  valid IC +0.0149  RankIC +0.0205  (13s)
+  epoch  26  train loss -0.2132  valid IC +0.0127  RankIC +0.0135  (13s)
+  epoch  27  train loss -0.2147  valid IC +0.0166  RankIC +0.0187  *  (13s)
+  epoch  28  train loss -0.2238  valid IC +0.0199  RankIC +0.0300  *  (14s)
+  epoch  29  train loss -0.2316  valid IC +0.0135  RankIC +0.0160  (14s)
+  epoch  30  train loss -0.2376  valid IC +0.0128  RankIC +0.0116  (14s)
+  epoch  31  train loss -0.2444  valid IC +0.0148  RankIC +0.0227  (14s)
+  epoch  32  train loss -0.2554  valid IC +0.0163  RankIC +0.0268  (14s)
+  epoch  33  train loss -0.2577  valid IC +0.0239  RankIC +0.0319  *  (14s)
+  epoch  34  train loss -0.2648  valid IC +0.0172  RankIC +0.0216  (14s)
+  epoch  35  train loss -0.2727  valid IC +0.0162  RankIC +0.0182  (13s)
+  epoch  36  train loss -0.2767  valid IC +0.0144  RankIC +0.0179  (13s)
+  epoch  37  train loss -0.2865  valid IC +0.0105  RankIC +0.0123  (13s)
+  epoch  38  train loss -0.2946  valid IC +0.0085  RankIC +0.0070  (14s)
+  epoch  39  train loss -0.3006  valid IC +0.0138  RankIC +0.0112  (14s)
+  epoch  40  train loss -0.3046  valid IC +0.0125  RankIC +0.0152  (14s)
+  epoch  41  train loss -0.3104  valid IC +0.0225  RankIC +0.0204  (14s)
+  epoch  42  train loss -0.3187  valid IC +0.0219  RankIC +0.0209  (14s)
+  epoch  43  train loss -0.3267  valid IC +0.0179  RankIC +0.0160  (14s)
+  early stop: 10 epochs without improvement
+  kept epoch 33 of 44; test IC +0.0353 RankIC +0.0294 MSE 2.2687 (616s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\sx5e\sl20_pl5\seed42\y2021
+[73/75]
+FinFormer sx5e y2022 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1020, 'valid': 258, 'test': 257}
+  epoch   0  train loss -0.0013  valid IC +0.0036  RankIC +0.0001  *  (13s)
+  epoch   1  train loss -0.0083  valid IC -0.0099  RankIC -0.0171  (14s)
+  epoch   2  train loss -0.0274  valid IC -0.0208  RankIC -0.0266  (14s)
+  epoch   3  train loss -0.0479  valid IC -0.0290  RankIC -0.0327  (14s)
+  epoch   4  train loss -0.0604  valid IC -0.0159  RankIC -0.0142  (14s)
+  epoch   5  train loss -0.0696  valid IC -0.0226  RankIC -0.0165  (14s)
+  epoch   6  train loss -0.0864  valid IC -0.0128  RankIC -0.0105  (14s)
+  epoch   7  train loss -0.1018  valid IC +0.0084  RankIC +0.0086  *  (14s)
+  epoch   8  train loss -0.1029  valid IC -0.0136  RankIC -0.0063  (14s)
+  epoch   9  train loss -0.1143  valid IC -0.0057  RankIC +0.0005  (14s)
+  epoch  10  train loss -0.1290  valid IC +0.0039  RankIC +0.0080  (14s)
+  epoch  11  train loss -0.1398  valid IC +0.0274  RankIC +0.0309  *  (14s)
+  epoch  12  train loss -0.1437  valid IC +0.0205  RankIC +0.0222  (14s)
+  epoch  13  train loss -0.1583  valid IC +0.0252  RankIC +0.0190  *  (14s)
+  epoch  14  train loss -0.1650  valid IC +0.0018  RankIC +0.0065  (14s)
+  epoch  15  train loss -0.1756  valid IC -0.0021  RankIC +0.0063  (14s)
+  epoch  16  train loss -0.1878  valid IC -0.0022  RankIC -0.0028  (14s)
+  epoch  17  train loss -0.1905  valid IC +0.0045  RankIC +0.0050  (14s)
+  epoch  18  train loss -0.2033  valid IC +0.0255  RankIC +0.0184  (14s)
+  epoch  19  train loss -0.2108  valid IC +0.0019  RankIC +0.0056  (14s)
+  epoch  20  train loss -0.2176  valid IC +0.0176  RankIC +0.0158  (13s)
+  epoch  21  train loss -0.2264  valid IC +0.0135  RankIC +0.0140  (14s)
+  epoch  22  train loss -0.2360  valid IC -0.0023  RankIC -0.0049  (14s)
+  epoch  23  train loss -0.2386  valid IC +0.0097  RankIC +0.0074  (14s)
+  early stop: 10 epochs without improvement
+  kept epoch 13 of 24; test IC -0.0185 RankIC -0.0212 MSE 2.2814 (351s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\sx5e\sl20_pl5\seed42\y2022
+[74/75]
+FinFormer sx5e y2023 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1023, 'valid': 257, 'test': 255}
+  epoch   0  train loss -0.0009  valid IC +0.0157  RankIC +0.0250  *  (14s)
+  epoch   1  train loss -0.0156  valid IC +0.0327  RankIC +0.0290  *  (14s)
+  epoch   2  train loss -0.0348  valid IC +0.0145  RankIC +0.0221  (14s)
+  epoch   3  train loss -0.0534  valid IC +0.0201  RankIC +0.0122  (14s)
+  epoch   4  train loss -0.0707  valid IC +0.0085  RankIC +0.0082  (14s)
+  epoch   5  train loss -0.0811  valid IC +0.0008  RankIC -0.0049  (14s)
+  epoch   6  train loss -0.0966  valid IC -0.0221  RankIC -0.0215  (14s)
+  epoch   7  train loss -0.0987  valid IC +0.0020  RankIC -0.0055  (14s)
+  epoch   8  train loss -0.1088  valid IC -0.0165  RankIC -0.0268  (14s)
+  epoch   9  train loss -0.1213  valid IC -0.0055  RankIC -0.0107  (14s)
+  epoch  10  train loss -0.1276  valid IC +0.0086  RankIC +0.0009  (14s)
+  epoch  11  train loss -0.1300  valid IC -0.0033  RankIC -0.0079  (14s)
+  early stop: 10 epochs without improvement
+  kept epoch 1 of 12; test IC -0.0009 RankIC +0.0100 MSE 2.5087 (186s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\sx5e\sl20_pl5\seed42\y2023
+[75/75]
+FinFormer sx5e y2024 seed 42 (T=20, L=5, clean=True) on cuda: FinFormer (finformer.py fit): keep the weights of the best validation IC pooled over all stock-days; stop after early_stop epochs without improvement
+  days: {'train': 1022, 'valid': 255, 'test': 256}
+  epoch   0  train loss -0.0063  valid IC +0.0269  RankIC +0.0173  *  (14s)
+  epoch   1  train loss -0.0262  valid IC +0.0165  RankIC +0.0215  (14s)
+  epoch   2  train loss -0.0377  valid IC +0.0093  RankIC +0.0120  (14s)
+  epoch   3  train loss -0.0454  valid IC -0.0007  RankIC +0.0004  (14s)
+  epoch   4  train loss -0.0642  valid IC -0.0053  RankIC -0.0066  (14s)
+  epoch   5  train loss -0.0726  valid IC -0.0026  RankIC -0.0052  (14s)
+  epoch   6  train loss -0.0850  valid IC +0.0123  RankIC +0.0064  (14s)
+  epoch   7  train loss -0.0982  valid IC +0.0137  RankIC +0.0109  *  (14s)
+  epoch   8  train loss -0.1051  valid IC +0.0055  RankIC +0.0019  (14s)
+  epoch   9  train loss -0.1219  valid IC +0.0033  RankIC +0.0083  (14s)
+  epoch  10  train loss -0.1304  valid IC -0.0048  RankIC +0.0015  (14s)
+  epoch  11  train loss -0.1398  valid IC +0.0104  RankIC +0.0129  (14s)
+  epoch  12  train loss -0.1493  valid IC +0.0150  RankIC +0.0089  (14s)
+  epoch  13  train loss -0.1543  valid IC +0.0123  RankIC +0.0080  (14s)
+  epoch  14  train loss -0.1609  valid IC -0.0049  RankIC -0.0068  (14s)
+  epoch  15  train loss -0.1760  valid IC +0.0019  RankIC +0.0043  (14s)
+  epoch  16  train loss -0.1805  valid IC -0.0009  RankIC -0.0022  (14s)
+  epoch  17  train loss -0.1907  valid IC -0.0008  RankIC -0.0016  (14s)
+  early stop: 10 epochs without improvement
+  kept epoch 7 of 18; test IC -0.0161 RankIC -0.0202 MSE 1.8495 (274s) -> D:\CodeProjects\master-thesis\code\results\Regression\FinFormer\sx5e\sl20_pl5\seed42\y2024
