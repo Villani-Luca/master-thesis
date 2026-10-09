@@ -120,7 +120,7 @@ Already drafted in `latex-thesis/chapters/02_second_chapter.tex` (46 verified re
 | Topic | Status | Material | Artefact |
 |---|---|---|---|
 | Long-only top-k baseline (k = 5 for DJI, 10 otherwise; rebalance every 5 days): CAGR, Sharpe, Sortino, MaxDD, volatility, turnover vs equal-weight and index | ✅ notebook 04 | Step 4 | **portfolio table**, equity curves |
-| Seed instability of holdings (Jaccard overlap, turnover between seed portfolios) | ☐ | Step 4 | **seed-overlap figure** |
+| Seed instability: two seeds of one model share 17-46% of their portfolio and differ by up to 15 points of yearly return; seed noise is about half the model differences in RankIC, and seeds disagree on its sign in 33-46% of cells | ✅ notebooks 03 §5, 04 §5 | **seed-overlap figure**, seed-vs-model table |
 | Models pick different stocks: two models' portfolios share 10-27% of their stocks (chance: 5-11%); the closest pairs share their feature set (MASTER-FactorVAE, HIST-DiscoverPLF/FinFormer), a first hint that the input data shapes the choices | ✅ notebook 04 obs. 7 | **model-overlap heatmaps** |
 | Margins to the k-boundary and **decision fragility** (12-18% of holdings within 0.1 score standard deviations of the cut; seed-noise comparison after stage 4) | ◐ notebook 04 | Steps 4, 9.1 | distribution figure |
 | Counterfactuals in feature space (Wachter-style, constraints: z-range, immutable market features, correlated groups) | ⭘ | Step 9.2 A | table of minimal perturbations |
