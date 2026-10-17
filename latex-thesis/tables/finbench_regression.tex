@@ -1,0 +1,39 @@
+\begin{table}[tb]
+\centering
+\caption{Regression error of our runs and of FinBench~\cite{pederzoli2026finbench} (horizon $L=5$, lookback $T=20$), averaged over the test years and the seeds 0, 5, 42; $\pm$: standard deviation between seeds. $\Delta$: our error relative to FinBench's; the lower error is in bold. $^\dagger$Our SX5E test years are 2021--2024 (constituent history starts in September 2020), FinBench's 2020--2024.}
+\begin{adjustbox}{max width=\textwidth}
+{\normalsize
+\setlength{\tabcolsep}{6pt}
+
+\begin{tabular}{llrrrrrr}
+\toprule
+\multirow{2}{*}{\textbf{Universe}} & \multirow{2}{*}{\textbf{Model}} & \multicolumn{3}{c}{\textbf{MSE}} & \multicolumn{3}{c}{\textbf{MAE}} \\
+\cmidrule(lr){3-5} \cmidrule(lr){6-8}
+ & & Ours & FinBench & $\Delta$ & Ours & FinBench & $\Delta$ \\
+\midrule
+\multirow{6}{*}{DJI} & MASTER & \textbf{0.980} {\scriptsize$\pm$0.001} & 1.249 & -21.5\% & \textbf{0.746} {\scriptsize$\pm$0.000} & 0.859 & -13.1\% \\
+ & MATCC & 1.491 {\scriptsize$\pm$0.009} & \textbf{1.130} & +32.0\% & 0.942 {\scriptsize$\pm$0.003} & \textbf{0.818} & +15.1\% \\
+ & FactorVAE & \textbf{0.888} {\scriptsize$\pm$0.003} & 0.971 & -8.5\% & \textbf{0.725} {\scriptsize$\pm$0.002} & 0.758 & -4.4\% \\
+ & HIST & \textbf{0.985} {\scriptsize$\pm$0.021} & 0.997 & -1.2\% & 0.748 {\scriptsize$\pm$0.009} & \textbf{0.747} & +0.2\% \\
+ & DiscoverPLF & \textbf{1.187} {\scriptsize$\pm$0.068} & 1.211 & -2.0\% & \textbf{0.827} {\scriptsize$\pm$0.024} & 0.830 & -0.3\% \\
+ & FinFormer & 2.467 {\scriptsize$\pm$0.428} & \textbf{1.657} & +48.9\% & 1.230 {\scriptsize$\pm$0.124} & \textbf{0.982} & +25.3\% \\
+\midrule
+\multirow{6}{*}{NASDAQ 100} & MASTER & \textbf{1.015} {\scriptsize$\pm$0.001} & 1.017 & -0.2\% & \textbf{0.718} {\scriptsize$\pm$0.001} & 0.720 & -0.3\% \\
+ & MATCC & 1.731 {\scriptsize$\pm$0.020} & \textbf{1.713} & +1.1\% & 0.989 {\scriptsize$\pm$0.004} & \textbf{0.981} & +0.8\% \\
+ & FactorVAE & \textbf{0.903} {\scriptsize$\pm$0.002} & 0.918 & -1.6\% & \textbf{0.718} {\scriptsize$\pm$0.000} & 0.725 & -0.9\% \\
+ & HIST & 1.035 {\scriptsize$\pm$0.015} & \textbf{1.030} & +0.4\% & 0.723 {\scriptsize$\pm$0.006} & \textbf{0.721} & +0.3\% \\
+ & DiscoverPLF & 1.154 {\scriptsize$\pm$0.039} & \textbf{1.104} & +4.5\% & 0.766 {\scriptsize$\pm$0.013} & \textbf{0.737} & +4.0\% \\
+ & FinFormer & 2.403 {\scriptsize$\pm$0.180} & \textbf{1.458} & +64.8\% & 1.161 {\scriptsize$\pm$0.072} & \textbf{0.867} & +33.9\% \\
+\midrule
+\multirow{6}{*}{SX5E$^\dagger$} & MASTER & \textbf{1.004} {\scriptsize$\pm$0.001} & 1.097 & -8.4\% & \textbf{0.752} {\scriptsize$\pm$0.000} & 0.792 & -5.1\% \\
+ & MATCC & 1.644 {\scriptsize$\pm$0.033} & \textbf{1.495} & +10.0\% & 0.995 {\scriptsize$\pm$0.014} & \textbf{0.941} & +5.8\% \\
+ & FactorVAE & \textbf{0.944} {\scriptsize$\pm$0.002} & 0.960 & -1.7\% & \textbf{0.758} {\scriptsize$\pm$0.001} & 0.764 & -0.8\% \\
+ & HIST & \textbf{1.068} {\scriptsize$\pm$0.047} & 1.113 & -4.0\% & \textbf{0.779} {\scriptsize$\pm$0.019} & 0.796 & -2.2\% \\
+ & DiscoverPLF & 1.212 {\scriptsize$\pm$0.034} & \textbf{1.149} & +5.5\% & 0.836 {\scriptsize$\pm$0.012} & \textbf{0.811} & +3.1\% \\
+ & FinFormer & 2.604 {\scriptsize$\pm$0.401} & \textbf{1.430} & +82.1\% & 1.293 {\scriptsize$\pm$0.126} & \textbf{0.922} & +40.2\% \\
+\bottomrule
+\end{tabular}
+}
+\end{adjustbox}
+\label{tab:finbench_regression}
+\end{table}
