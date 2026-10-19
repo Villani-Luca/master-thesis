@@ -114,9 +114,11 @@ def run_portfolio(run_dirs: list[Path], model: str, universe: str, seq_len: int,
 
     `run_dirs`: the trained runs of consecutive test years (one per year). `returns`: the output of
     asset_returns(universe), to reuse it across models. Writes holdings.parquet (every candidate,
-    held or not), returns.parquet (portfolio, equal-weight benchmark, index) and metrics.json.
+    held or not), returns.parquet (portfolio, equal-weight benchmark, index), their .csv.gz copies
+    (xaifin.store) and metrics.json.
     """
     from xaifin.portfolio.topk import load_predictions, rebalance_periods, topk_holdings
+    from xaifin.store import write_portfolio_csv
 
     k = int(k or TOP_K[universe])
     seq_len, pred_len, seed = int(seq_len), int(pred_len), int(seed)
@@ -147,6 +149,7 @@ def run_portfolio(run_dirs: list[Path], model: str, universe: str, seq_len: int,
     out.mkdir(parents=True, exist_ok=True)
     holdings.to_parquet(out / "holdings.parquet", index=False)
     daily.rename_axis("date").reset_index().to_parquet(out / "returns.parquet", index=False)
+    write_portfolio_csv(out)
     (out / "metrics.json").write_text(json.dumps(metrics, indent=2))
     return metrics
 

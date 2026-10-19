@@ -8,7 +8,8 @@ weights on the test year and writes, in RunConfig.run_dir:
 - metrics.json: test metrics of the kept weights (metrics.summary);
 - train_history.csv: one row per epoch (trainer.fit);
 - results_sl<T>_pl<L>.pkl: FinBench's results format (metrics, preds, labels, pred_date, last_date,
-  tickers), so FinBench's Evaluation/ code can read it.
+  tickers), so FinBench's Evaluation/ code can read it;
+- predictions.csv.gz: the same predictions as a table (xaifin.store), the copy that goes in git.
 
 run_grid skips the runs whose metrics.json exists, so an interrupted grid resumes where it stopped.
 """
@@ -29,6 +30,7 @@ from xaifin.config import rolling_window
 from xaifin.data.loading import active_tickers, trading_days
 from xaifin.models.base import ModelAdapter, RunConfig
 from xaifin.models.registry import find_runs, get_adapter
+from xaifin.store import write_predictions_csv
 from xaifin.training.trainer import SELECTION_RULES, evaluate, fit
 
 
@@ -96,6 +98,7 @@ def train_run(cfg: RunConfig, device: str | None = None, log: Callable[[str], No
     history.to_csv(run_dir / "train_history.csv", index=False)
     with open(run_dir / f"results_sl{cfg.seq_len}_pl{cfg.pred_len}.pkl", "wb") as f:
         pickle.dump(results, f)
+    write_predictions_csv(run_dir)
     (run_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))  # last: marks the run as done
     log(f"  kept epoch {result['kept_epoch']} of {result['epochs_run']}; test IC {metrics['IC']:+.4f} "
         f"RankIC {metrics['RankIC']:+.4f} MSE {metrics['MSE']:.4f} ({time.time() - start:.0f}s) -> {run_dir}")

@@ -69,20 +69,25 @@ def load_run(run_dir: Path, device: str | torch.device | None = None) -> ModelAd
 
 
 def find_runs(results_root: Path = RESULTS_ROOT) -> pd.DataFrame:
-    """One row per trained run (a folder with model.pth) of the results store, with what it holds."""
+    """One row per trained run (a folder with model.pth or config.json) of the results store, with what it holds.
+
+    A clone of the repository has no model.pth (not in git, see xaifin.store), so runs are also found by config.json.
+    """
     rows = []
-    for checkpoint in sorted(Path(results_root).glob("Regression/*/*/*/*/*/model.pth")):
-        run_dir = checkpoint.parent
+    run_dirs = {p.parent for name in ("model.pth", "config.json")
+                for p in Path(results_root).glob(f"Regression/*/*/*/*/*/{name}")}
+    for run_dir in sorted(run_dirs):
         try:
             cfg, has_config = run_config(run_dir)
         except ValueError:
             continue
         rows.append({
             "model": cfg.model, "universe": cfg.universe, "seq_len": cfg.seq_len, "pred_len": cfg.pred_len,
-            "seed": cfg.seed, "test_year": cfg.test_year, "clean": cfg.clean, "config.json": has_config,
+            "seed": cfg.seed, "test_year": cfg.test_year, "clean": cfg.clean, "checkpoint": (run_dir / "model.pth").exists(),
+            "config.json": has_config,
             "metrics": (run_dir / "metrics.json").exists(), "history": (run_dir / "train_history.csv").exists(),
             "path": run_dir,
         })
-    columns = ["model", "universe", "seq_len", "pred_len", "seed", "test_year", "clean", "config.json", "metrics",
+    columns = ["model", "universe", "seq_len", "pred_len", "seed", "test_year", "clean", "checkpoint", "config.json", "metrics",
                "history", "path"]
     return pd.DataFrame(rows, columns=columns)
