@@ -67,9 +67,18 @@ def load_constituents(universe: str, source: str = "eodhd") -> pd.DataFrame:
     })
 
 
-def load_alpha(universe: str, kind: str = "alpha158") -> pd.DataFrame:
-    """Feature file of a universe: instrument, date (ISO string), then the feature columns."""
-    return pd.read_csv(alpha_path(universe, kind))
+def load_alpha(universe: str, kind: str = "alpha158", tickers: list[str] | None = None) -> pd.DataFrame:
+    """Feature file of a universe: instrument, date (ISO string), then the feature columns; only `tickers` if given.
+
+    Reads the Parquet copy (<universe>_<kind>.parquet, scripts/convert_data.py) when it exists:
+    the same table, but only the requested tickers are read. The CSV files of S&P 500 and STOXX 600
+    are 10-25 GB, too much to parse in full for every run when many runs share a server.
+    """
+    parquet = alpha_path(universe, kind).with_suffix(".parquet")
+    if parquet.exists():
+        return pd.read_parquet(parquet, filters=[("instrument", "in", list(tickers))] if tickers is not None else None)
+    df = pd.read_csv(alpha_path(universe, kind))
+    return df if tickers is None else df[df["instrument"].isin(tickers)]
 
 
 def active_tickers(universe: str, on_date: str, source: str = "eodhd") -> list[str]:
@@ -115,8 +124,7 @@ def alpha_frame(universe: str, window, pred_len: int, kind: str = "alpha158", ma
     features by date, add the label, keep the tickers with data in the training period.
     `window` is a config.RollingWindow. Dates stay ISO strings, as in FinBench.
     """
-    df = load_alpha(universe, kind)
-    df = df[df["instrument"].isin(active_tickers(universe, window.start_test_date, constituents))]
+    df = load_alpha(universe, kind, active_tickers(universe, window.start_test_date, constituents))
     if market:
         df = df.merge(load_market(universe), how="left", on="date")
     df = add_labels(df, universe, pred_len)

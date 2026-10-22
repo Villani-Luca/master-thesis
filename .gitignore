@@ -55,3 +55,11 @@ code/results/xai/**/attributions.npz
 code/results/Regression/**/*.pth
 code/results/Regression/**/*.pkl
 code/results/portfolio/**/*.parquet
+
+
+# Half-trained runs (deleted when the run finishes)
+code/results/Regression/**/resume.pt
+code/results/Regression/**/resume.tmp
+
+# Logs of grid.py run
+logs/

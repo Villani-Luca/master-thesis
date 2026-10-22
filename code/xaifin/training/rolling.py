@@ -12,6 +12,8 @@ weights on the test year and writes, in RunConfig.run_dir:
 - predictions.csv.gz: the same predictions as a table (xaifin.store), the copy that goes in git.
 
 run_grid skips the runs whose metrics.json exists, so an interrupted grid resumes where it stopped.
+While a run trains, resume.pt holds its state after the last finished epoch (trainer.fit), so an
+interrupted run also resumes from there instead of from scratch; it is deleted when the run is saved.
 """
 
 import json
@@ -31,6 +33,8 @@ from xaifin.data.loading import active_tickers, trading_days
 from xaifin.models.base import ModelAdapter, RunConfig
 from xaifin.models.registry import find_runs, get_adapter
 from xaifin.store import write_predictions_csv
+
+RESUME_FILE = "resume.pt"
 from xaifin.training.trainer import SELECTION_RULES, evaluate, fit
 
 
@@ -71,7 +75,9 @@ def train_run(cfg: RunConfig, device: str | None = None, log: Callable[[str], No
         f"clean={cfg.clean}) on {adapter.device}: {SELECTION_RULES[adapter.hparams['selection']]}")
     days = {split: len(dataset) for split, dataset in adapter.splits().items()}
     log(f"  days: {days}")
-    result = fit(adapter, log)
+    resume_file = cfg.run_dir / RESUME_FILE
+    cfg.run_dir.mkdir(parents=True, exist_ok=True)
+    result = fit(adapter, log, resume_file=resume_file)
     metrics, results = _test_results(adapter)
 
     adapter.save()
@@ -100,6 +106,7 @@ def train_run(cfg: RunConfig, device: str | None = None, log: Callable[[str], No
         pickle.dump(results, f)
     write_predictions_csv(run_dir)
     (run_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))  # last: marks the run as done
+    resume_file.unlink(missing_ok=True)
     log(f"  kept epoch {result['kept_epoch']} of {result['epochs_run']}; test IC {metrics['IC']:+.4f} "
         f"RankIC {metrics['RankIC']:+.4f} MSE {metrics['MSE']:.4f} ({time.time() - start:.0f}s) -> {run_dir}")
     return metrics

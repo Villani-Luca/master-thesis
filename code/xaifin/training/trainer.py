@@ -7,12 +7,16 @@ final weights) come from the adapter, so one loop trains all six models as FinBe
 
 import collections
 import copy
+import os
+import random
 import time
+from pathlib import Path
 from typing import Callable, Iterable
 
 import numpy as np
 import pandas as pd
 import torch
+from torch.optim.lr_scheduler import LRScheduler
 
 from xaifin.data.datasets import DayBatch
 from xaifin.models.base import ModelAdapter
@@ -93,13 +97,44 @@ def average_params(params_list) -> dict:
     return new_params
 
 
-def fit(adapter: ModelAdapter, log: Callable[[str], None] = print) -> dict:
+def _scheduler_state(scheduler) -> dict:
+    """A scheduler's state, including the schedulers it wraps (MATCC's ChainedScheduler holds three)."""
+    own = {k: v for k, v in scheduler.__dict__.items() if k != "optimizer" and not isinstance(v, LRScheduler)}
+    inner = {k: _scheduler_state(v) for k, v in scheduler.__dict__.items() if isinstance(v, LRScheduler)}
+    return {"own": own, "inner": inner}
+
+
+def _load_scheduler_state(scheduler, state: dict) -> None:
+    scheduler.__dict__.update(state["own"])
+    for k, inner in state["inner"].items():
+        _load_scheduler_state(getattr(scheduler, k), inner)
+
+
+def _rng_state() -> dict:
+    return {"python": random.getstate(), "numpy": np.random.get_state(), "torch": torch.get_rng_state(),
+            "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None}
+
+
+def _load_rng_state(state: dict) -> None:
+    random.setstate(state["python"])
+    np.random.set_state(state["numpy"])
+    torch.set_rng_state(state["torch"])
+    if state["cuda"] is not None and torch.cuda.is_available():
+        torch.cuda.set_rng_state_all(state["cuda"])
+
+
+def fit(adapter: ModelAdapter, log: Callable[[str], None] = print, resume_file: Path | None = None) -> dict:
     """Train with the adapter's FinBench settings and load the weights its selection rule keeps.
 
     After every epoch the validation split is evaluated (metrics in the history; the rules that
     need it use it). Returns {'history': DataFrame, 'kept_epoch', 'epochs_run', 'seconds'}; the
     history has one row per epoch: train_loss, lr, valid_* metrics, and kept (this epoch's weights
     became the kept ones).
+
+    With `resume_file`, the whole training state (weights, optimizer, scheduler, random generators,
+    history, kept weights) is saved there after every epoch, and if the file already exists training
+    picks up after the last saved epoch. An interrupted run then loses at most one epoch, and ends
+    with the same weights as an uninterrupted one. The caller deletes the file once the run is saved.
     """
     h, model = adapter.hparams, adapter.model
     rule = h["selection"]
@@ -109,9 +144,37 @@ def fit(adapter: ModelAdapter, log: Callable[[str], None] = print) -> dict:
     recent = collections.deque(maxlen=h.get("smooth_steps", 1))
     history, kept_state, kept_epoch = [], None, None
     best = np.inf if rule == "min_valid_loss" else -np.inf
-    stall, start = 0, time.time()
+    stall, start, elapsed, first_epoch, finished = 0, time.time(), 0.0, 0, False
 
-    for epoch in range(h["n_epochs"]):
+    if resume_file is not None and Path(resume_file).exists():
+        state = torch.load(resume_file, map_location="cpu", weights_only=False)
+        device = next(model.parameters()).device
+        on_device = lambda sd: {k: v.to(device) for k, v in sd.items()}  # noqa: E731
+        model.load_state_dict(state["model"])
+        optimizer.load_state_dict(state["optimizer"])
+        if scheduler is not None:
+            _load_scheduler_state(scheduler, state["scheduler"])
+        recent.extend(on_device(sd) for sd in state["recent"])
+        history, kept_epoch, best, stall = state["history"], state["kept_epoch"], state["best"], state["stall"]
+        kept_state = on_device(state["kept_state"]) if state["kept_state"] is not None else None
+        elapsed, finished, epoch = state["seconds"], state["finished"], state["epoch"]
+        first_epoch = epoch + 1
+        _load_rng_state(state["rng"])
+        log(f"  resuming after epoch {epoch} ({elapsed / 60:.0f} min already trained)")
+
+    def save_state(epoch: int, finished: bool) -> None:
+        if resume_file is None:
+            return
+        state = {"epoch": epoch, "finished": finished, "model": model.state_dict(),
+                 "optimizer": optimizer.state_dict(),
+                 "scheduler": _scheduler_state(scheduler) if scheduler is not None else None,
+                 "recent": list(recent), "history": history, "kept_state": kept_state, "kept_epoch": kept_epoch,
+                 "best": best, "stall": stall, "seconds": elapsed + time.time() - start, "rng": _rng_state()}
+        tmp = Path(resume_file).with_suffix(".tmp")
+        torch.save(state, tmp)
+        os.replace(tmp, resume_file)  # atomic: a kill during the save leaves the previous file intact
+
+    for epoch in range(first_epoch, h["n_epochs"]) if not finished else ():
         tick = time.time()
         row = {"epoch": epoch, "lr": optimizer.param_groups[0]["lr"]}
         row["train_loss"] = train_epoch(adapter, optimizer, scheduler, epoch)
@@ -121,6 +184,7 @@ def fit(adapter: ModelAdapter, log: Callable[[str], None] = print) -> dict:
             recent.append(current)
             if epoch < h.get("eval_from_epoch", 0):  # DiscoverPLF evaluates only from epoch 20
                 history.append(row | {"kept": False, "seconds": time.time() - tick})
+                save_state(epoch, finished=False)
                 continue
             model.load_state_dict(average_params(recent))
 
@@ -143,10 +207,12 @@ def fit(adapter: ModelAdapter, log: Callable[[str], None] = print) -> dict:
         log(f"  epoch {epoch:3d}  train loss {row['train_loss']:.4f}  valid IC {valid['IC']:+.4f}  "
             f"RankIC {valid['RankIC']:+.4f}" + ("  *" if improved else "") + f"  ({row['seconds']:.0f}s)")
 
-        if rule == "train_loss_threshold" and row["train_loss"] <= h["train_stop_loss_thred"]:
-            break
-        if h.get("early_stop") and stall >= h["early_stop"]:
+        stop = rule == "train_loss_threshold" and row["train_loss"] <= h["train_stop_loss_thred"]
+        if not stop and h.get("early_stop") and stall >= h["early_stop"]:
             log(f"  early stop: {stall} epochs without improvement")
+            stop = True
+        save_state(epoch, finished=stop or epoch == h["n_epochs"] - 1)
+        if stop:
             break
 
     if rule in ("last", "train_loss_threshold") or kept_state is None:  # None: the score was never finite
@@ -157,4 +223,4 @@ def fit(adapter: ModelAdapter, log: Callable[[str], None] = print) -> dict:
     model.load_state_dict(kept_state)
     model.eval()
     return {"history": pd.DataFrame(history), "kept_epoch": kept_epoch, "epochs_run": epoch + 1,
-            "seconds": time.time() - start}
+            "seconds": elapsed + time.time() - start}

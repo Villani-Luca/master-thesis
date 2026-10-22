@@ -4,6 +4,13 @@ This is the working plan for turning [`docs/papers/Outline Tesi.pdf`](docs/paper
 
 > **Research question.** Stock-prediction models have weak predictive power (accuracy ≈ 50%, IC ≈ 0.0x). That instability carries over into long-only top-k portfolios. *How do input features drive predictions, how does that turn into allocation decisions, and does the instability come from the **data** or from the **model design**?*
 
+> **Deadline: everything finished by 2026-11-18** (decided 2026-10-22). The full plan below would take about two months, so it is cut to fit:
+> - **XAI starts on the 117 runs available** (seed 42 of all six models on dji, nasdaq100, sx5e × L = 5, plus MASTER seeds 0 and 5; the stage-4 seed 0/5 runs of the other models were lost). The whole grid (all seeds, sp500, sxxp, and the **required** horizons L = 1 and 20) is trained in parallel on an external H200 (`code/scripts/remote/`, ~13 days). Steps 3–4 cover the full grid with all three horizons. XAI then extends to the seed 0/5 runs at L = 5 (needed for the seed factor of Step 7), and, if time is left, to L = 1 and 20 on the same three universes.
+> - Working plan, decisions (methods, targets, granularity) and log: [`PIANO.md`](PIANO.md).
+> - **Kept:** Step 5 with IG, permutation importance by family and attention where easy; Step 6 reduced; **Step 7 in full** (the core result); Step 8 light; Step 9.1; app pages `3_Explain` and `4_Compare`; writing.
+> - **Cut (future work in the thesis):** SHAP/LIME beyond dji y2020, Step 9.2, Step 10, page `5_Over_time`, the LightGBM/TreeSHAP reference unless time is left.
+> - The calendar is in §3. Items marked *(cut)* below are not done before the deadline.
+
 ---
 
 ## 0. How to use this guide
@@ -313,7 +320,8 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 - [x] `training/rolling.py` + `scripts/train_rolling.py --models MASTER --universes dji --years 2020-2024 --seeds 0 5 42 --sl 20 --pl 5`. Skips runs that already exist (resumable); `--models all`; logs to `results/Regression/train_rolling.log`. Each run writes `model.pth`, `config.json` (with a `training` section: rule, kept epoch, validation metrics, time, device), `metrics.json`, `train_history.csv` and FinBench's `results_sl<T>_pl<L>.pkl`.
 - [x] Migrate the existing MASTER results to the new layout (done 2026-09-29, see §2.2). → Moved to `results/legacy/` on 2026-10-06: they used another selection rule and no data-quality filter.
 - [x] FinBench's published numbers: `results/analysis/finbench_table2.csv` (Table 2: MSE and MAE only; FinBench reports no IC for these six models).
-- [ ] Run the grid **in stages**, checking each stage before going on:
+- [ ] **Extended grid on the external H200** (2026-10-22): sp500 and sxxp added, horizons L = 1, 5, 20, so 1242 runs (117 done). **All three horizons are required.** Launched as one grid (the scheduler packs big and small tasks together); ~13 days, so back around 4–6 Nov: this is the critical path of the calendar. When it is back: `grid.py status` 1242/1242, `export_results.py`, `run_portfolio.py`, notebooks 03 and 04 re-run.
+- [x] Run the grid **in stages**, checking each stage before going on:
   1. MASTER × dji × y2020 × seed 42 (already done, re-run through the package); → ✅ 2026-10-06: stopped at epoch 6 (training loss 0.947), test IC 0.044, RankIC 0.053, MSE 0.977; 1 minute on the RTX 5090;
   2. all 6 models × dji × y2020 × seed 42 → compare with the FinBench tables (`code/finbench/results.md`). FactorVAE will score lower if its test-time leakage is fixed; → ✅ 2026-10-06. Test RankIC 0.009 (DiscoverPLF) to 0.053 (MASTER); MSE in FinBench's range for HIST (0.963 vs 0.997) and DiscoverPLF (1.176 vs 1.211), higher for MATCC (1.60 vs 1.13) and FinFormer (2.93 vs 1.66, scale-free loss), lower for MASTER (0.98 vs 1.25); one year and one seed against FinBench's averages, so indicative only. Validation IC at the kept epoch is often ≤ 0: the selection rules pick on noise. FactorVAE keeps epoch 1 of 30 (lowest validation VAE loss). Times: MASTER 1 min, FinFormer 3, HIST 6, MATCC 13, DiscoverPLF 17, FactorVAE 50;
   3. all 6 models × {dji, nasdaq100, sx5e} × 2020–2024 × seed 42. SX5E only has 2021–2024: its membership history starts on 2020-09-30, so the 2020 universe is empty (notebook 01); → ✅ 2026-10-07: 84 runs, no failures, about 29 GPU hours (FactorVAE 15 of them). Results in notebook 03;
@@ -352,15 +360,16 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 | Family | Method | Resolution | Notes |
 |---|---|---|---|
 | Gradient (Captum) | Saliency, **Integrated Gradients**, GradientSHAP, DeepLIFT | full `[T,F]` per stock | fast on GPU; main workhorse. Baseline = 0 (training median) |
-| Shapley / surrogate | **KernelSHAP / PermutationSHAP**, **LIME** | **feature groups** | full `T×F` (e.g. 20×221) is too many players, so mask a feature across all timesteps (F players), or use families (~35 players) |
+| Shapley / surrogate | **KernelSHAP / PermutationSHAP**, **LIME** | **feature groups** | full `T×F` (e.g. 20×221) is too many players, so mask a feature across all timesteps (F players), or use families (~35 players). **Deadline scope: dji y2020 only**, as a check of IG |
 | Global, model-agnostic | **Cross-sectional permutation importance** | per feature / family | shuffle a feature *across stocks within each day*, then measure the drop in RankIC and the change in top-k membership. The metric closest to finance |
 | Time-series specific | lag-window occlusion, TimeSHAP-style (feature × time-step × event) | per lag / window | answers "which days in the lookback matter?" |
 | Intrinsic | attention weights (MASTER T/S attention, gate; MATCC; FinFormer), HIST concept weights, FactorVAE factor exposures | model-specific | the MASTER notebook already notes that the attention modules must be patched to *return* their weights. Use this as supporting evidence only (attention ≠ explanation) |
-| Reference | TreeSHAP on LightGBM | exact | anchors "what the data allows" (Step 7) |
+| Reference | TreeSHAP on LightGBM | exact | anchors "what the data allows" (Step 7). *(cut unless time is left)* |
 
 - [ ] `xai/base.py`: an `Explainer` protocol, `explain(adapter, batch, target) -> attr[N,T,F]`. `target` is either `"pred"` (the raw score) or `"topk_margin"` (the score minus the k-boundary score, which explains *portfolio membership* rather than the score).
 - [ ] Implement the methods above, one module per family.
-- [ ] Explain only on **rebalance dates** (≈50 per year) to keep storage manageable: 50 × 100 stocks × 20 × 221 × 2 bytes ≈ 45 MB per run in float16.
+- [ ] Explain only on **rebalance dates** (≈50 per year) to keep storage manageable: 50 × 100 stocks × 20 × 221 × 2 bytes ≈ 45 MB per run in float16. Use the same L = 5 dates for every horizon (L = 1 would have five times as many).
+- [ ] First, measure the cost of IG on one run (MASTER and FactorVAE, dji y2020) to size the batch over the 252 runs. Permutation importance by **family** (~35 groups), not by single feature.
 
 ### 5.2 Aggregation and ranking (`xai/aggregate.py`)
 - [ ] Normalize each sample: `ã = |a| / Σ|a|`, so that models with different output scales are comparable.
@@ -374,7 +383,7 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 - [ ] **Notebook `05_xai_single_model.ipynb`**: MASTER × dji × y2020. Run every method, then show a `T×F` heatmap for one stock/day, the top-20 features globally, a family bar chart, the lag profile, permutation importance vs IG, and attention maps. Only after this works, generalize to the other models.
 - [ ] **App page `3_Explain.py`**: pick model/universe/year/seed/method → (a) global ranking bar chart plus family breakdown, (b) a date + ticker selector showing the `T×F` heatmap and a waterfall of the top features, (c) an "explain now" button that runs a gradient method on demand for one day (GPU, cached), (d) the attention viewer for models that expose it.
 
-**Done when:** `global.parquet` exists for at least IG and permutation importance for every run in the grid, and SHAP/LIME exist for the stage-2 grid (every model, dji, y2020).
+**Done when:** `global.parquet` exists for IG and permutation importance for every available L = 5 run on dji, nasdaq100, sx5e (117 now, all three seeds once the H200 grid is back), for both targets (`pred` and `topk_margin`), and SHAP/LIME exist for the stage-2 grid (every model, dji, y2020). If a model's internals (HIST graph, FactorVAE, attention weights) take more than a day, keep IG and permutation for it and skip its attention.
 **Thesis artefacts:** top-feature tables per model; family-importance figure; example local explanation.
 
 ---
@@ -385,12 +394,12 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 
 ### Tasks (`xai/evaluation.py`, results in `xai_metrics.json`)
 - [ ] **Faithfulness:** deletion/insertion curves. Mask the top-k attributed features (with the baseline), record |Δ prediction| and ΔRankIC, and compare with random masking. Report AOPC.
-- [ ] **Stability / robustness:** similarity of attributions under small input noise (max-sensitivity). Also similarity between neighbouring days for the same stock.
+- [ ] *(cut)* **Stability / robustness:** similarity of attributions under small input noise (max-sensitivity). Also similarity between neighbouring days for the same stock.
 - [ ] **Sanity check** (Adebayo et al. 2018): randomize the model weights; the attributions must change.
 - [ ] **Method agreement:** rank correlation between IG, SHAP, LIME and permutation importance on the same run.
-- [ ] **Baseline sensitivity:** zero baseline vs per-day cross-sectional mean.
+- [ ] *(cut)* **Baseline sensitivity:** zero baseline vs per-day cross-sectional mean.
 - [ ] **Notebook `06_xai_evaluation.ipynb`**: pick the methods to trust for the rest of the thesis, and justify the choice.
-- [ ] **App:** a "quality" tab on `3_Explain.py` with the deletion curve and the method-agreement heatmap.
+- [ ] *(cut)* **App:** a "quality" tab on `3_Explain.py` with the deletion curve and the method-agreement heatmap.
 
 **Done when:** a documented choice of primary method(s) with the evidence behind it.
 
@@ -414,7 +423,7 @@ Within a group, compare features one to one. Across groups, compare at the **fam
   - models **agree** on features, and IC is low for all of them → the signal in the data is limited or noisy (**data-driven instability**);
   - models **disagree** while having similar IC → several equally good but different explanations exist (Rashomon effect), so architecture drives *which* signal is used (**model-driven**);
   - seed disagreement ≈ model disagreement → the explanations themselves are not stable, so no architectural conclusion can be drawn;
-  - LightGBM/TreeSHAP reference: if the deep models' top features match it, the data sets the pattern.
+  - LightGBM/TreeSHAP reference *(cut unless time is left)*: if the deep models' top features match it, the data sets the pattern.
 - [ ] Link to allocation: repeat the comparison with `target="topk_margin"` attributions. Do the features that drive the *portfolio* differ from those that drive the *score*?
 - [ ] **Notebook `07_cross_model_comparison.ipynb`**: agreement heatmaps (model × model), seed-vs-model agreement boxplots, the variance-decomposition table, and "consistently dominant features" (features in the top-10 across ≥ X% of runs).
 - [ ] **App page `4_Compare.py`**: multi-select models → side-by-side rankings, an agreement heatmap, a family radar/bar chart, and seed-dispersion error bars.
@@ -428,12 +437,14 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 
 **Goal:** find out whether particular periods (high volatility) change model behaviour and explanations.
 
+**Deadline scope (light):** yearly only, 2020 and 2022 against the calmer years: IC, portfolio returns and family shares per year, plus the year-to-year drift. The monthly series and the app page are cut.
+
 ### Tasks
 - [ ] `analysis/regimes.py`: realized volatility of the index from `<nation>_market.csv` (e.g. `std_price_change_20_*`), then label each date/month low/medium/high volatility. Mark the known events: 2020 COVID crash, 2022 rate-hike bear market.
 - [ ] Per regime and per year: IC/RankIC, portfolio returns, **importance drift** (the distance between importance vectors of consecutive windows), and family shares (e.g. does volatility/market importance rise in turbulent periods?).
-- [ ] A monthly (not yearly) attribution time-series inside each test year.
+- [ ] *(cut)* A monthly (not yearly) attribution time-series inside each test year.
 - [ ] **Notebook `08_period_analysis.ipynb`**: a timeline plot (index vol, IC and family shares stacked on shared x-axes), and a regime × model table.
-- [ ] **App page `5_Over_time.py`**: pick model/universe → importance over time with volatility shading, plus a year-to-year drift chart.
+- [ ] *(cut)* **App page `5_Over_time.py`**: pick model/universe → importance over time with volatility shading, plus a year-to-year drift chart.
 
 **Done when:** a figure and a short text answering "are some periods more unstable, and do the explanations shift with them?".
 
@@ -448,7 +459,9 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 - [ ] Compare the margins with the **seed standard deviation of predictions** (Step 3). *Decision fragility* = the fraction of holdings whose margin is smaller than the seed noise.
 - [ ] Flip rate under Gaussian noise ε on predictions, for ε in a grid; the resulting turnover and return change.
 
-### 9.2 Input space (with realistic constraints)
+**Deadline scope:** 9.1 only (the margins exist since Step 4), in notebook 04 or a short notebook 09. 9.2 is cut and goes to future work.
+
+### 9.2 Input space (with realistic constraints) *(cut)*
 - [ ] **(A) Feature space, gradient-based** (Wachter-style): minimize `‖δ‖₁ + λ·hinge(margin(x+δ))` using `adapter.forward`. Constraints: stay inside the clipped z-range [−3, 3], perturb only mutable features (not `market`), keep perturbations sparse, and move correlated features together (clusters from Step 1).
 - [ ] **(B) OHLCV space, black-box** (most realistic, because the features are derived): perturb the raw price/volume path of the last few days (e.g. close ±x%), **recompute Alpha158/360** with the pipeline in `finbench/Evaluation/features/`, re-normalize, and re-predict. Bisection/random search on x finds the minimal perturbation that flips membership.
 - [ ] Metrics: distance of the counterfactual (L1 in z-space, number of features changed, % price move), flip rate at a given ε, and which features the counterfactuals change most (compare with Step 5 attributions).
@@ -459,7 +472,9 @@ Within a group, compare features one to one. Across groups, compare at the **fam
 
 ---
 
-## Step 10: Data-perturbation sensitivity tests (*Seconda parte*)
+## Step 10: Data-perturbation sensitivity tests (*Seconda parte*) *(cut: future work)*
+
+Not done before the 2026-11-18 deadline; described in the conclusions as future work. The family ablation would also need new training.
 
 These are to be defined with the supervisor based on the results. Scaffold in `xaifin/perturb/` so they plug into the same pipeline:
 - [ ] Noise injection on OHLCV at several σ → recompute features → Δ IC, Δ portfolio, Δ attributions.
@@ -484,7 +499,7 @@ The pages are added step by step, so the app grows together with the research:
 | `2_Models.py` | 2–3 | load a checkpoint, config, training curve, metrics grid |
 | `3_Explain.py` | 5–6 | global and local attributions, heatmaps, on-demand IG, attention, explanation quality |
 | `4_Compare.py` | 7, 10 | cross-model/seed agreement, dominant features, variance decomposition |
-| `5_Over_time.py` | 8 | importance drift vs volatility regimes |
+| `5_Over_time.py` *(cut)* | 8 | importance drift vs volatility regimes |
 | `6_Portfolio.py` | 4, 9 | top-k holdings, margins, counterfactual what-if |
 
 ### Tasks
@@ -515,6 +530,17 @@ Export every thesis figure from the notebooks to `latex-thesis/images/results/` 
 
 ## 3. Suggested order and milestones
 
+**Calendar to the 2026-11-18 deadline** (replaces the milestone plan below where they differ):
+
+| Dates | Work | In parallel |
+|---|---|---|
+| 22–24 Oct | launch the full H200 grid (L = 1, 5, 20); IG cost measured; `xai/base.py` + IG on MASTER × dji × y2020 | writing: methodology (data, models, rolling protocol) |
+| 25 Oct – 1 Nov | Step 5: IG, permutation by family, attention where easy, for the 6 models; aggregation; `explain.py` batch on the 117 runs | writing: XAI methods |
+| 2–6 Nov | Step 6 reduced; **Step 7 in full** | check the H200 every day |
+| 5–9 Nov | grid back → Steps 3–4 re-run on the full grid; Step 8 light; Step 9.1 | |
+| 10–17 Nov | results and conclusions chapters, figures, app pages `3_Explain` and `4_Compare` | draft to the supervisor as early as possible |
+| 18 Nov | submission | |
+
 | Milestone | Steps | Outcome |
 |---|---|---|
 | **M1: Foundations** | 0, 1, 2 | environment fixed, package skeleton, 6 adapters verified |
@@ -535,13 +561,13 @@ Build the app page for each step **in the same milestone** as the step, not at t
 | 0 Environment & reading | `00_environment_check` | `pyproject.toml` | – | ✅ done (model notes + chapter 2 drafted; read the papers yourself too) |
 | 1 Groups & universes | `01_universes_and_data` | `config`, `data/features` | `1_Data` | ✅ done |
 | 2 Adapters | `02_model_adapters` | `data/*`, `models/*` | `2_Models` | ✅ done: data pipelines, six adapters (equivalence test: all pass), registry, app page |
-| 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ✅ done: 252 runs (stages 1-4, seeds 0/5/42), FinBench selection rules, notebook 03 with observations |
+| 3 Rolling training | `03_rolling_training` | `training/*`, `scripts/train_rolling` | `2_Models` | ✅ done: 252 runs (stages 1-4, seeds 0/5/42), FinBench selection rules, notebook 03 with observations. ◐ extended grid (1242 runs) training on the external H200 |
 | 4 Portfolio baseline | `04_portfolio_baseline` | `portfolio/topk`, `backtest` | `6_Portfolio` | ✅ done: 54 portfolios (3 seeds), checked against FinBench, notebook with observations |
 | 5 XAI engine | `05_xai_single_model` | `xai/*`, `scripts/explain` | `3_Explain` | ☐ |
 | 6 XAI evaluation | `06_xai_evaluation` | `xai/evaluation` | `3_Explain` (quality) | ☐ |
 | 7 Cross-model diagnosis | `07_cross_model_comparison` | `analysis/agreement`, `variance` | `4_Compare` | ☐ |
-| 8 Period analysis | `08_period_analysis` | `analysis/regimes` | `5_Over_time` | ☐ |
-| 9 Counterfactuals (opt.) | `09_counterfactual_stability` | `portfolio/counterfactual` | `6_Portfolio` | ☐ |
-| 10 Perturbation tests | `10_perturbation_tests` | `perturb/*` | `4_Compare` | ☐ |
+| 8 Period analysis | `08_period_analysis` | `analysis/regimes` | ~~`5_Over_time`~~ | ☐ (light) |
+| 9 Counterfactuals (opt.) | `09_counterfactual_stability` | `portfolio/counterfactual` | `6_Portfolio` | ☐ (9.1 only) |
+| 10 Perturbation tests | – | – | – | ✂ cut: future work |
 | 11 Application | – | `viz.py` | `Home` + all pages | ◐ `Home`, `1_Data`, `2_Models`; README explains how to launch it |
 | 12 Thesis | – | – | – | ☐ |

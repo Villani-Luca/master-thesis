@@ -1,0 +1,6 @@
+# Only what training needs (code/scripts/train_rolling.py, grid.py), for GPU servers.
+# torch comes separately from the CUDA index: see code/scripts/remote/setup.sh.
+numpy>=1.26,<3
+pandas>=2.2,<3
+scipy>=1.11,<2
+pyarrow>=17,<26
