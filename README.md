@@ -35,7 +35,7 @@ pip install -r code/requirements.txt
 pip install -e code               # makes `import xaifin` work everywhere
 ```
 
-The datasets (from the FinBench authors' shared Drive folder) go in `code/data/<universe>/` and FinBench in `code/finbench/` (`git clone https://github.com/softlab-unimore/finbench code/finbench`). Then run `code/notebooks/00_environment_check.ipynb` to check the setup.
+The datasets (from the FinBench authors' shared Drive folder) go in `code/data/<universe>/` and FinBench is in `code/finbench/`: a plain copy of https://github.com/softlab-unimore/finbench at commit `71938a4` (2026-09-07), kept read-only. Then run `code/notebooks/00_environment_check.ipynb` to check the setup.
 
 ## Running
 

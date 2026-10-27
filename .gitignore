@@ -38,12 +38,6 @@ latex-thesis/main.fls
 latex-thesis/main.log
 latex-thesis/main.toc
 
-# Docs
-docs/
-
-# FinBench Framework (read-only reference clone)
-code/finbench/
-
 # Local datasets
 code/data/
 
