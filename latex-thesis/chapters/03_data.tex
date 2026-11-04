@@ -2,7 +2,7 @@
 % Chapter 3 - Data
 % First draft, 2026-10-27. Source: notebook 01_universes_and_data (Step 1),
 % xaifin/data/{features,quality,normalization}.py, docs/model_notes.md.
-% Figures still to export from notebook 01 to images/results/ (see TODOs).
+% Figures and the label table: code/scripts/thesis_figures.py (data_*).
 % ---------------------------------------------------------------------------
 
 \chapter{Data}
@@ -36,7 +36,7 @@ The data are those distributed with FinBench~\cite{pederzoli2026finbench}: daily
     \label{tab:data_universes}
 \end{table}
 
-The study focuses on three \emph{core} universes, chosen to differ in size and region: the DJI, with 30 large US companies; the NASDAQ-100, with about one hundred US companies dominated by the technology sector; and the EURO STOXX 50, with the fifty largest companies of the euro area. The two large universes, the S\&P 500 and the STOXX Europe 600, with about 500 and 600 members, are part of an extended grid that also covers the other horizons of FinBench (Section~\ref{sec:data_protocol}). % TODO: update when the H200 grid is back (expected 4-9 November): which results use the extended grid.
+The study focuses on three \emph{core} universes, chosen to differ in size and region: the DJI, with 30 large US companies; the NASDAQ-100, with about one hundred US companies dominated by the technology sector; and the EURO STOXX 50, with the fifty largest companies of the euro area. The two large universes, the S\&P 500 and the STOXX Europe 600, with about 500 and 600 members, are part of an extended grid that also covers the other horizons of FinBench (Section~\ref{sec:data_protocol}).
 
 FinBench builds the universe of each test year from the membership history: a model is trained, validated and tested on the stocks that are index members at the start of the test year. This rule has two consequences. First, it introduces a \emph{survivorship} effect, since the training years only contain stocks that were still in the index at a later date; this is a limitation shared with the benchmark and is discussed in Chapter~\ref{ch:conclusions}. Second, the membership history of the two European indexes starts on 30 September 2020, so on 1 January 2020 no stock satisfies the rule and the 2020 test year is empty for the EURO STOXX 50 and the STOXX Europe 600. Their rolling grids therefore cover the test years 2021--2024 only.
 
@@ -62,12 +62,13 @@ The experiments follow FinBench's rolling protocol (Section~\ref{sec:rw_task}). 
         2024 & 2019--2022 & 2023 & 2024 \\
         \bottomrule
     \end{tabular}
-    \caption{Rolling windows of the FinBench protocol. Every window is run with the seeds 0, 5 and 42, a lookback of $T = 20$ days and a horizon of $L = 5$ days. $^\ast$Not available for the European universes (see Section~\ref{sec:data_universes}).}
+    \caption{Rolling windows of the FinBench protocol. Every window is run with the seeds 0, 5 and 42 and the three lookback--horizon pairs $(T, L) = (5, 1)$, $(20, 5)$ and $(60, 20)$ days. $^\ast$Not available for the European universes (see Section~\ref{sec:data_universes}).}
     \label{tab:data_windows}
 \end{table}
 
-Of the three lookback--horizon pairs of FinBench, this thesis uses the intermediate one, a lookback of $T = 20$ trading days and a horizon of $L = 5$ trading days, which corresponds to weekly rebalancing. Every configuration is trained with the three seeds of the benchmark, 0, 5 and 42. With six models, the three core universes, five test years (four for the EURO STOXX 50) and three seeds, this \emph{core grid} contains $6 \times 3 \times (5 + 5 + 4) = 252$ training runs. An \emph{extended grid} adds the S\&P 500 and the STOXX Europe 600 and the other two lookback--horizon pairs, $(5, 1)$ and $(60, 20)$, for a total of 1242 runs.
-% TODO: update when the H200 grid is back (expected 4-9 November); say which chapters use the extended grid.
+FinBench evaluates three lookback--horizon pairs: a lookback of $T = 5$ trading days with a horizon of $L = 1$ day, $T = 20$ with $L = 5$, and $T = 60$ with $L = 20$, i.e.\ daily, weekly and monthly rebalancing. The main horizon of this thesis is the intermediate one, $(T, L) = (20, 5)$. Every configuration is trained with the three seeds of the benchmark, 0, 5 and 42. With six models, the three core universes, five test years (four for the EURO STOXX 50) and three seeds, this \emph{core grid} contains $6 \times 3 \times (5 + 5 + 4) = 252$ training runs. The \emph{extended grid} adds the S\&P 500 and the STOXX Europe 600 and the other two lookback--horizon pairs, for a total of $6 \times 3 \times 3 \times (5 + 5 + 5 + 4 + 4) = 1242$ runs.
+
+The two grids serve different purposes. Predictive performance (Chapter~\ref{ch:results}) and the portfolios (Chapter~\ref{ch:portfolio}) are reported on the extended grid, which shows how the results change with the size of the universe and with the horizon. The explanations (Chapters~\ref{ch:xai_method} and~\ref{ch:results}) are computed on the core grid, where every model, universe, year and seed is explained, so that the comparisons of Chapter~\ref{ch:results} have all the factors of the design. % TODO: if L = 1, 20 are explained in time, say so here.
 
 % ===========================================================================
 \section{Input Features}
@@ -135,8 +136,14 @@ The catalogue shows how different the two sets are. Alpha360 is almost entirely 
 
 The target of every model is the forward return over the horizon $L$ on the adjusted close price (Equation~\ref{eq:rw_return}), normalised cross-sectionally with a daily z-score. MASTER and MATCC also drop the 2.5\% most extreme labels on each side during training, and FactorVAE clips the normalised label to $\pm 3$. One exception, inherited from the reference implementation, is discussed in Section~\ref{sec:fw_issues}: FactorVAE's label is computed over $T = 20$ days rather than $L = 5$.
 
-The target is noisy. After the data-quality filter of Section~\ref{sec:data_quality}, the median five-day return of a year lies between $-0.2\%$ and $0.7\%$, while its 5th--95th percentile range is about $\pm 10$--$12\%$ in 2020 and $\pm 4$--$8\%$ in most other years. The share of positive returns lies between 48\% and 59\%. The cross-sectional z-score removes the year-to-year changes of scale from the target, but not from the features, which still reflect the volatility of the period.
-% TODO figure: label distribution per year (notebook 01, section 6) -> images/results/data_labels.pdf
+The target is noisy. After the data-quality filter of Section~\ref{sec:data_quality}, the median five-day return of a year lies between $-0.2\%$ and $0.7\%$, while its 5th--95th percentile range is about $\pm 10$--$12\%$ in 2020 and $\pm 4$--$8\%$ in most other years. The share of positive returns lies between 48\% and 59\% (Figure~\ref{fig:data_labels}). The cross-sectional z-score removes the year-to-year changes of scale from the target, but not from the features, which still reflect the volatility of the period.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/results/data_labels.pdf}
+    \caption{Distribution of the five-day forward return per year in the three core universes, after the data-quality filter of Section~\ref{sec:data_quality}: boxes span the quartiles, whiskers the 5th to 95th percentiles; solid line, median; dashed line, mean.}
+    \label{fig:data_labels}
+\end{figure}
 
 % ===========================================================================
 \section{Data Quality}
@@ -175,15 +182,22 @@ FinBench trains on these data as they are. This thesis instead discards the samp
 \end{itemize}
 The filter removes samples rather than rows of the files, so that an input window never joins the days before and after a gap. It is applied to training, validation and test data alike, and turned off only to reproduce FinBench exactly (Section~\ref{sec:fw_equivalence}).
 
-The filter removes between 0.07\% (EURO STOXX 50) and 0.9\% (STOXX Europe 600) of the samples, and 2.3\% for the DJI, all of them from \texttt{PRG.US}. Its effect on the target is large: the bad prices inflate the yearly standard deviation of the five-day label by up to twenty times, and the filter brings it back in line with market volatility, e.g.\ from 73\% to 3.9\% for the EURO STOXX 50 in 2015, from 30\% to 4.4\% for the STOXX Europe 600 in 2024 and from 17.5\% to 7.0\% for the NASDAQ-100 in 2022. What remains in the rolling windows is mostly real: the crash and rebound of March 2020, the first weeks of trading of recently listed companies, the 2022 sanctions on Russian miners. Two errors remain in part, the penny prices of \texttt{ORRON.ST} above the 0.01 threshold and some post-failure prices of Signature Bank in 2023, and are listed among the limitations.
-% TODO table/figure: label standard deviation per year before/after the filter (notebook 01, section 5).
+The filter removes between 0.07\% (EURO STOXX 50) and 0.9\% (STOXX Europe 600) of the samples, and 2.3\% for the DJI, all of them from \texttt{PRG.US}. Its effect on the target is large: the bad prices inflate the yearly standard deviation of the five-day label by up to twenty times, and the filter brings it back in line with market volatility, e.g.\ from 73\% to 3.9\% for the EURO STOXX 50 in 2015, from 30\% to 4.4\% for the STOXX Europe 600 in 2024 and from 17.5\% to 7.0\% for the NASDAQ-100 in 2022 (Table~\ref{tab:data_label_std}). What remains in the rolling windows is mostly real: the crash and rebound of March 2020, the first weeks of trading of recently listed companies, the 2022 sanctions on Russian miners. Two errors remain in part, the penny prices of \texttt{ORRON.ST} above the 0.01 threshold and some post-failure prices of Signature Bank in 2023, and are listed among the limitations.
+
+\input{tables/data_label_std.tex}
 
 % ===========================================================================
 \section{Redundancy among Alpha158 Features}
 \label{sec:data_redundancy}
 
-Many Alpha158 features are computed with the same operator over different windows, or with operators that are algebraically related, so the set is highly redundant. Grouping the 157 features by the absolute Spearman correlation computed on every Wednesday of the study period, with complete linkage at $|\rho| \geq 0.9$, gives 103--105 groups depending on the universe; 80--82 features fall into 27--29 groups of near-duplicates. Some features are exact rescalings of others: the share of up moves (SUMP), the share of down moves (SUMN) and their difference (SUMD) satisfy $\mathrm{SUMN} = 1 - \mathrm{SUMP}$ and $\mathrm{SUMD} = 2\,\mathrm{SUMP} - 1$, and the same holds for their volume counterparts (VSUMP, VSUMN, VSUMD), so 20 features add no information at all.
-% TODO figure: clustered correlation matrix of Alpha158 (notebook 01, section 7) -> images/results/data_alpha158_corr.pdf
+Many Alpha158 features are computed with the same operator over different windows, or with operators that are algebraically related, so the set is highly redundant. Grouping the 157 features by the absolute Spearman correlation computed on every Wednesday of the study period, with complete linkage at $|\rho| \geq 0.9$, gives 103--105 groups depending on the universe; 80--82 features fall into 27--29 groups of near-duplicates. Some features are exact rescalings of others: the share of up moves (SUMP), the share of down moves (SUMN) and their difference (SUMD) satisfy $\mathrm{SUMN} = 1 - \mathrm{SUMP}$ and $\mathrm{SUMD} = 2\,\mathrm{SUMP} - 1$, and the same holds for their volume counterparts (VSUMP, VSUMN, VSUMD), so 20 features add no information at all. Figure~\ref{fig:data_alpha158_corr} shows the resulting block structure.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/results/data_alpha158_corr.pdf}
+    \caption{Absolute Spearman correlation between the 157 Alpha158 features of the NASDAQ-100, computed on every Wednesday of the study period. The features are in the order of the hierarchical clustering (complete linkage), so that groups of near-duplicates form dark blocks along the diagonal; the other universes look alike.}
+    \label{fig:data_alpha158_corr}
+\end{figure}
 
 This redundancy has two consequences for the rest of the thesis. Attribution methods such as SHAP and permutation importance split or blur the credit among correlated features, so a feature can look unimportant only because a near-duplicate takes its share; importance is therefore reported per correlation group as well as per feature. Counterfactual perturbations, in turn, must move a group of correlated features together, since its members cannot change independently.
 
@@ -191,8 +205,14 @@ This redundancy has two consequences for the rest of the thesis. Attribution met
 \section{Market Regimes}
 \label{sec:data_volatility}
 
-The annualised realised volatility of the market indexes, i.e.\ the standard deviation of daily index returns over 20 days scaled by $\sqrt{252}$, identifies the regimes of the study period. 2020, the year of the COVID-19 crash, is the most volatile year in every universe, with an average volatility of 28\% for the DJI, 27\% for the S\&P 500 and the EURO STOXX 50 and 23\% for the STOXX Europe 600, about twice that of a calm year. 2022, a bear market driven by rising interest rates, is the second most volatile year, and the most volatile for the NASDAQ-100 (32\%). 2017 is the calmest year everywhere (6.5\% for the DJI). The test years 2020 and 2022 are therefore the high-volatility regimes of the period analysis in Chapter~\ref{ch:results}.
-% TODO figure: volatility timeline with regimes (notebook 01, section 8) -> images/results/data_volatility.pdf
+The annualised realised volatility of the market indexes, i.e.\ the standard deviation of daily index returns over 20 days scaled by $\sqrt{252}$, identifies the regimes of the study period. 2020, the year of the COVID-19 crash, is the most volatile year in every universe, with an average volatility of 28\% for the DJI, 27\% for the S\&P 500 and the EURO STOXX 50 and 23\% for the STOXX Europe 600, about twice that of a calm year. 2022, a bear market driven by rising interest rates, is the second most volatile year, and the most volatile for the NASDAQ-100 (32\%). 2017 is the calmest year everywhere (6.5\% for the DJI). The test years 2020 and 2022 are therefore the high-volatility regimes of the period analysis in Chapter~\ref{ch:results} (Figure~\ref{fig:data_volatility}).
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/results/data_volatility.pdf}
+    \caption{Annualised 20-day realised volatility of the market indexes over the study period; shaded, the test years. Outside the 2020 crash the NASDAQ-100 is the most volatile US index; the two European indexes move together.}
+    \label{fig:data_volatility}
+\end{figure}
 
 % ===========================================================================
 \section{Summary}

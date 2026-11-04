@@ -1,9 +1,55 @@
 % ---------------------------------------------------------------------------
-% Chapter 7 - stub, 2026-10-27. Planned content: docs/thesis_topics.md, section 7.
-% Fed by: Steps 4, 9 (notebooks 04, 09).
+% Chapter 7 - Portfolio Stability
+% First draft of the protocol, 2026-11-04. Sources: xaifin/portfolio/topk.py, backtest.py,
+% notebook 04_portfolio_baseline, PIANO.md (decisions of 2026-11-04 on opens and thin days).
+% Results (Section 7.4 onwards) to be written once notebook 04 is re-run on the full grid.
 % ---------------------------------------------------------------------------
 
 \chapter{Portfolio Stability and Counterfactuals}
 \label{ch:portfolio}
 
-\textit{To be written.}
+The models of this thesis are evaluated on how well they rank stocks, but a ranking is used to build a portfolio. This chapter turns each model's predictions into the long-only portfolio of FinBench and asks two questions: whether the portfolios earn more than simply holding the whole universe, and how stable the allocation decisions are, from one seed or one model to another and against small changes of the scores. Section~\ref{sec:pf_protocol} describes how the portfolio is built and how its returns are computed, Section~\ref{sec:pf_metrics} the benchmarks and performance measures, and Section~\ref{sec:pf_fragility} the measures of stability used in the rest of the chapter.
+
+% ===========================================================================
+\section{From Scores to a Portfolio}
+\label{sec:pf_protocol}
+
+\paragraph{The rule.} The portfolio follows FinBench's long-only evaluation. The test period is divided into holding periods of $L$ business days, the horizon of the model: daily, weekly or monthly for $L = 1$, 5 and 20. At the start of each period the portfolio uses the most recent prediction made before that day, i.e.\ the scores computed from inputs that end on the previous trading day (a prediction older than seven days is an error), and buys the $k$ stocks with the highest scores in equal parts: $k = 5$ for the DJI, as in FinBench, and $k = 10$ for the larger universes. The positions are held until the next rebalance. There is no short leg, no leverage, and, as in FinBench, no transaction costs; turnover is reported instead, so that the cost of a strategy can be judged.
+
+\paragraph{Returns.} The return of a stock on a day is computed on adjusted prices. On the first day of a period the portfolio buys at the open, so the stock earns its open-to-close return; on the following days it earns its close-to-close return. A stock without a price on a day contributes zero, and the portfolio return is the weighted sum of the returns of its stocks. These rules reproduce FinBench's evaluation exactly: for MASTER on the DJI over the test years 2020--2024, the holdings computed with FinBench's own code and with the framework of this thesis are identical in all 260 periods, the daily returns agree within $3 \cdot 10^{-17}$, and all the performance measures of Section~\ref{sec:pf_metrics} are identical.
+
+\paragraph{One departure: unreliable opening prices.} The data-quality filter of Section~\ref{sec:data_quality} checks closing prices, but the portfolio also trades at the open. Opening prices that the filter would reject therefore reach the backtest. The clearest case is Signature Bank (\texttt{SBNY.US}), which failed in March 2023 and remained in the S\&P 500 universe of that year, since the universe is fixed at the start of the test year: on 31 July 2023 its listing opens at \$0.0003 and closes at \$0.05, an open-to-close return of more than 16{,}000\%. On that day alone the equal-weight benchmark of the daily-rebalanced S\&P 500 portfolios gained 34\%, and the portfolios that held the stock reported a compound annual growth of up to 256\%. An opening price is therefore not traded on when the filter's thresholds would reject it, i.e.\ when it is below one cent or when the close of the same day is more than three times or less than a third of it; on that day the stock earns its close-to-close return. The rule changes no price of the DJI or the EURO STOXX 50, so the equivalence with FinBench above is unaffected; it changes 557 stock-days of the NASDAQ-100, 36 of the S\&P 500 and 63 of the STOXX Europe 600 between 2020 and 2024, almost all of them penny-priced listings.
+
+\paragraph{Days with few prices.} On some European holidays, such as Easter Monday and 26 December, only a handful of the STOXX Europe 600 stocks trade, and the prediction of the next rebalance may cover fewer than $k$ stocks. As in FinBench, all the available stocks are then held in equal parts.
+
+\paragraph{Buying at the open and the daily horizon.} Buying at the open of each period has a consequence that grows as the holding period shortens. With $L = 1$ every day is the first day of a period, so a daily-rebalanced portfolio earns only the open-to-close returns of its stocks and never the overnight return between the close and the next open. Overnight and intraday returns differ markedly in these data: for the STOXX Europe 600 between 2021 and 2024, the average stock gains 13.7\% a year overnight and loses 1.5\% intraday. As a result, the equal-weight benchmark of Section~\ref{sec:pf_metrics} grows by 1.3\% a year with daily rebalancing on the DJI and the S\&P 500, against 5.9\% and 9.2\% with weekly rebalancing, and loses 1.9\% a year on the STOXX Europe 600. Portfolios and equal-weight benchmark are affected in the same way, so comparing a model with the equal-weight benchmark remains fair at every horizon; comparing a daily portfolio with the index, whose returns are close-to-close, is not.
+
+% ===========================================================================
+\section{Benchmarks and Performance Measures}
+\label{sec:pf_metrics}
+
+Each portfolio is compared with two benchmarks over the same days. The \emph{equal-weight} benchmark holds, in each period, all the stocks the model ranks in equal parts, with the same return rules: it is what an investor would earn with no ability to choose among them, and it isolates the value of the model's ranking from the performance of the universe. The \emph{index} is the market index of the universe, whose daily close-to-close returns are taken from the market file of the data set.
+
+The performance measures are those of FinBench's report, computed with the formulas of the quantstats library, with a risk-free rate of zero and 252 trading days a year: the compound annual growth rate (CAGR), the annualised volatility, the Sharpe and Sortino ratios, the maximum drawdown, i.e.\ the worst fall from a previous peak, and the return of each calendar year. The \emph{turnover} is the average one-way turnover per rebalance, half the sum of the absolute changes of the weights between two consecutive periods: 0 for a portfolio that never changes, 1 for one that replaces all its stocks.
+
+% ===========================================================================
+\section{Measures of Stability}
+\label{sec:pf_fragility}
+
+\paragraph{Margins to the boundary.} The decision to hold a stock depends only on whether its score is among the $k$ highest. How close the decision is to changing is measured by the \emph{margin} of each stock to the boundary of the portfolio:
+\begin{equation}
+    \label{eq:pf_margin}
+    \text{margin}_i = \begin{cases} s_i - s_{(k+1)} & \text{if stock } i \text{ is held,} \\ s_{(k)} - s_i & \text{otherwise,} \end{cases}
+\end{equation}
+where $s_{(j)}$ is the $j$-th highest score of the day. A held stock leaves the portfolio if its score falls by more than its margin, or if another stock's score rises above it; a stock outside enters if its score rises by more than its margin. Scores have different scales across models, so the margin is divided by the cross-sectional standard deviation of the day's scores. A held stock with a margin of 0.1 is one tenth of a standard deviation away from being replaced. The margin is the signed counterpart of the top-$k$ margin explained in Chapter~\ref{ch:xai_method} (Equation~\ref{eq:xm_margin}).
+
+\paragraph{Overlap between portfolios.} Two portfolios, of two seeds of one model or of two models, are compared period by period through the Jaccard overlap of the stocks they hold, $|A \cap B| / |A \cup B|$, and through the turnover needed to go from one to the other. As a reference, two portfolios of $k$ stocks drawn at random from $N$ overlap on average by about $k / (2N - k)$: 0.09 for the DJI, 0.05 for the NASDAQ-100, 0.11 for the EURO STOXX 50 and about 0.01 for the two large universes.
+
+% ===========================================================================
+\section{Results}
+\label{sec:pf_results}
+
+% TODO (RIESECUZIONE.md A4): performance per universe and horizon against the benchmarks (notebook 04 sections 2 and 6),
+% overlap between models and between seeds (sections 4-5), distribution of the margins (section 3),
+% comparison with FinBench's Table 7 (also in Chapter 4), fragility of the decisions against seed noise (Step 9.1).
+\textit{To be written once the portfolios of the full grid are computed.}

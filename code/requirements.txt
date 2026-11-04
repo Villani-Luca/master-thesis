@@ -10,6 +10,7 @@ joblib>=1.4,<2
 matplotlib>=3.8,<4
 seaborn>=0.13,<1
 plotly>=5.22,<6
+kaleido==0.1.0.post1  # static export of the thesis figures (0.2.1 hangs on Windows)
 
 # Machine learning / graph / optimization
 # GPU-enabled PyTorch for NVIDIA CUDA 12.8 environments (e.g. RTX 5090)

@@ -1,9 +1,158 @@
 % ---------------------------------------------------------------------------
-% Chapter 5 - stub, 2026-10-27. Planned content: docs/thesis_topics.md, section 5.
-% Fed by: THESIS_GUIDE.md Steps 5-6.
+% Chapter 5 - Explainability Methodology
+% First draft, 2026-11-04. Sources: xaifin/xai/*, scripts/explain.py, notebook 05_xai_single_model,
+% PIANO.md (B1-B7 and the decisions of 2026-11-04), docs/thesis_topics.md section 5.
+% Numbers marked TODO come from trial runs and are to be replaced by those of the final run
+% (MASTER, DJI, T = 20, L = 5, seed 42, test year 2020) once it is retrained and explained.
 % ---------------------------------------------------------------------------
 
 \chapter{Explainability Methodology}
 \label{ch:xai_method}
 
-\textit{To be written.}
+This chapter defines how the trained models are explained. The methods themselves were introduced in Section~\ref{sec:rw_xai}; here they are adapted to the setting of the thesis, in which a model scores all the stocks of a day at once and its scores are turned into a portfolio. Section~\ref{sec:xm_what} defines what is explained: the unit, the two outputs and the days. Section~\ref{sec:xm_methods} presents the methods and Section~\ref{sec:xm_baseline} the choice of the baseline, which turned out to be decisive for one of the models. Section~\ref{sec:xm_path} discusses how gradients are integrated when the stocks of a day interact, Section~\ref{sec:xm_aggregation} how local attributions are aggregated into global importance, and Section~\ref{sec:xm_cost} the cost and the scope of the computation. The evaluation of the explanations is the subject of Section~\ref{sec:xm_evaluation}.
+
+% ===========================================================================
+\section{What Is Explained}
+\label{sec:xm_what}
+
+\paragraph{The unit.} All the models of this thesis receive one trading day at a time, as a tensor $X \in \mathbb{R}^{N \times T \times F}$ with the inputs of the $N$ stocks of the universe, and return a score $s_i$ for each stock. Five of the six models mix the stocks of the day: MASTER and MATCC through attention across stocks, HIST and DiscoverPLF through shared concepts, FinFormer through a stock graph, and FactorVAE through latent factors estimated on the whole cross-section. The score of stock $i$ therefore depends on the inputs of every other stock. An explanation always passes the whole day through the model and attributes the output of stock $i$ to that stock's own inputs $x_i \in \mathbb{R}^{T \times F}$, i.e.\ $20 \times 220$ values for MASTER and MATCC (157 Alpha158 and 63 market features), $20 \times 157$ for FactorVAE and $1 \times 360$ for the Alpha360 models, whose attributions are later mapped to the six series and 60 lags of the feature catalogue (Section~\ref{sec:data_catalog}).
+
+How much the other stocks matter differs widely across models. On one day of the test year, the share of the gradient of $s_i$ that flows through the inputs of the other stocks is 34\% for MASTER, 69\% for HIST and only 1\% for FactorVAE. % TODO: all six models on the final runs.
+For HIST, most of what moves a stock's score lies in the other stocks of its concepts.
+
+\paragraph{Two outputs.} The first output is the score itself, $t_i = s_i$ (target \emph{pred}). The second is the score relative to the portfolio boundary, the \emph{top-$k$ margin}
+\begin{equation}
+    \label{eq:xm_margin}
+    m_i = s_i - s^{(k)}_{-i},
+\end{equation}
+where $s^{(k)}_{-i}$ is the $k$-th highest score among the other stocks, i.e.\ the score stock $i$ must beat to enter the long-only portfolio of the $k$ best-ranked stocks. The margin is positive for the held stocks, for which it equals $s_i - s_{(k+1)}$, and negative for the others, for which it equals $s_i - s_{(k)}$. Explaining $m_i$ instead of $s_i$ asks which inputs decide portfolio membership rather than the score; in a cross-sectional model the two can differ, because moving $x_i$ also moves the scores of the other stocks and therefore the boundary.
+
+\paragraph{The days.} Each run is explained on the days on which its portfolio trades: the prediction days used by the weekly rebalances of Chapter~\ref{ch:portfolio}, on the $L = 5$ grid for every horizon so that the explanations of different horizons refer to the same days. To halve the cost, every other rebalance is used, i.e.\ about 26 days per test year, covering every season and both the calm and the stressed periods.
+
+% ===========================================================================
+\section{Methods}
+\label{sec:xm_methods}
+
+Table~\ref{tab:xm_methods} lists the methods. They answer different questions and are used together.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{@{}lllp{6.2cm}@{}}
+        \toprule
+        \textbf{Method} & \textbf{Type} & \textbf{Resolution} & \textbf{Question answered} \\
+        \midrule
+        Integrated Gradients & gradient, local & every input $(t, f)$ & how much each input moves the stock's output away from the average stock's \\
+        Saliency & gradient, local & every input $(t, f)$ & how sensitive the output is to each input at the observed point \\
+        Shapley values & perturbation, local & feature family & exact contribution of each family, with all interactions \\
+        LIME & surrogate, local & feature family & a linear surrogate of the effect of removing families \\
+        Permutation importance & perturbation, global & feature family & how much ranking skill and how much of the portfolio depend on each family \\
+        Intrinsic weights & model-specific & model-dependent & what the gates and attention of MASTER, MATCC and FinFormer weigh, as supporting evidence \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Explanation methods used in this thesis. Families are those of Section~\ref{sec:data_catalog}: seven for the Alpha158 models, three for the Alpha360 models; the market family is discussed in Section~\ref{sec:xm_baseline}.}
+    \label{tab:xm_methods}
+\end{table}
+
+\paragraph{Integrated Gradients.} IG (Equation~\ref{eq:rw_ig}) is the main method. The integral is approximated with 16 Gauss--Legendre nodes, the default quadrature of Captum~\cite{kokhlikyan2020captum}. Captum's own implementation cannot be used directly: it batches the integration steps along the first dimension of the input, which here is the stock, so the steps would be mixed with the cross-section. IG is therefore computed on top of the per-stock gradients described in Section~\ref{sec:xm_path}, with Captum's nodes and weights, so that it approximates the same integral.
+
+\paragraph{Saliency.} The signed gradient $\partial t_i / \partial x_i$ at the observed input~\cite{simonyan2014deep}. It costs one sixteenth of IG and is computed for every run as a cheap second gradient method.
+
+\paragraph{Shapley values on families.} With the families as players, Shapley values can be computed \emph{exactly}: $2^7 = 128$ coalitions for the Alpha158 models and $2^3 = 8$ for the Alpha360 models. A family absent from a coalition takes, for every stock of the day, the value of the average stock (Section~\ref{sec:xm_baseline}), and one forward pass gives the value of the coalition for all the stocks at once. The attributions then satisfy local accuracy exactly (to $10^{-8}$ in practice), with no sampling error.
+
+\paragraph{LIME.} LIME~\cite{ribeiro2016lime} is applied on the same binary representation of the families: 200 random coalitions, weighted by an exponential kernel of the share of families removed, and a ridge regression per stock. Its coefficients agree with the exact Shapley values (Spearman 0.88--0.92 per stock), % TODO: final runs.
+so it serves as a check of the surrogate approach rather than as an independent source.
+
+\paragraph{Permutation importance.} On each explained day, the inputs of one family are shuffled across the stocks of the day with a single permutation, at every time step, so that each stock receives another stock's values of that family and keeps its own values of the others~\cite{breiman2001random,fisher2019all}. Two quantities are recorded, averaged over five permutations and over the days: the drop in RankIC with respect to the labels on which the model is evaluated, which measures how much \emph{ranking skill} the family carries, and the share of the top-$k$ portfolio that changes, which measures how much of the \emph{allocation} depends on it. The two need not agree: a family can reshuffle the portfolio without carrying any skill.
+
+\paragraph{Intrinsic weights.} Three models compute weights that can be read directly. MASTER has a feature gate, which rescales the 157 Alpha158 features according to the market features of the last day and is the same for every stock, attention among the days of a stock's window, attention among stocks, and a final temporal attention. MATCC replaces the gate with a market filter that \emph{adds} a market-dependent shift to each feature, and keeps the attention among stocks and the temporal attention. FinFormer fuses a temporal and a spatial representation of each stock through a gate, whose value says how much of the stock's final representation comes from the other stocks; it also has a dynamic and a static attention among stocks, the latter restricted to the sector and industry graph, and an attention over the 60 positions of its input sequence, which, because of the column order discussed in Section~\ref{sec:fw_issues}, are blocks of ten lags of the same series and therefore weigh the six price and volume series. The weights are obtained without changing the models: MASTER's forward pass is replayed with its own modules, and for MATCC and FinFormer the inputs of the attention modules are captured during the forward pass and the weights recomputed from them; in every case the result reproduces the model's output exactly. HIST and FactorVAE, whose internal quantities are concept and factor loadings rather than weights over inputs, are explained by the post-hoc methods only. Following the debate summarised in Section~\ref{sec:rw_xai}, intrinsic weights are treated as supporting evidence and compared with the post-hoc attributions rather than read as explanations.
+
+% ===========================================================================
+\section{The Baseline}
+\label{sec:xm_baseline}
+
+Integrated Gradients, Shapley values and LIME all compare the input with a reference that stands for the absence of information. After the robust z-score, the zero vector corresponds to the median of the training data and is the usual choice. This thesis uses instead the \textbf{average stock of the day}: for each day, the baseline of every stock is the cross-sectional mean of the inputs, $b = \frac{1}{N} \sum_{j} x_j$. Three reasons support this choice.
+
+\paragraph{It matches the task.} The models are evaluated on how they rank the stocks of a day, and the portfolio depends only on the ranking. With the day's average as the reference, an attribution says why a stock scores differently from the average stock of that day, which is the question behind both the ranking and the top-$k$ margin. A zero baseline instead also attributes the market-wide state of the day, which is common to all stocks and cannot change their ranking.
+
+\paragraph{The zero baseline fails for FactorVAE.} The first layer of FactorVAE's feature extractor is a layer normalisation over the features of each day of the window. Its output, and therefore the score, does not change when the inputs of a stock are multiplied by a positive constant: $f(\alpha x_i) = f(x_i)$ for every $\alpha > 0$. Along the straight path from the zero vector the score is constant everywhere except at the origin, where it jumps, and the gradients that IG integrates diverge as $\alpha \to 0$. The per-feature attributions then depend on where the integration nodes fall. On one stock of the DJI, the change of the score from the baseline is $+0.040$, while IG with 16, 64 and 256 steps sums to $-0.052$, $+0.048$ and $+0.040$. With the average stock as the baseline the path is no longer a rescaling, and IG converges with 16 steps for every model tested: the attributions with 16 and 64 steps rank the inputs almost identically (Spearman $\geq 0.998$) and their sum matches the change of the output within about 2\%. % TODO: all models on the final runs.
+
+\paragraph{One baseline for all models.} Using the same reference for the six models keeps their explanations comparable. The zero baseline is kept as a sensitivity check: on a trial run of MASTER the two baselines rank a stock's features with a median Spearman correlation of 0.84, so the choice matters and is reported. % TODO: Step 6 result on the final runs.
+
+The average-stock baseline has one consequence that must be kept in mind when reading the results. The market features of MASTER and MATCC are the same for every stock of a day, so they coincide with their baseline and receive zero attribution by construction; for the same reason, shuffling them across stocks changes nothing. Their effect is not lost: it enters the attributions of the other families through the feature gate, which rescales them according to the market state, and it is read from the gate itself (Section~\ref{sec:xm_methods}).
+
+% ===========================================================================
+\section{Integrating Over a Cross-Section}
+\label{sec:xm_path}
+
+For a model that scores each stock on its own inputs, IG of stock $i$ is Equation~\ref{eq:rw_ig} applied to $x_i$. When the stocks interact, there are two ways to move from the baseline to the observed day.
+
+\begin{itemize}
+    \item \textbf{Own path.} Only the inputs of stock $i$ move, $x_i(\gamma) = b + \gamma (x_i - b)$, while the other stocks stay at their observed values. Completeness then holds for each stock: the attributions of $x_i$ sum to $t_i(X) - t_i(X \text{ with } x_i = b)$. Each stock needs its own path, i.e.\ $N$ times the number of steps in forward and backward passes per day.
+    \item \textbf{Joint path.} The whole day moves together, $X(\gamma) = B + \gamma (X - B)$, and stock $i$ keeps the part of the gradient that flows through its own inputs:
+    \begin{equation}
+        \label{eq:xm_joint}
+        \mathrm{IG}_{i}(X) = (x_i - b) \odot \int_0^1 \frac{\partial t_i\big(B + \gamma (X - B)\big)}{\partial x_i} \, d\gamma .
+    \end{equation}
+    One forward pass per step serves all the stocks; the per-stock gradients, i.e.\ the diagonal blocks of the Jacobian of the scores with respect to the inputs, are obtained by batched backward passes.
+\end{itemize}
+
+The own path is the definition that matches the question ``what does this stock's own data contribute''; the joint path does not satisfy completeness per stock, because part of the change of $t_i$ comes from the other stocks moving along the same path. On the runs tested, however, the two produce almost the same ranking of each stock's inputs (Spearman 0.986 to 1.000 per stock), while the own path costs four to ten times more. % TODO: Step 6 result on the final runs.
+The joint path is therefore used for the whole grid, and the own path is computed on a subset as a check (Section~\ref{sec:xm_evaluation}).
+
+% ===========================================================================
+\section{From Local Attributions to Global Importance}
+\label{sec:xm_aggregation}
+
+Each run yields one attribution tensor per explained stock-day. To compare models with different score scales and days with different volatility, every sample is normalised by its total absolute attribution, $\tilde a = |a| / \sum |a|$, so that each stock-day carries the same weight. The importance of a group of inputs is the share of $\tilde a$ it receives, averaged over the samples, and its variability is the standard deviation of the daily averages. Groups are formed at five levels: single features (summed over the time steps), lags, families, sources and horizons (Section~\ref{sec:data_catalog}). The signed share is also kept to read the direction of the effect.
+
+At the level of families, two measures are computed, because they answer different questions. The \emph{gross} share sums the absolute attributions of the family's inputs, $\sum_{j \in G} |a_j|$: it measures how sensitive the output is to the family, and counts inputs of the same family that push in opposite directions. The \emph{net} share takes the absolute value of their sum, $|\sum_{j \in G} a_j|$: it measures the family's total contribution, which is what the family-level methods measure. On a trial run of MASTER the net shares of IG match the exact Shapley values of the families within 0.01 for every family, whereas the gross shares are more uneven (the position family receives 28\% of the gross attribution and 18\% of the net). % TODO: final run; which measure the comparisons of Chapter 6 use follows from Section 5.7.
+This agreement between a gradient method on 4{,}400 inputs and an exact game-theoretic computation on seven players is itself a check of the gradient attributions.
+
+% ===========================================================================
+\section{Cost and Scope}
+\label{sec:xm_cost}
+
+Table~\ref{tab:xm_cost} reports the cost of IG per explained day and target, measured on an NVIDIA RTX 5090 that was training other models at the same time. The cost grows linearly with the size of the cross-section: a NASDAQ-100 day costs about three times a DJI day. MASTER and MATCC take less than a second per day; the models whose per-stock gradients cannot be batched efficiently through their recurrent layers take seconds, DiscoverPLF the longest.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{@{}lrr@{}}
+        \toprule
+        \textbf{Model} & \textbf{DJI} ($N \approx 29$) & \textbf{NASDAQ-100} ($N \approx 101$) \\
+        \midrule
+        MASTER & 0.7 & 2.0 \\
+        MATCC & 0.8 & 2.9 \\
+        FactorVAE & 7.7 & 19.6 \\
+        HIST & 9.7 & 29.9 \\
+        DiscoverPLF & 23.2 & 74.7 \\
+        FinFormer & 9.0 & 28.4 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Seconds per explained day and target for Integrated Gradients (joint path, 16 steps, average-stock baseline), on a GPU shared with training; Saliency costs about one sixteenth, the permutation of the families a few seconds per run.}
+    \label{tab:xm_cost}
+\end{table}
+
+With these costs, IG and Saliency are computed for every run of the core grid at the main horizon (six models, three universes, five test years, three seeds, $L = 5$), on both targets, together with the permutation importance of the families: about 60 GPU hours in total. Shapley values and LIME, which are used to check the gradient attributions, are computed on the DJI for the test year 2020 for all the models. The intrinsic weights are extracted for MASTER, MATCC and FinFormer on every explained run. Explanations of the other horizons are left as an extension. % TODO: update if L = 1, 20 are explained in time.
+
+% ===========================================================================
+\section{Evaluating the Explanations}
+\label{sec:xm_evaluation}
+
+With weak models, explanations may be as noisy as the predictions, so they are checked before any conclusion is drawn from them, following Section~\ref{sec:rw_eval}:
+\begin{itemize}
+    \item a \textbf{sanity check}~\cite{adebayo2018sanity}: with randomised weights the attributions must change;
+    \item the \textbf{agreement between methods} on the same run: IG, Saliency, Shapley values, LIME and permutation importance, at the level of families;
+    \item \textbf{faithfulness}: deletion curves that remove the inputs in the order given by the attributions and record the change of the output and of the RankIC, against random removal;
+    \item the two settings chosen above: the joint against the own path, and the average-stock against the zero baseline.
+\end{itemize}
+% TODO: results of Step 6 (notebook 06) and the justified choice of the main method and of the gross or net family share.
+
+% ===========================================================================
+\section{Summary}
+\label{sec:xm_summary}
+
+Each trained model is explained day by day, on the days its portfolio trades, by attributing each stock's score and its margin to the portfolio boundary to the stock's own inputs. Integrated Gradients is the main method, with the average stock of the day as the baseline, which fits a ranking task and is the only reference under which IG converges for FactorVAE, and with a joint integration path that ranks the inputs like the per-stock path at a fraction of its cost. Exact Shapley values and LIME on feature families, cross-sectional permutation importance and MASTER's own weights complement it. Local attributions are normalised per stock-day and aggregated into importance per feature, lag and family, with a net family share that matches the exact Shapley values. The next chapter compares these importances across seeds, models, years and universes.

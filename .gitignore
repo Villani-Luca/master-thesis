@@ -42,7 +42,7 @@ latex-thesis/main.toc
 code/data/
 
 # Large attribution tensors (global.parquet and metrics stay in git)
-code/results/xai/**/attributions.npz
+code/results/xai/**/attributions*.npz
 
 # Training and portfolio outputs: the large files stay local and are kept on a separate drive
 # (checkpoints, results pickles, predictions, holdings); the small ones (config.json, metrics.json,
