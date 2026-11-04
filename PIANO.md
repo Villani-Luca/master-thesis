@@ -124,8 +124,18 @@ In ordine. Ogni voce ha il criterio di "fatto".
   quando il batch è completo. Manca la diagnosi scritta.
 - [ ] **C3. Step 8 leggero**: per anno, 2020 e 2022 contro gli anni calmi; IC, rendimenti, quote
   delle famiglie, deriva anno su anno; notebook 08.
+  → 2026-11-04: notebook `08_periods_and_regimes.ipynb` scritto e collaudato (regimi del cap. 3: 2020 e 2022
+  alta volatilità, 2021/2023/2024 calmi): RankIC per anno e regime contro la volatilità dell'indice,
+  rendimento in eccesso sull'equal weight per anno, quote nette delle famiglie per anno e differenza tra
+  regimi, deriva anno su anno delle spiegazioni (anni consecutivi, transizioni calme vs con anno volatile).
+  Da rieseguire a batch XAI completo e dopo `--reaggregate`; mancano le osservazioni.
 - [ ] **C4. Step 9.1**: fragilità delle decisioni (margini dello Step 4 contro il rumore tra seed:
   subito su MASTER, poi su tutti).
+  → 2026-11-04: `portfolio/fragility.py` (rumore tra seed = std dello z-score giornaliero del titolo tra i seed;
+  posizione fragile se margin_z < rumore) e notebook `09_decision_fragility.ipynb`, provati sui seed 0 e 5:
+  la quota di posizioni fragili coincide con il turnover osservato tra i portafogli di due seed (14 coppie
+  modello × universo: correlazione 0,976, scarto medio 0,014). Posizioni fragili: 42–50% per FactorVAE,
+  HIST, DiscoverPLF; 55–70% per FinFormer e MATCC. Da rieseguire con i tre seed.
 
 ### D. Preparazione al rientro della griglia
 - [x] **D1. Notebook 03 e 04** generici su 5 universi × 3 orizzonti: rieseguibili senza modifiche.

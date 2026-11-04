@@ -42,6 +42,8 @@ Stima: domani 5/11, pomeriggio o sera.
 - [ ] **A4. Notebook 04** (`04_portfolio_baseline.ipynb`): rieseguire tutto (rigenera `portfolio_summary.csv`,
   `portfolio_margins.csv`, `portfolio_horizons.csv`). Riscrivere le **Observations** (nuova sezione 6 sugli
   orizzonti; a L = 1 portafogli ed equal weight perdono il rendimento notturno, vedi registro).
+- [ ] **A4b. Notebook 09** (`09_decision_fragility.ipynb`, Step 9.1): rieseguire con i tre seed (salva
+  `results/analysis/decision_fragility.csv`) e scrivere le **Observations**.
 - [ ] **A5. Confronto con FinBench**: `python code/scripts/compare_finbench.py` (dopo A3, perché legge
   `metrics_summary.csv`). Scrive `latex-thesis/tables/finbench_regression.tex` e `finbench_portfolio.tex`
   con i tre orizzonti.
@@ -80,6 +82,8 @@ Stima: 6/11 sera – 7/11 mattina.
   rieseguire e scrivere le **Observations**.
 - [ ] **C4. Notebook 06** (Step 6): rieseguire; scegliere e motivare il metodo principale e la misura per
   famiglia (`importance` lorda o `net`).
+- [ ] **C4b. Notebook 08** (Step 8, anni e regimi): rieseguire (serve B1 per le quote nette) e scrivere le
+  **Observations**.
 - [ ] **C5. Notebook 07** (Step 7): rieseguire; scrivere la **diagnosi** dati vs modello. Tenere conto del
   sanity check (HIST e in parte MASTER hanno attribuzioni simili a quelle del modello non allenato).
 - [ ] **C6. Tesi**: sostituire i numeri marcati `% TODO` nei capitoli (`grep -n "TODO" latex-thesis/chapters/*.tex`),
