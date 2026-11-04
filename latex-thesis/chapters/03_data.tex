@@ -1,0 +1,201 @@
+% ---------------------------------------------------------------------------
+% Chapter 3 - Data
+% First draft, 2026-10-27. Source: notebook 01_universes_and_data (Step 1),
+% xaifin/data/{features,quality,normalization}.py, docs/model_notes.md.
+% Figures still to export from notebook 01 to images/results/ (see TODOs).
+% ---------------------------------------------------------------------------
+
+\chapter{Data}
+\label{ch:data}
+
+This chapter describes the data on which all models are trained and explained. Section~\ref{sec:data_universes} presents the investment universes and Section~\ref{sec:data_protocol} the rolling protocol that splits them into training, validation and test periods. Section~\ref{sec:data_features} describes the input features and how they are grouped for the comparison of explanations, and Section~\ref{sec:data_target} the prediction target. Section~\ref{sec:data_quality} reports the errors found in the price data and the filter that removes them. Finally, Sections~\ref{sec:data_redundancy} and~\ref{sec:data_volatility} analyse two properties of the data that matter for the explanations: the redundancy among the Alpha158 features and the market regimes of the study period.
+
+% ===========================================================================
+\section{Investment Universes}
+\label{sec:data_universes}
+
+The data are those distributed with FinBench~\cite{pederzoli2026finbench}: daily prices and volumes of the constituents of five stock indexes between 2015 and 2024, the Alpha158 and Alpha360 features computed from them, the market features used by MASTER and MATCC, the relational inputs of HIST, DiscoverPLF and FinFormer, and the membership history of each index. Table~\ref{tab:data_universes} summarises the five universes.
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{@{}llrrrl@{}}
+        \toprule
+        \textbf{Universe} & \textbf{Region} & \textbf{Index members} & \textbf{Tickers with prices} & \textbf{Stock-days} & \textbf{Role} \\
+        \midrule
+        Dow Jones Industrial Average (DJI) & US & 30 & 43--44 & 108{,}465 & core \\
+        NASDAQ-100 & US & 101--104 & 176--183 & 440{,}744 & core \\
+        S\&P 500 & US & 503--505 & 612--623 & 1{,}559{,}563 & extended grid \\
+        EURO STOXX 50 (SX5E) & EU & 50--51$^\ast$ & 60--61 & 151{,}086 & core \\
+        STOXX Europe 600 (SXXP) & EU & 600--615$^\ast$ & 735--749 & 1{,}823{,}474 & extended grid \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{The investment universes. \emph{Index members}: constituents at the start of each test year (range over 2020--2024); \emph{tickers with prices}: stocks with a price on the first days of each test year, including past members; \emph{stock-days}: rows of the feature files over 2015--2024. $^\ast$2021--2024 only: the membership history of the European indexes starts on 30 September 2020.}
+    \label{tab:data_universes}
+\end{table}
+
+The study focuses on three \emph{core} universes, chosen to differ in size and region: the DJI, with 30 large US companies; the NASDAQ-100, with about one hundred US companies dominated by the technology sector; and the EURO STOXX 50, with the fifty largest companies of the euro area. The two large universes, the S\&P 500 and the STOXX Europe 600, with about 500 and 600 members, are part of an extended grid that also covers the other horizons of FinBench (Section~\ref{sec:data_protocol}). % TODO: update when the H200 grid is back (expected 4-9 November): which results use the extended grid.
+
+FinBench builds the universe of each test year from the membership history: a model is trained, validated and tested on the stocks that are index members at the start of the test year. This rule has two consequences. First, it introduces a \emph{survivorship} effect, since the training years only contain stocks that were still in the index at a later date; this is a limitation shared with the benchmark and is discussed in Chapter~\ref{ch:conclusions}. Second, the membership history of the two European indexes starts on 30 September 2020, so on 1 January 2020 no stock satisfies the rule and the 2020 test year is empty for the EURO STOXX 50 and the STOXX Europe 600. Their rolling grids therefore cover the test years 2021--2024 only.
+
+The price files also contain past members of each index, so the number of tickers with prices is larger than the number of members (Table~\ref{tab:data_universes}). The STOXX Europe 600 adds a further complication: its stocks trade on exchanges with different holiday calendars, and some members are priced through US over-the-counter or Frankfurt listings rather than their home exchange, so on some days the cross-section of the universe is only partially observed.
+
+% ===========================================================================
+\section{Rolling Protocol}
+\label{sec:data_protocol}
+
+The experiments follow FinBench's rolling protocol (Section~\ref{sec:rw_task}). Each test year from 2020 to 2024 defines one \emph{rolling window}: the models are trained on four calendar years, validated on the following year, i.e.\ the year before the test year, and tested on the test year (Table~\ref{tab:data_windows}). The windows overlap, so the study period covers 2015--2024 and each year from 2019 onwards plays every role in turn. A model is trained from scratch for every window.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{@{}cccc@{}}
+        \toprule
+        \textbf{Test year} & \textbf{Training} & \textbf{Validation} & \textbf{Test} \\
+        \midrule
+        2020$^\ast$ & 2015--2018 & 2019 & 2020 \\
+        2021 & 2016--2019 & 2020 & 2021 \\
+        2022 & 2017--2020 & 2021 & 2022 \\
+        2023 & 2018--2021 & 2022 & 2023 \\
+        2024 & 2019--2022 & 2023 & 2024 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Rolling windows of the FinBench protocol. Every window is run with the seeds 0, 5 and 42, a lookback of $T = 20$ days and a horizon of $L = 5$ days. $^\ast$Not available for the European universes (see Section~\ref{sec:data_universes}).}
+    \label{tab:data_windows}
+\end{table}
+
+Of the three lookback--horizon pairs of FinBench, this thesis uses the intermediate one, a lookback of $T = 20$ trading days and a horizon of $L = 5$ trading days, which corresponds to weekly rebalancing. Every configuration is trained with the three seeds of the benchmark, 0, 5 and 42. With six models, the three core universes, five test years (four for the EURO STOXX 50) and three seeds, this \emph{core grid} contains $6 \times 3 \times (5 + 5 + 4) = 252$ training runs. An \emph{extended grid} adds the S\&P 500 and the STOXX Europe 600 and the other two lookback--horizon pairs, $(5, 1)$ and $(60, 20)$, for a total of 1242 runs.
+% TODO: update when the H200 grid is back (expected 4-9 November); say which chapters use the extended grid.
+
+% ===========================================================================
+\section{Input Features}
+\label{sec:data_features}
+
+\subsection{Alpha158, Alpha360 and Market Features}
+
+The two model groups receive different inputs (Section~\ref{sec:rw_forecasting}). The Alpha158 models read, for each stock, a window of $T = 20$ days of 157 engineered features. The Alpha360 models read a single vector of 360 values, i.e.\ six series over the last 60 days, so their effective lookback is one day. In addition, MASTER and MATCC receive the market features of their region: 21 statistics of the price and volume of each market index, i.e.\ 63 features for the US universes (three indexes) and 42 for the European ones (two indexes). These are the same for all the stocks of a day.
+
+Alpha360 values are ratios to the current close price (volumes to the current volume), so the lagged close $\mathrm{CLOSE}k$ is exactly the $k$-day rate of change of Alpha158, and two columns, $\mathrm{CLOSE0}$ and $\mathrm{VOLUME0}$, are constant by construction and carry no information.
+
+All features are normalised with a robust z-score, $\tilde{x} = (x - \mathrm{median}) / (1.4826 \cdot \mathrm{MAD})$, with the median and the median absolute deviation (MAD) of each feature computed on the training period only, and clipped to $[-3, 3]$. Missing values are then replaced by 0, i.e.\ by the training median. They are negligible: under 0.8\% for every feature, except for the price--volume correlation features (CORD), which reach 3\% in the NASDAQ-100 and 4.8\% in the STOXX Europe 600. Since 0 is the training median of every feature after normalisation, it is also the natural baseline for the attribution methods of Chapter~\ref{ch:xai_method}.
+
+\subsection{Families, Sources and Horizons}
+\label{sec:data_catalog}
+
+The two feature sets share almost no individual features, so the explanations of the two model groups cannot be compared feature by feature. To make them comparable, every feature is assigned a value along three dimensions (Table~\ref{tab:data_catalog}):
+\begin{itemize}[noitemsep]
+    \item its \textbf{family}, i.e.\ what it measures: momentum, trend, position within the recent range, volatility, single-day candle shape, volume, or price--volume co-movement;
+    \item its \textbf{source}, i.e.\ the raw series it is computed from: the close only, the open, high and low together with the close, the volume only, or price and volume together;
+    \item its \textbf{horizon}, i.e.\ how far back it looks: short (up to 5 days), medium (6--20 days) or long (21--60 days). A rolling feature over a window of $w$ days takes the horizon of $w$; an Alpha360 value of lag $k$ takes the horizon of $k + 1$, i.e.\ of the shortest Alpha158 window that contains that day.
+\end{itemize}
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{@{}llrrr@{}}
+        \toprule
+        \textbf{Dimension} & \textbf{Value} & \textbf{Alpha158} & \textbf{Alpha360} & \textbf{Market (US)} \\
+        \midrule
+        \multirow{8}{*}{Family}
+            & momentum      & 35 & 296 & -- \\
+            & trend         & 20 & --  & -- \\
+            & position      & 45 & --  & -- \\
+            & volatility    & 11 & --  & -- \\
+            & candle        & 11 & 4   & -- \\
+            & volume        & 25 & 60  & -- \\
+            & price--volume & 10 & --  & -- \\
+            & market        & -- & --  & 63 \\
+        \midrule
+        \multirow{5}{*}{Source}
+            & close         & 75 & 60  & -- \\
+            & OHLC          & 42 & 240 & -- \\
+            & volume        & 25 & 60  & -- \\
+            & price--volume & 15 & --  & -- \\
+            & market index  & -- & --  & 63 \\
+        \midrule
+        \multirow{3}{*}{Horizon}
+            & short (1--5 days)   & 41 & 30  & 15 \\
+            & medium (6--20 days) & 58 & 90  & 24 \\
+            & long (21--60 days)  & 58 & 240 & 24 \\
+        \midrule
+        \multicolumn{2}{@{}l}{Total} & 157 & 360 & 63 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Feature catalogue: number of features of each set by family, source and horizon. The European market features (42) have the same structure for two indexes instead of three.}
+    \label{tab:data_catalog}
+\end{table}
+
+The catalogue shows how different the two sets are. Alpha360 is almost entirely made of momentum features (296 of 360 values are past prices relative to today's close) and of volume, and it looks mostly far back: two thirds of its values are on the long horizon. Alpha158 spreads over all seven families, and position and momentum features are the most numerous. The two sets overlap only on momentum, volume and candle features. For this reason, the comparisons \emph{within} a group are made on individual features, while the comparisons \emph{across} groups are made on sources and horizons, which do not require any interpretation of what a feature measures.
+
+% ===========================================================================
+\section{Prediction Target}
+\label{sec:data_target}
+
+The target of every model is the forward return over the horizon $L$ on the adjusted close price (Equation~\ref{eq:rw_return}), normalised cross-sectionally with a daily z-score. MASTER and MATCC also drop the 2.5\% most extreme labels on each side during training, and FactorVAE clips the normalised label to $\pm 3$. One exception, inherited from the reference implementation, is discussed in Section~\ref{sec:fw_issues}: FactorVAE's label is computed over $T = 20$ days rather than $L = 5$.
+
+The target is noisy. After the data-quality filter of Section~\ref{sec:data_quality}, the median five-day return of a year lies between $-0.2\%$ and $0.7\%$, while its 5th--95th percentile range is about $\pm 10$--$12\%$ in 2020 and $\pm 4$--$8\%$ in most other years. The share of positive returns lies between 48\% and 59\%. The cross-sectional z-score removes the year-to-year changes of scale from the target, but not from the features, which still reflect the volatility of the period.
+% TODO figure: label distribution per year (notebook 01, section 6) -> images/results/data_labels.pdf
+
+% ===========================================================================
+\section{Data Quality}
+\label{sec:data_quality}
+
+The study of extreme labels, i.e.\ prices that double or halve within five days, showed that most of them are genuine market moves, such as the crash of March 2020, but that some are errors in the data. Comparing the names in the membership files with the companies of the price listings revealed a second kind of error: tickers mapped to the wrong company. Table~\ref{tab:data_errors} lists the errors that reach the training or test data of a model.
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{@{}lllp{7.2cm}@{}}
+        \toprule
+        \textbf{Universe} & \textbf{Ticker} & \textbf{Error} & \textbf{Description} \\
+        \midrule
+        DJI & \texttt{PRG.US} & wrong company & listed as Procter \& Gamble, but the prices are those of PROG Holdings (\$12--64 over 2015--2024, against \$51--175 for P\&G); in every DJI test year \\
+        STOXX 600 & \texttt{TEN.US} & wrong company & listed as Tenaris, prices of Tsakos Energy Navigation (test years 2021--2023) \\
+        STOXX 600 & \texttt{TOM.F} & wrong company & listed as Tomra Systems, prices of Toyota Motor (test years 2021--2022) \\
+        STOXX 600 & \texttt{SAABY.US} & stale price & constant price of 992{,}237 for five years, then about 11: a $-99.999\%$ label in 2024 \\
+        STOXX 600 & \texttt{ORRON.ST} & near-zero price & falls to 0.0002, with 50 labels of $+100\%$ or more in 2019--2022 \\
+        S\&P 500 & \texttt{DISH.US} & zero price & recorded at 0 after the merger with EchoStar: a $-100\%$ label in 2023 \\
+        EURO STOXX 50 & \texttt{VIV.PA} & price jump & adjusted close of 0.044 instead of 4.11 on 31 December 2015 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Main errors in the price data that reach a model. The most serious one, \texttt{PRG.US}, affects one of the 30 DJI stocks in every test year.}
+    \label{tab:data_errors}
+\end{table}
+
+FinBench trains on these data as they are. This thesis instead discards the samples whose prices cannot be trusted. A sample, i.e.\ stock $i$ on day $t$, is discarded when one of the following problems falls within the days it reads, from the first price behind its input features to the end of its label:
+\begin{itemize}[noitemsep]
+    \item \textbf{wrong company}: the three tickers of Table~\ref{tab:data_errors} whose prices belong to another firm;
+    \item \textbf{stale price}: the same adjusted close on 20 or more consecutive trading days, typical of a delisted ticker whose last price is repeated;
+    \item \textbf{price below 0.01}: an error or a quote after a delisting;
+    \item \textbf{price jump}: a price that triples, or falls to a third, from one day to the next. No index member moves like this in the study period; the cases found are bad prices, unadjusted corporate actions and quotes after a bank failure.
+\end{itemize}
+The filter removes samples rather than rows of the files, so that an input window never joins the days before and after a gap. It is applied to training, validation and test data alike, and turned off only to reproduce FinBench exactly (Section~\ref{sec:fw_equivalence}).
+
+The filter removes between 0.07\% (EURO STOXX 50) and 0.9\% (STOXX Europe 600) of the samples, and 2.3\% for the DJI, all of them from \texttt{PRG.US}. Its effect on the target is large: the bad prices inflate the yearly standard deviation of the five-day label by up to twenty times, and the filter brings it back in line with market volatility, e.g.\ from 73\% to 3.9\% for the EURO STOXX 50 in 2015, from 30\% to 4.4\% for the STOXX Europe 600 in 2024 and from 17.5\% to 7.0\% for the NASDAQ-100 in 2022. What remains in the rolling windows is mostly real: the crash and rebound of March 2020, the first weeks of trading of recently listed companies, the 2022 sanctions on Russian miners. Two errors remain in part, the penny prices of \texttt{ORRON.ST} above the 0.01 threshold and some post-failure prices of Signature Bank in 2023, and are listed among the limitations.
+% TODO table/figure: label standard deviation per year before/after the filter (notebook 01, section 5).
+
+% ===========================================================================
+\section{Redundancy among Alpha158 Features}
+\label{sec:data_redundancy}
+
+Many Alpha158 features are computed with the same operator over different windows, or with operators that are algebraically related, so the set is highly redundant. Grouping the 157 features by the absolute Spearman correlation computed on every Wednesday of the study period, with complete linkage at $|\rho| \geq 0.9$, gives 103--105 groups depending on the universe; 80--82 features fall into 27--29 groups of near-duplicates. Some features are exact rescalings of others: the share of up moves (SUMP), the share of down moves (SUMN) and their difference (SUMD) satisfy $\mathrm{SUMN} = 1 - \mathrm{SUMP}$ and $\mathrm{SUMD} = 2\,\mathrm{SUMP} - 1$, and the same holds for their volume counterparts (VSUMP, VSUMN, VSUMD), so 20 features add no information at all.
+% TODO figure: clustered correlation matrix of Alpha158 (notebook 01, section 7) -> images/results/data_alpha158_corr.pdf
+
+This redundancy has two consequences for the rest of the thesis. Attribution methods such as SHAP and permutation importance split or blur the credit among correlated features, so a feature can look unimportant only because a near-duplicate takes its share; importance is therefore reported per correlation group as well as per feature. Counterfactual perturbations, in turn, must move a group of correlated features together, since its members cannot change independently.
+
+% ===========================================================================
+\section{Market Regimes}
+\label{sec:data_volatility}
+
+The annualised realised volatility of the market indexes, i.e.\ the standard deviation of daily index returns over 20 days scaled by $\sqrt{252}$, identifies the regimes of the study period. 2020, the year of the COVID-19 crash, is the most volatile year in every universe, with an average volatility of 28\% for the DJI, 27\% for the S\&P 500 and the EURO STOXX 50 and 23\% for the STOXX Europe 600, about twice that of a calm year. 2022, a bear market driven by rising interest rates, is the second most volatile year, and the most volatile for the NASDAQ-100 (32\%). 2017 is the calmest year everywhere (6.5\% for the DJI). The test years 2020 and 2022 are therefore the high-volatility regimes of the period analysis in Chapter~\ref{ch:results}.
+% TODO figure: volatility timeline with regimes (notebook 01, section 8) -> images/results/data_volatility.pdf
+
+% ===========================================================================
+\section{Summary}
+\label{sec:data_summary}
+
+The data define a difficult and noisy setting: a target whose sign is close to a coin toss, two feature sets that share almost no features and of which one is highly redundant, a study period that includes two stressed regimes, and price files with errors that the original benchmark does not remove. These properties shape the methodology of the following chapters: explanations are compared on families, sources and horizons, reported per group of correlated features, and analysed separately for calm and volatile periods, and all models are trained on the filtered data.

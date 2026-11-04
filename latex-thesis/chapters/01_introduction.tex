@@ -1,10 +1,60 @@
+% ---------------------------------------------------------------------------
+% Chapter 1 - Introduction
+% First draft, 2026-10-27. Numbers from notebooks 01, 03 and 04 (Steps 1, 3, 4).
+% To revise once the explainability results (Steps 5-8) are in: research
+% questions 1-4 and the contributions still describe planned work.
+% ---------------------------------------------------------------------------
+
 \chapter{Introduction}
 \label{ch:introduction}
 
-\section{Section}
-\label{sec:objective}
+\section{Motivation}
+\label{sec:intro_motivation}
 
-This template can be used as a basis for writing the final thesis for the Master’s Degree in Computer Engineering/Artificial Intelligence Engineering. The table of contents, as well as the lists of figures and code listings, are generated automatically. The following chapter provides examples of basic elements.
+Deep learning models for stock forecasting have grown steadily more complex. Recent architectures combine recurrent or Transformer encoders over the history of each stock with attention across stocks, latent factor models and graphs of predefined relations, and they are trained on hundreds of engineered features. Their published results are usually reported as small improvements of ranking metrics on a given market and period. Yet the signal they try to extract is weak: in the data used in this thesis the share of stocks whose five-day return is positive lies between 48\% and 59\%, depending on the universe and the year, so predicting that a stock will rise is barely better than a coin toss.
 
-\subsection{Subsection}
-This is an example of a subsection.
+The weakness of the signal has two consequences that motivate this work. The first concerns \emph{allocation}. Forecasts are used to rank stocks, and a long-only top-$k$ portfolio holds the $k$ stocks with the highest predicted return. When the predictions carry little information, the composition of such a portfolio depends on small differences between scores, and it can change substantially with any perturbation of the model or of its inputs. In the experiments of this thesis, two training runs of the same model that differ only in the random seed share between 17\% and 46\% of the stocks they hold, barely more than two different architectures (10--27\%). The second consequence concerns \emph{trust}. If a model's decisions change with its random initialisation, it is not clear what the model has learned, and whether two models that obtain similar scores rely on the same information.
+
+Explainable artificial intelligence (XAI) offers tools to answer these questions. Feature attribution methods such as SHAP, LIME and Integrated Gradients estimate how much each input contributes to a prediction, and their results can be aggregated into a ranking of the features a model relies on. In finance these methods are mostly applied to a single model at a time, and the reliability of the resulting explanations is rarely checked (Chapter~\ref{ch:related_work}). This thesis instead applies them systematically to several recent architectures trained on identical data with an identical protocol, so that their explanations can be compared with each other and related to the decisions of the portfolios built from their predictions.
+
+\section{Research Questions}
+\label{sec:intro_questions}
+
+The central question of the thesis is whether the instability of stock forecasting models and of the portfolios built on them comes from the \textbf{data} or from the \textbf{model design}. It is broken down into five research questions:
+\begin{enumerate}[label=\textbf{RQ\arabic*}, leftmargin=*, noitemsep]
+    \item \label{rq:features} Which input features drive the predictions of each model, at the level of individual features, of feature families and of time horizons?
+    \item \label{rq:agreement} Do different architectures trained on the same data rely on the same features, and are their explanations stable across random seeds?
+    \item \label{rq:diagnosis} Is the observed instability data-driven, i.e.\ shared by all models because the inputs carry a weak and changing signal, or model-driven, i.e.\ due to architectures that reach similar accuracy through different internal logic?
+    \item \label{rq:periods} How do predictive performance and feature importance change across periods and market regimes, in particular in the high-volatility years 2020 and 2022?
+    \item \label{rq:allocation} How do attributions translate into allocation decisions, and how fragile is the composition of a long-only top-$k$ portfolio with respect to small changes in the predictions?
+\end{enumerate}
+
+% TODO: once Step 7 is done, add one sentence per RQ anticipating the answer.
+
+\section{Approach}
+\label{sec:intro_approach}
+
+The study builds on FinBench~\cite{pederzoli2026finbench}, a recent benchmark that re-implements many stock forecasting models under a common protocol. From it, six regression models are selected that form two groups of directly comparable architectures: MASTER, MATCC and FactorVAE, which use the Alpha158 feature set, and HIST, DiscoverPLF and FinFormer, which use Alpha360. Within a group the models see exactly the same inputs, so differences in their explanations can only come from the architecture or from the training randomness.
+
+The models are trained on three investment universes, the Dow Jones Industrial Average, the NASDAQ-100 and the EURO STOXX 50, with FinBench's rolling protocol: five test years from 2020 to 2024, each preceded by four years of training and one of validation, and three random seeds per configuration. This gives 252 trained models, extended to two larger universes and two further horizons in a grid of 1242 runs. % TODO: confirm once the H200 grid is back.
+Their predictions are turned into long-only top-$k$ portfolios, and their behaviour is explained with post-hoc attribution methods, whose quality is evaluated before they are used. Explanations are then compared across models, seeds, periods and universes, and the variance of the attributions is decomposed into the share due to each of these factors. Finally, the margins of the held stocks from the top-$k$ boundary measure how fragile the allocation decisions are.
+
+All of this is implemented in a single framework that wraps the six models behind a common interface, reproduces FinBench's data pipelines and training procedures exactly, and stores every result in one layout read by the analysis notebooks and by an interactive application.
+
+\section{Contributions}
+\label{sec:intro_contributions}
+
+The main contributions of this thesis are:
+\begin{enumerate}[noitemsep]
+    \item \textbf{A unified and verified framework}, \texttt{xaifin}, that wraps six heterogeneous stock-ranking models behind one interface. An equivalence test shows that every wrapped model trains and predicts exactly as FinBench's own code, so that results obtained through the framework stand for the benchmark's models. Along the way, the work identifies and documents several issues of the reference implementations, among them a label leakage in the evaluation of FactorVAE, and errors in the market data such as tickers mapped to the wrong company.
+    \item \textbf{A systematic comparison of explanations} across architectures, seeds, periods and universes, based on attribution methods whose faithfulness and stability are evaluated, leading to a diagnosis of whether the instability of the models comes from the data or from their design.
+    \item \textbf{A link between explanations and allocation}: the attribution of portfolio membership rather than of raw scores, the margins of held stocks from the top-$k$ boundary, and the fragility of portfolio decisions under small changes of the predictions.
+    \item \textbf{An interactive application} to load trained models, inspect their attributions and compare architectures.
+\end{enumerate}
+
+% TODO: revise contributions 2-4 once Steps 5-11 are complete.
+
+\section{Structure of the Thesis}
+\label{sec:intro_structure}
+
+Chapter~\ref{ch:related_work} introduces the forecasting task, the six models and the explainability literature, and identifies the gap addressed by this work. Chapter~\ref{ch:data} describes the data: the investment universes, the rolling protocol, the feature sets and the target, and the data-quality problems found and filtered. Chapter~\ref{ch:framework} presents the models as they are trained here, the framework that wraps them, its verification against FinBench and the reproduction of the benchmark's results. Chapter~\ref{ch:xai_method} describes the explainability methodology and the evaluation of the explanations. Chapter~\ref{ch:results} reports the results: predictive performance, attributions, the cross-model comparison and the analysis over periods. Chapter~\ref{ch:portfolio} turns to portfolios, their instability across models and seeds and the fragility of their decisions. Chapter~\ref{ch:application} presents the application, and Chapter~\ref{ch:conclusions} concludes with the answers to the research questions, the limitations of the study and directions for future work.

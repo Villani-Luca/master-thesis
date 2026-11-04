@@ -1,0 +1,176 @@
+% ---------------------------------------------------------------------------
+% Chapter 4 - Models and a Reproducible Framework
+% First draft, 2026-10-27. Sources: docs/model_notes.md (issues 1-10),
+% notebook 02_model_adapters (equivalence test), notebook 03_rolling_training,
+% xaifin/models/*, xaifin/training/trainer.py, THESIS_GUIDE.md §2.2-2.4.
+% ---------------------------------------------------------------------------
+
+\chapter{Models and a Reproducible Framework}
+\label{ch:framework}
+
+Explanations can only be compared across models if the models differ in nothing but their architecture. This chapter describes how this condition is met. Section~\ref{sec:fw_selection} explains the choice of the six models, and Section~\ref{sec:fw_training} how each of them is trained. Section~\ref{sec:fw_issues} reports the problems found in the reference implementations and how each is handled. Section~\ref{sec:fw_xaifin} presents the framework that wraps the models behind a common interface, and Section~\ref{sec:fw_equivalence} the test that verifies it against the original code. Finally, Section~\ref{sec:fw_reproduction} describes the training of the full experimental grid and compares its results with those published by FinBench.
+
+% ===========================================================================
+\section{Model Selection}
+\label{sec:fw_selection}
+
+FinBench implements about twenty models, but they are not directly comparable: besides their architecture they differ in the task (classification, regression or ranking) and, above all, in their inputs. Reading the data loaders and training scripts of all the models of the benchmark shows that they fall into five groups by input data: raw OHLCV series; the Alpha158 feature set; the Alpha360 feature set; technical indicators and moving averages; and relational or alternative data such as knowledge graphs and news. Within a group the models read the same files with the same protocol, so differences in their behaviour can be attributed to the architecture.
+
+This thesis studies the two groups built on the Qlib feature sets (Table~\ref{tab:fw_groups}). Both contain three recent regression models with the same target, both rely on engineered features whose meaning is documented, which makes attributions interpretable, and both include models with built-in interpretable signals that can be compared with post-hoc explanations (Table~\ref{tab:rw_models}). Having two groups also allows a second comparison, across feature sets, at the level of the feature families, sources and horizons of Section~\ref{sec:data_catalog}.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{@{}llllp{4.2cm}@{}}
+        \toprule
+        \textbf{Group} & \textbf{Models} & \textbf{Input per stock} & \textbf{Market features} & \textbf{Families} \\
+        \midrule
+        Alpha158 & MASTER, MATCC, FactorVAE & $20 \times 157$ & 63 US / 42 EU (MASTER, MATCC) & all seven \\
+        Alpha360 & HIST, DiscoverPLF, FinFormer & $1 \times 360$ & none & momentum, candle, volume \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{The two groups of comparable models. HIST and DiscoverPLF also receive a stock-to-concept matrix and the market capitalisation of each stock, FinFormer a sector and industry graph.}
+    \label{tab:fw_groups}
+\end{table}
+
+% ===========================================================================
+\section{Training as in the Reference Code}
+\label{sec:fw_training}
+
+A methodological choice underlies all the experiments: \emph{each model is trained exactly as in FinBench's implementation}, with its own loss, optimiser, number of epochs and rule for selecting the final weights. Only the parts that do not change what the model learns, such as how its predictions are read out, are corrected (Section~\ref{sec:fw_issues}). This keeps the results comparable with the published ones and makes the trained models stand for the benchmark's models. The alternative, a single training procedure for all models, would make the comparison cleaner but would study modified versions of the architectures, whose behaviour might differ from that reported by their authors.
+
+The consequence is that the six models differ not only in architecture but also in how they are trained and selected (Table~\ref{tab:fw_training}). Three selection rules use the validation set (lowest validation loss, best validation IC averaged per day, best validation IC pooled over all stock-days), while MASTER and MATCC keep the weights of their last epoch. HIST and DiscoverPLF additionally evaluate the average of the weights of the last five epochs rather than the weights of a single epoch.
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{@{}lp{2.4cm}p{3.2cm}cp{5.2cm}c@{}}
+        \toprule
+        \textbf{Model} & \textbf{Loss} & \textbf{Optimiser} & \textbf{Max epochs} & \textbf{Selection of the final weights} & \textbf{Run / kept} \\
+        \midrule
+        MASTER & MSE & Adam, lr $10^{-5}$ & 40 & stop at the first epoch with training loss $\leq 0.95$, keep the last weights & 11 / 10 \\
+        MATCC & MSE & Adam, lr $3 \cdot 10^{-4}$, weight decay, warm-up and cosine schedule & 70 & keep the last weights & 70 / 69 \\
+        FactorVAE & MSE reconstruction + KL & Adam, lr $10^{-4}$, cosine schedule & 30 & lowest validation loss & 30 / 1 \\
+        HIST & MSE & Adam, lr $2 \cdot 10^{-4}$ & 200 & best validation IC of the average of the last 5 epochs; early stop after 30 epochs & 44 / 13 \\
+        DiscoverPLF & MSE + $0.05 \times$ VAE losses & Adam, lr $2 \cdot 10^{-4}$ & 50 & as HIST, from epoch 20; early stop after 25 epochs & 50 / 29 \\
+        FinFormer & $-$CCC & Adam, lr $2 \cdot 10^{-4}$ & 200 & best validation IC pooled over all stock-days; early stop after 10 epochs & 14 / 3 \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Training set-up of the six models, as in FinBench's implementation. \emph{Run / kept}: median number of epochs run and index of the epoch kept over the 252 runs of the core grid (epochs counted from 0). CCC: concordance correlation coefficient.}
+    \label{tab:fw_training}
+\end{table}
+
+% ===========================================================================
+\section{Issues in the Reference Implementations}
+\label{sec:fw_issues}
+
+Reading the reference code of the six models, and running it on the actual data files, revealed several differences between the implementations and the papers or the benchmark's documentation. They are summarised in Table~\ref{tab:fw_issues}. Following the choice of Section~\ref{sec:fw_training}, the issues that only affect how predictions are read out, or how the code runs, are fixed, while those that change what a model learns are kept and documented.
+
+\begin{table}[htbp]
+    \centering
+    \footnotesize
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{@{}p{2.1cm}p{7.6cm}p{3.2cm}@{}}
+        \toprule
+        \textbf{Model} & \textbf{Issue} & \textbf{Treatment} \\
+        \midrule
+        FactorVAE & Test predictions are the reconstruction from the posterior factors, which the encoder infers from the true future returns (label leakage). & fixed: prediction from the prior path \\
+        FactorVAE & Predictions are random samples of the predicted distribution, even in evaluation mode. & fixed: mean of the distribution \\
+        FactorVAE & The label is computed over the lookback $T$ instead of the horizon $L$, i.e.\ a 20-day return for $(T, L) = (20, 5)$. & kept, stated wherever FactorVAE is compared \\
+        FactorVAE & The first two features (KMID, KLEN) are not normalised. & kept \\
+        HIST, DiscoverPLF, FinFormer & The Alpha360 columns are stored lag by lag, while the models reshape them as if they were stored series by series, so the recurrent layers do not read the days in chronological order. & kept; attributions computed on the original 360 columns \\
+        MASTER, MATCC, FinFormer & Training runs are not seeded, so the published runs cannot be repeated. & seeded \\
+        HIST, DiscoverPLF & The forward pass fails on a CPU. & fixed (no effect on GPU) \\
+        MATCC & The market file is read from two different paths. & fixed \\
+        \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Issues found in FinBench's implementations of the six models. Issues that change what a model learns are kept, so that the trained models remain those of the benchmark.}
+    \label{tab:fw_issues}
+\end{table}
+
+Two of these issues deserve a comment. The \textbf{FactorVAE leakage} means that the test metrics published for FactorVAE are computed on predictions that have seen the labels they are evaluated against; the leak-free predictions used here are those that the model would produce in practice. The \textbf{Alpha360 layout} means that, for HIST and DiscoverPLF, the first step of the recurrent encoder reads the close price at lags 0, 10, 20, \ldots, 50, the second step the open price at the same lags, and so on, while FinFormer first sorts the columns alphabetically. The models still receive all 360 values in a consistent order and can learn from them, but the temporal inductive bias of their recurrent and attention layers does not apply as designed. For explainability this has a precise consequence: attributions are computed on the original 360 columns and then mapped to series and lags, which is valid, whereas any reading of the models' internal states along their ``time'' axis would not be. Retraining the Alpha360 models with chronologically ordered inputs is left for future work (Chapter~\ref{ch:conclusions}).
+
+% ===========================================================================
+\section{The \texttt{xaifin} Framework}
+\label{sec:fw_xaifin}
+
+The six models come from different code bases, each with its own data loader, training loop and evaluation script. To train, explain and compare them in the same way, they are wrapped in a Python package, \texttt{xaifin}, organised in three layers:
+\begin{itemize}[noitemsep]
+    \item the \textbf{package}, which contains all the logic: data loading and normalisation, the model adapters, training, portfolio construction, explanation and analysis;
+    \item the \textbf{notebooks}, one per step of the work, which import the package, run it and produce the figures and tables of this thesis;
+    \item the \textbf{application}, a graphical interface that reads the same package and the same results (Chapter~\ref{ch:application}).
+\end{itemize}
+% TODO figure: framework diagram (data -> adapter -> training / XAI / portfolio -> results store -> notebooks and app) -> images/results/fw_architecture.pdf
+
+\subsection{The Model Adapter Interface}
+
+The central abstraction is the \emph{model adapter}. An adapter owns one model for one run, i.e.\ one cell of the experimental grid (model, universe, test year, seed, lookback and horizon), and implements, for that model:
+\begin{itemize}[noitemsep]
+    \item how FinBench builds its data, returned as a sequence of \emph{day batches}, each containing all the stocks of one trading day with their inputs, labels and any extra inputs such as concept matrices or graphs;
+    \item its prediction as a differentiable function from the inputs of a day, a tensor of shape $N \times T \times F$ for $N$ stocks, to one score per stock, which is the function the attribution methods explain;
+    \item how FinBench trains it: the loss, the optimiser and scheduler, and the loop settings of Table~\ref{tab:fw_training}.
+\end{itemize}
+A single training loop then trains any model through its adapter, and every other component, from the explanation methods to the portfolio backtest, only interacts with adapters. Since all six models are cross-sectional, a day batch is also the natural unit of explanation: the prediction of each stock is attributed to its own inputs while the inputs of the other stocks of the day are held fixed.
+
+\subsection{Data Pipelines}
+
+FinBench builds the inputs of the models in three different ways, and each is reproduced exactly. For MASTER and MATCC, the window of a stock is its own last $T$ rows; for FactorVAE, it covers the last $T$ trading days of the calendar, with the days on which the stock has no data filled in; for the Alpha360 models there is no window, and each sample is a single row. The re-implementation builds the windows with array indexing instead of scanning the history of every stock for every day, which gives the same samples in the same order with lower time and memory requirements, and applies the data-quality filter of Section~\ref{sec:data_quality} after the windows are built.
+
+The three Alpha360 models reorder their 360 input columns in different ways (Section~\ref{sec:fw_issues}). Their adapters all take the 360 columns in their original order and apply each model's reordering inside the prediction function, so that the three models share one input space and their attributions can be compared column by column.
+
+\subsection{Results Store and Reproducibility}
+
+Every run writes its results to a fixed directory layout, indexed by model, universe, lookback and horizon, seed and test year: the configuration (all hyper-parameters, the selected epoch and the version of the code), the test metrics, the training history and the predictions for every stock and day of the test year, together with the trained weights. Portfolios and explanations are stored in the same way. The notebooks, the scripts and the application all read this store, so a result is computed once and every figure and table can be regenerated from it. Every source of randomness is seeded before a model is built, so the initial weights depend only on the seed, and the differences between seeds measured in the following chapters are due to controlled randomness only.
+
+% ===========================================================================
+\section{Equivalence with FinBench}
+\label{sec:fw_equivalence}
+
+To make sure that the adapters stand for FinBench's models, each adapter was compared with FinBench's own code on the DJI, test year 2020, $(T, L) = (20, 5)$ and seed 42, with the data-quality filter turned off as in FinBench. FinBench's data code, model classes, training-step and evaluation functions were called on its own files, and both sides were driven with the same order of the training days and the same random state before each day. Three things were compared: the initial weights; the weights after one training epoch, of about one thousand trading days, starting from the same initial weights; and the test predictions and metrics, each side using its own evaluation code.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabular}{@{}lccc@{}}
+        \toprule
+        \textbf{Model} & \textbf{Initial weights} & \textbf{Weights after one epoch} & \textbf{Test predictions} \\
+        \midrule
+        MASTER & identical & $2 \cdot 10^{-6}$ & $\leq 2 \cdot 10^{-6}$ \\
+        MATCC & identical & $4 \cdot 10^{-5}$ & $\leq 2 \cdot 10^{-6}$ \\
+        FactorVAE & identical & identical & $\leq 2 \cdot 10^{-6}$$^\ast$ \\
+        HIST & identical & identical & $\leq 2 \cdot 10^{-6}$ \\
+        DiscoverPLF & identical & identical & $\leq 2 \cdot 10^{-6}$ \\
+        FinFormer & identical & identical & $\leq 2 \cdot 10^{-6}$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Equivalence test between the adapters and FinBench's code: largest absolute difference. IC, RankIC and MSE agree to the reported digits for every model. $^\ast$Against FinBench's leak-free prediction function without sampling noise (Section~\ref{sec:fw_issues}).}
+    \label{tab:fw_equivalence}
+\end{table}
+
+All six adapters pass (Table~\ref{tab:fw_equivalence}). The initial weights are identical, and after one epoch the weights of four models are bit-identical. The remaining differences, $2 \cdot 10^{-6}$ for MASTER and $4 \cdot 10^{-5}$ for MATCC, are floating-point rounding: they appear on the first training day and barely grow, and the parameters involved have gradients of the order of $10^{-6}$, which the two sides compute with different rounding, while Adam's first updates move every parameter by about the learning rate whatever the size of its gradient. The test predictions agree within $2 \cdot 10^{-6}$ for all models. For FactorVAE, training is bit-identical and the only difference is the corrected readout: FinBench's own evaluation, which reads the labels and samples its predictions, gives two different RankICs for the same weights in two calls.
+
+% ===========================================================================
+\section{Training the Grid and Reproducing FinBench}
+\label{sec:fw_reproduction}
+
+The full grid of Section~\ref{sec:data_protocol}, 252 runs, was trained with the data-quality filter on, without failures, in about 88 hours on a single NVIDIA RTX 5090 GPU. The cost varies widely across models: a MASTER run takes about 2 minutes, FinFormer 5, HIST 11, MATCC 16 and DiscoverPLF 24, while FactorVAE takes 67 minutes per run, because its implementation runs 96 attention layers sequentially for every day, and alone accounts for 47 of the 88 hours. The models are small: their cost comes from FactorVAE's sequential layers and from the size of the cross-section, not from the number of parameters, and a single run uses only a fraction of the GPU. The extended grid of 1242 runs is trained on an NVIDIA H200 with eight runs sharing the GPU; running several processes per GPU or changing the number of CPU threads was verified to give bit-identical weights and predictions.
+% TODO: add the H200 totals once the extended grid is back.
+
+Table~\ref{tab:finbench_regression} compares the regression error of these runs with the results published by FinBench. Since FinBench's numbers are averages of its own runs, partly unseeded and, for FactorVAE, computed on leaky predictions, only the order of magnitude is expected to agree. Of the 18 model--universe pairs, 10 agree within about 5\%, including HIST and DiscoverPLF in every universe and most models on the NASDAQ-100. Three are better: MASTER on the DJI ($-21\%$) and on the EURO STOXX 50 ($-8\%$), and FactorVAE on the DJI ($-8.5\%$), even though FinBench's FactorVAE predictions see the labels. Five are worse: FinFormer in every universe ($+49\%$ to $+82\%$) and MATCC on the DJI ($+32\%$) and the EURO STOXX 50 ($+10\%$).
+
+\input{tables/finbench_regression.tex}
+
+Some of these differences have a clear cause. FinFormer is trained with the negative concordance correlation coefficient, which rewards agreement in correlation, mean and variance but not the scale on which MSE is measured: its MSE is high from the first epoch, while its ranking quality is similar to the other models'. FinFormer is therefore compared on IC and RankIC in the rest of the thesis. On the EURO STOXX 50, the test years differ (2021--2024 here, 2020--2024 in FinBench), and the most volatile year is missing from these runs. On the DJI, the runs of this thesis exclude \texttt{PRG.US}, whose prices belong to another company and enter every DJI test year of FinBench. % TODO: check whether the filter explains MASTER's and FactorVAE's lower DJI error (rerun with CLEAN_DATA off), and investigate MATCC's higher error.
+The returns of the market indexes computed from the same data agree with those reported by FinBench (e.g.\ 8.7\% a year for the DJI against 8\%), which supports the correctness of the data and of the backtest of Chapter~\ref{ch:portfolio}.
+% TODO: add the portfolio comparison with FinBench's Table 7 once run_portfolio.py --k 5 and compare_finbench.py have been run.
+
+% ===========================================================================
+\section{Summary}
+\label{sec:fw_summary}
+
+The six models are wrapped in a framework that reproduces FinBench's data pipelines and training procedures exactly, as verified by an equivalence test, while correcting the issues that do not affect learning, most notably the label leakage of FactorVAE's evaluation. The 252 trained models obtain regression errors in line with the published ones for most model--universe pairs, with differences that are explained by the loss of FinFormer, the data-quality filter and the test years available for the European universe. Within each group, the models now differ only in their architecture, their reference training procedure and the random seed, which is the condition needed to compare their explanations.
