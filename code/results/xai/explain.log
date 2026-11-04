@@ -28,3 +28,5 @@
 2026-11-04 13:50:35  [5/51] FactorVAE dji sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 895 s
 2026-11-04 14:00:22  [6/56] FinFormer dji sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 835 s
 2026-11-04 14:06:21  [6/51] FactorVAE dji sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 946 s
+2026-11-04 14:15:17  [7/56] FinFormer dji sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 895 s
+2026-11-04 14:21:42  [7/51] FactorVAE dji sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 921 s
