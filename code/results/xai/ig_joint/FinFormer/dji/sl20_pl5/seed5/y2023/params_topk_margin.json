@@ -1,0 +1,14 @@
+{
+  "method": "ig_joint",
+  "n_steps": 16,
+  "path": "joint",
+  "baseline": "mean",
+  "approximation": "gausslegendre",
+  "target": "topk_margin",
+  "k": 5,
+  "date_stride": 2,
+  "rows": 783,
+  "days": 27,
+  "seconds": 406.4,
+  "device": "cuda"
+}
