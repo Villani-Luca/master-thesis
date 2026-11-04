@@ -95,6 +95,12 @@ def lower_bold(ours: float, theirs: float, digits: int = 3) -> tuple[str, str]:
     return (f"\\textbf{{{a}}}", b) if ours < theirs else (a, f"\\textbf{{{b}}}")
 
 
+def horizon_row(table: pd.DataFrame, pred_len: int, columns: int) -> str:
+    """A row opening the block of one horizon."""
+    seq_len = table.loc[table["pred_len"] == pred_len, "seq_len"].iloc[0]
+    return f"\\multicolumn{{{columns}}}{{l}}{{\\textit{{Horizon $L={pred_len}$, lookback $T={seq_len}$}}}} \\\\"
+
+
 def table_tex(body: list[str], columns: str, header: list[str], caption: str, label: str) -> str:
     return "\n".join([
         "\\begin{table}[tb]", "\\centering", f"\\caption{{{caption}}}",
@@ -104,10 +110,13 @@ def table_tex(body: list[str], columns: str, header: list[str], caption: str, la
 
 
 def regression_tex(table: pd.DataFrame) -> str:
-    body = []
+    body, horizon = [], None
     for (pred_len, universe), g in table.groupby(["pred_len", "universe"], sort=False):
         if body:
             body.append("\\midrule")
+        if pred_len != horizon:
+            body.append(horizon_row(table, pred_len, 8))
+            horizon = pred_len
         years = g["test_years"].iloc[0]
         name = UNIVERSE_NAMES[universe] + ("" if years == "2020-2024" else f"$^\\dagger$")
         for i, r in enumerate(g.itertuples()):
@@ -117,13 +126,12 @@ def regression_tex(table: pd.DataFrame) -> str:
             body.append(f"{first} & {r.model} & {mse} {{\\scriptsize$\\pm${num(r.MSE_sd)}}} & {fb_mse} & "
                         f"{r.delta_MSE_pct:+.1f}\\% & {mae} {{\\scriptsize$\\pm${num(r.MAE_sd)}}} & {fb_mae} & "
                         f"{r.delta_MAE_pct:+.1f}\\% \\\\")
-    pred_lens = sorted(table["pred_len"].unique())
     header = ["\\multirow{2}{*}{\\textbf{Universe}} & \\multirow{2}{*}{\\textbf{Model}} & "
               "\\multicolumn{3}{c}{\\textbf{MSE}} & \\multicolumn{3}{c}{\\textbf{MAE}} \\\\",
               "\\cmidrule(lr){3-5} \\cmidrule(lr){6-8}",
               " & & Ours & FinBench & $\\Delta$ & Ours & FinBench & $\\Delta$ \\\\"]
     caption = ("Regression error of our runs and of FinBench~\\cite{pederzoli2026finbench} "
-               f"(horizon $L={', '.join(map(str, pred_lens))}$, lookback $T=20$), "
+               "at each horizon $L$ (with its lookback $T$), "
                "averaged over the test years and the seeds 0, 5, 42; $\\pm$: standard deviation between seeds. "
                "$\\Delta$: our error relative to FinBench's; the lower error is in bold. "
                "$^\\dagger$Our SX5E test years are 2021--2024 (constituent history starts in September 2020), "
@@ -132,10 +140,13 @@ def regression_tex(table: pd.DataFrame) -> str:
 
 
 def portfolio_tex(table: pd.DataFrame) -> str:
-    body = []
+    body, horizon = [], None
     for (pred_len, universe), g in table.groupby(["pred_len", "universe"], sort=False):
         if body:
             body.append("\\midrule")
+        if pred_len != horizon:
+            body.append(horizon_row(table, pred_len, 4))
+            horizon = pred_len
         years = g["test_years"].iloc[0]
         name = UNIVERSE_NAMES[universe] + ("" if years == "2020-2024" else f"$^\\dagger$")
         body.append(f"\\multirow{{{len(g) + 1}}}{{*}}{{{name}}} & Index & {num(g['index_CAGR'].iloc[0], 2)} & "
@@ -143,8 +154,8 @@ def portfolio_tex(table: pd.DataFrame) -> str:
         for r in g.itertuples():
             body.append(f" & {r.model} & {num(r.CAGR, 2)} {{\\scriptsize$\\pm${num(r.CAGR_sd, 2)}}} & {num(r.FB_CAGR, 2)} \\\\")
     header = ["\\textbf{Universe} & \\textbf{Model} & \\textbf{Ours} & \\textbf{FinBench} \\\\"]
-    caption = (f"CAGR of the long-only top-{PORTFOLIO_K} portfolios (equal weights, rebalanced every $L=5$ "
-               "trading days) of our runs and of FinBench~\\cite{pederzoli2026finbench} (Table 7), as a fraction; ours averaged "
+    caption = (f"CAGR of the long-only top-{PORTFOLIO_K} portfolios (equal weights, rebalanced every $L$ "
+               "trading days, the model's horizon) of our runs and of FinBench~\\cite{pederzoli2026finbench} (Table 7), as a fraction; ours averaged "
                "over the seeds 0, 5, 42 ($\\pm$: standard deviation between seeds). Index: CAGR of the universe's "
                "index over the same days. --: not reported by FinBench. "
                "$^\\dagger$Our SX5E test years are 2021--2024, FinBench's 2020--2024.")

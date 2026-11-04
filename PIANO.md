@@ -94,10 +94,33 @@ In ordine. Ogni voce ha il criterio di "fatto".
   subito su MASTER, poi su tutti).
 
 ### D. Preparazione al rientro della griglia
-- [ ] **D1. Notebook 03 e 04** generici su 5 universi × 3 orizzonti: rieseguibili senza modifiche.
+- [x] **D1. Notebook 03 e 04** generici su 5 universi × 3 orizzonti: rieseguibili senza modifiche.
+  → 2026-11-04: sezioni 1-6 a L = 5 su tutti e 5 gli universi, nuova sezione "Horizons" (L = 1, 5, 20) in
+  entrambi; il 04 legge solo i portafogli con il k di default (i top-5 servono a `compare_finbench.py`) e
+  salva anche `portfolio_horizons.csv`.
 - [ ] **D2. Procedura di rientro**: estrarre il pacchetto, `grid.py status` = 1242/1242,
   `export_results.py`, `run_portfolio.py`, notebook 03/04, `compare_finbench.py`, poi
   `explain.py` sulle nuove run L = 5 (seed 0/5) e, se c'è tempo, L = 1 e 20 su dji, nasdaq100, sx5e.
+  → 2026-11-04: pacchetto (`xaifin_results_luca-gpu-priv-0_20261103_0809`) copiato, 1242/1242, nessun
+  traceback nei log (in `logs/grid_h200/`); `export_results.py` fatto; portafogli fatti per le run con pickle.
+  **In corso:** riaddestramento sulla RTX 5090 delle 117 run pre-griglia (vedi registro), poi
+  `run_portfolio.py` (anche `--k 5`, `--force` sui 18 seed 42 senza parquet), notebook 03/04, `compare_finbench.py`.
+  Processi staccati: `logs/grid_retrain_117.out`, `logs/portfolio_k5.out`, `logs/portfolio_sxxp.out`.
+  **Da fare, in ordine:**
+  1. quando finiscono i portafogli: collaudare il notebook 04; capire perché l'equal weight di sxxp rende
+     ~-2% l'anno contro +6% dell'indice (titoli OTC/Francoforte?);
+  2. quando `grid.py status` torna a 1242/1242: confrontare le 117 run rifatte con
+     `results/legacy/pre_grid_rtx5090/` (attese identiche: stessa GPU, stesso torch) e scriverlo nel registro;
+  3. `run_portfolio.py` e `run_portfolio.py --k 5` per i gruppi che mancano; `--force` sui 18 portafogli
+     seed 42 L = 5 (hanno solo i CSV, senza parquet);
+  4. rieseguire i notebook 03 e 04 (rigenerano `metrics_summary.csv`, `portfolio_*.csv`) e riscrivere le
+     "Observations" (i seed 0/5 di L = 5 sono cambiati; nuove sezioni Horizons);
+  5. `compare_finbench.py` (tabelle `finbench_regression.tex` e `finbench_portfolio.tex` con i tre orizzonti);
+  6. tesi: TODO di `03_data.tex` (quali capitoli usano la griglia estesa) e di `04_framework.tex` (totali H200,
+     paragrafo "252 runs / 88 hours" da riscrivere, confronto con la Table 7, testo sui 18 pair da aggiornare);
+     dire che il training non è riproducibile tra GPU diverse;
+  7. copiare `code/results/Regression/` e `code/results/portfolio/` sul drive (~6 GB, fuori da git);
+  8. poi Step 5 (XAI): i checkpoint di tutte le 1242 run sono sul disco.
 - [ ] **D3. Pacchetti parziali**: chiedere all'amico un `pack_results.sh` ogni ~3 giorni, per far
   partire lo XAI sulle nuove run senza aspettare la fine.
 
@@ -132,3 +155,8 @@ In ordine. Ogni voce ha il criterio di "fatto".
 | 2026-10-22 | L = 1 e L = 20 obbligatori; la griglia intera gira sulla H200 dell'amico con `launch_grid.py` |
 | 2026-10-22 | `grid.py`/`train.sh` del repo aggiornati con tetto RAM, watchdog, THREADS = 2 (non usati dalla run in corso, che ha il suo orchestratore) |
 | 2026-10-22 | Decisioni D1–D6 (tabella sopra) |
+| 2026-11-04 | Griglia H200 rientrata: 1242/1242 (1125 run nuove), ~919 ore-GPU sommate sulle run, ~12 giorni (22/10–3/11) |
+| 2026-11-04 | **Le run riaddestrate su H200 non coincidono con quelle della RTX 5090**: i seed 0/5 di L = 5 (persi, rifatti sulla H200) differiscono dagli originali in `metrics_summary.csv` del commit 34abdca (IC fino a 0,055; epoca tenuta diversa in 10–14 run su 14 per HIST, DiscoverPLF, FinFormer; FactorVAE quasi uguale). Stesso codice e stesso torch: è il non determinismo tra GPU diverse. Le osservazioni dei notebook 03/04 e il testo della tesi sui seed vanno aggiornati |
+| 2026-11-04 | Le 117 run pre-griglia avevano solo le copie CSV (né `model.pth` né pickle su questo PC): spostate in `results/legacy/pre_grid_rtx5090/` e **riaddestrate sulla RTX 5090** (`grid.py run --horizons 5 --universes dji nasdaq100 sx5e`, stesso torch 2.11.0+cu128), confrontando poi le metriche con quelle vecchie |
+| 2026-11-04 | Giorni con meno di k titoli (festività europee: sxxp ha 5–7 titoli su ~400 a Pasquetta e il 26/12): si tengono tutti gli n < k titoli a peso 1/n, come FinBench (`topk_holdings`); margine NaN in quel periodo |
+| 2026-11-04 | Dati spostati da `code/data/data/<universo>` a `code/data/<universo>` (dove li cerca `config.DATA_ROOT`); `.venv` ricreato (torch 2.11.0+cu128) |

@@ -48,13 +48,13 @@ python code/scripts/export_results.py --zip ckpt.zip  # CSV copies + checkpoints
 
 ## Results
 
-Everything in `code/results/` except the binary files is in git:
+The small files of `code/results/` are in git; the large ones (marked *local*) stay on disk and are kept on a separate drive:
 
 | Folder | Content |
 |---|---|
 | `analysis/` | summary tables: `metrics_summary.csv` (test metrics, one row per run), `portfolio_summary.csv`, `portfolio_margins.csv`, the comparison with FinBench's tables (see its README) |
-| `Regression/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/y<test year>/` | one trained run: `config.json` (hyper-parameters, kept epoch), `metrics.json` (test IC, RankIC, MSE, …), `train_history.csv` (one row per epoch), `predictions.csv.gz` (date, realized, ticker, score, label) |
-| `portfolio/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/top<k>/` | one portfolio over the test years: `metrics.json` (CAGR, Sharpe, turnover, yearly returns), `holdings.csv.gz` (every candidate stock per rebalance, with rank and margin to the top-k), `returns.csv.gz` (daily returns of the portfolio, equal-weight benchmark and index) |
+| `Regression/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/y<test year>/` | one trained run: `config.json` (hyper-parameters, kept epoch), `metrics.json` (test IC, RankIC, MSE, …), `train_history.csv` (one row per epoch); *local*: `predictions.csv.gz` (date, realized, ticker, score, label), `results_sl<T>_pl<L>.pkl`, `model.pth` |
+| `portfolio/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/top<k>/` | one portfolio over the test years: `metrics.json` (CAGR, Sharpe, turnover, yearly returns), `returns.csv.gz` (daily returns of the portfolio, equal-weight benchmark and index); *local*: `holdings.csv.gz` (every candidate stock per rebalance, with rank and margin to the top-k), the `.parquet` files |
 | `data_summary/` | Step 1 data summaries per universe |
 
-The checkpoints (`model.pth`) are not in git: they are shared as a zip that unzips into `code/` (`export_results.py --zip`).
+The local files (about 6 GB for the full grid) are not in git: copy `code/results/Regression/` and `code/results/portfolio/` from the drive into `code/results/` (or unzip the checkpoints archive of `export_results.py --zip` into `code/`).

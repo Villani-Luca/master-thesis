@@ -1,9 +1,9 @@
 """The results store on disk: shareable CSV copies of the outputs, and the checkpoint archive (THESIS_GUIDE.md §2.2).
 
-What stays in git (small, readable without the code): per run config.json, metrics.json,
-train_history.csv and predictions.csv.gz; per portfolio metrics.json, holdings.csv.gz and
-returns.csv.gz. What does not (.gitignore): model.pth, the FinBench results pickle and the
-parquet files; the checkpoints are shared as one zip (pack_checkpoints) instead.
+What stays in git (small, readable without the code): per run config.json, metrics.json and
+train_history.csv; per portfolio metrics.json and returns.csv.gz. What does not (.gitignore, kept
+on a separate drive): model.pth, the FinBench results pickle, predictions.csv.gz, holdings.csv.gz
+and the parquet files; the checkpoints can also be shared as one zip (pack_checkpoints).
 
 - write_predictions_csv(run_dir): predictions.csv.gz from the run's results pickle (date, realized,
   ticker, score, label; topk.load_predictions).

@@ -50,6 +50,8 @@ def topk_holdings(predictions: pd.DataFrame, periods: list[tuple[pd.Timestamp, p
 
     Columns: start, end (the holding period), prediction_date (last input day of the prediction
     used), ticker, score, rank (1 = highest score), held, weight (1/k if held, else 0), margin.
+    On a day with only n < k stocks (a holiday on most of the universe's exchanges) all n are held
+    at 1/n, as FinBench's create_long_short_portfolio_history does, and their margin is NaN.
     margin is the distance to the k-boundary, always >= 0: for a held stock, its score minus the
     (k+1)-th score (how far it can fall and stay); for another stock, the k-th score minus its
     score (how far it must rise to enter). margin_z is the margin divided by the day's cross-sectional
@@ -70,13 +72,14 @@ def topk_holdings(predictions: pd.DataFrame, periods: list[tuple[pd.Timestamp, p
         order = np.argsort(scores)  # FinBench: np.argsort(scores)[-top_k:]
         held = np.zeros(len(g), dtype=bool)
         held[order[-k:]] = True
+        n_held = min(k, len(g))  # fewer than k stocks on the day (sxxp holidays): hold them all, as FinBench
         rank = np.empty(len(g), dtype=int)
         rank[order[::-1]] = np.arange(1, len(g) + 1)
-        kth = scores[order[-k]]
+        kth = scores[order[-n_held]]
         next_out = scores[order[-k - 1]] if len(g) > k else np.nan
         rows.append(pd.DataFrame({
             "start": start, "end": end, "prediction_date": day, "ticker": g["ticker"].to_numpy(), "score": scores,
-            "rank": rank, "held": held, "weight": np.where(held, 1.0 / k, 0.0),
+            "rank": rank, "held": held, "weight": np.where(held, 1.0 / n_held, 0.0),
             "margin": np.where(held, scores - next_out, kth - scores),
         }))
         rows[-1]["margin_z"] = rows[-1]["margin"] / scores.std(ddof=1)
