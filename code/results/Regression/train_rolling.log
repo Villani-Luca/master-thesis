@@ -51927,3 +51927,63 @@
 2026-11-04 16:59:15    epoch  28  train loss 0.7996  valid IC +0.0084  RankIC -0.0056  (107s)
 2026-11-04 16:59:47    epoch  27  train loss 0.1726  valid IC +0.0948  RankIC +0.1006  (445s)
 2026-11-04 17:00:34    epoch  26  train loss 0.2994  valid IC -0.0131  RankIC -0.0066  (455s)
+2026-11-04 17:01:03    epoch  29  train loss 0.7826  valid IC +0.0096  RankIC -0.0070  (108s)
+2026-11-04 17:02:53    epoch  30  train loss 0.8031  valid IC +0.0040  RankIC -0.0097  (110s)
+2026-11-04 17:03:32    epoch  28  train loss 0.3967  valid IC +0.0402  RankIC +0.0531  (461s)
+2026-11-04 17:04:44    epoch  31  train loss 0.7869  valid IC +0.0025  RankIC -0.0090  (111s)
+2026-11-04 17:06:34    epoch  32  train loss 0.7684  valid IC -0.0002  RankIC -0.0105  (110s)
+2026-11-04 17:07:40    epoch  28  train loss 0.1715  valid IC +0.0951  RankIC +0.1006  (473s)
+2026-11-04 17:08:23    epoch  33  train loss 0.7547  valid IC -0.0022  RankIC -0.0112  (108s)
+2026-11-04 17:08:36    epoch  27  train loss 0.2988  valid IC -0.0141  RankIC -0.0079  (482s)
+2026-11-04 17:10:12    epoch  34  train loss 0.7435  valid IC -0.0044  RankIC -0.0108  (109s)
+2026-11-04 17:11:20    epoch  29  train loss 0.3957  valid IC +0.0405  RankIC +0.0535  (468s)
+2026-11-04 17:11:58    kept epoch 1 of 30; test IC -0.0809 RankIC -0.0784 MSE 0.9283 (14517s) -> D:\CodeProjects\master-thesis\code\results\Regression\FactorVAE\nasdaq100\sl20_pl5\seed42\y2021
+2026-11-04 17:11:58  [3/5]
+2026-11-04 17:11:58  FactorVAE nasdaq100 y2022 seed 42 (T=20, L=5, clean=True) on cuda: FactorVAE (train.py main): keep the weights of the lowest validation loss (the VAE loss)
+2026-11-04 17:12:00    epoch  35  train loss 0.7239  valid IC -0.0005  RankIC -0.0075  (107s)
+2026-11-04 17:12:19    days: {'train': 1007, 'valid': 252, 'test': 251}
+2026-11-04 17:13:43    epoch  36  train loss 0.7077  valid IC -0.0005  RankIC -0.0091  (103s)
+2026-11-04 17:15:21    epoch  29  train loss 0.1714  valid IC +0.0952  RankIC +0.1010  (461s)
+2026-11-04 17:15:30    epoch  37  train loss 0.6983  valid IC -0.0016  RankIC -0.0070  (107s)
+2026-11-04 17:15:59    kept epoch 1 of 30; test IC +0.1071 RankIC +0.0963 MSE 0.8995 (14625s) -> D:\CodeProjects\master-thesis\code\results\Regression\FactorVAE\dji\sl20_pl5\seed42\y2021
+2026-11-04 17:15:59  [3/5]
+2026-11-04 17:15:59  FactorVAE dji y2022 seed 42 (T=20, L=5, clean=True) on cuda: FactorVAE (train.py main): keep the weights of the lowest validation loss (the VAE loss)
+2026-11-04 17:16:06    days: {'train': 1007, 'valid': 252, 'test': 251}
+2026-11-04 17:16:23    epoch  28  train loss 0.2980  valid IC -0.0135  RankIC -0.0066  (467s)
+2026-11-04 17:17:16    epoch  38  train loss 0.6816  valid IC +0.0035  RankIC -0.0040  (106s)
+2026-11-04 17:19:04    epoch  39  train loss 0.6614  valid IC +0.0016  RankIC -0.0053  (108s)
+2026-11-04 17:19:56    epoch   0  train loss 1.1724  valid IC -0.0765  RankIC -0.0631  *  (457s)
+2026-11-04 17:20:52    epoch  40  train loss 0.6494  valid IC -0.0010  RankIC -0.0050  (108s)
+2026-11-04 17:22:40    epoch  41  train loss 0.6431  valid IC -0.0042  RankIC -0.0060  (108s)
+2026-11-04 17:23:50    epoch   0  train loss 1.2543  valid IC +0.0942  RankIC +0.0759  *  (464s)
+2026-11-04 17:24:15    epoch  29  train loss 0.2957  valid IC -0.0137  RankIC -0.0069  (472s)
+2026-11-04 17:24:26    epoch  42  train loss 0.6384  valid IC -0.0044  RankIC -0.0038  (106s)
+2026-11-04 17:24:53    kept epoch 1 of 30; test IC +0.0003 RankIC -0.0069 MSE 0.9502 (14879s) -> D:\CodeProjects\master-thesis\code\results\Regression\FactorVAE\sx5e\sl20_pl5\seed42\y2022
+2026-11-04 17:24:53  [3/4]
+2026-11-04 17:24:53  FactorVAE sx5e y2023 seed 42 (T=20, L=5, clean=True) on cuda: FactorVAE (train.py main): keep the weights of the lowest validation loss (the VAE loss)
+2026-11-04 17:25:04    days: {'train': 1028, 'valid': 257, 'test': 255}
+2026-11-04 17:26:10    epoch  43  train loss 0.6100  valid IC -0.0071  RankIC -0.0085  (104s)
+2026-11-04 17:27:30    epoch   1  train loss 0.8809  valid IC -0.0816  RankIC -0.0637  (454s)
+2026-11-04 17:27:54    epoch  44  train loss 0.6022  valid IC -0.0051  RankIC -0.0048  (105s)
+2026-11-04 17:29:43    epoch  45  train loss 0.5799  valid IC -0.0034  RankIC -0.0043  (108s)
+2026-11-04 17:31:28    epoch   1  train loss 0.8899  valid IC +0.0884  RankIC +0.0800  *  (457s)
+2026-11-04 17:31:30    epoch  46  train loss 0.5720  valid IC -0.0066  RankIC -0.0064  (107s)
+2026-11-04 17:32:46    epoch   0  train loss 1.2576  valid IC +0.0367  RankIC +0.0391  *  (462s)
+2026-11-04 17:33:08    epoch  47  train loss 0.5632  valid IC -0.0076  RankIC -0.0078  (98s)
+2026-11-04 17:34:56    epoch  48  train loss 0.5487  valid IC -0.0095  RankIC -0.0112  (108s)
+2026-11-04 17:35:02    epoch   2  train loss 0.8661  valid IC -0.0741  RankIC -0.0567  (451s)
+2026-11-04 17:36:45    epoch  49  train loss 0.5457  valid IC -0.0082  RankIC -0.0081  (109s)
+2026-11-04 17:36:45    early stop: 25 epochs without improvement
+2026-11-04 17:36:54    kept epoch 24 of 50; test IC +0.0208 RankIC +0.0176 MSE 1.1817 (5150s) -> D:\CodeProjects\master-thesis\code\results\Regression\DiscoverPLF\dji\sl20_pl5\seed42\y2022
+2026-11-04 17:36:54  [4/5]
+2026-11-04 17:36:54  DiscoverPLF dji y2023 seed 42 (T=20, L=5, clean=True) on cuda: HIST, DiscoverPLF (train.py main): from eval_from_epoch on, evaluate the average of the last smooth_steps epochs' weights; keep the average with the best validation IC (daily mean); stop after early_stop epochs without improvement
+2026-11-04 17:37:04    days: {'train': 1003, 'valid': 251, 'test': 250}
+2026-11-04 17:39:03    epoch   2  train loss 0.8610  valid IC +0.0445  RankIC +0.0481  (455s)
+2026-11-04 17:40:37    epoch   1  train loss 0.9442  valid IC +0.0453  RankIC +0.0480  *  (471s)
+2026-11-04 17:42:43    epoch   3  train loss 0.8492  valid IC -0.0498  RankIC -0.0388  (461s)
+2026-11-04 17:46:56    epoch   3  train loss 0.7928  valid IC +0.0163  RankIC +0.0363  (473s)
+2026-11-04 17:48:44    epoch   2  train loss 0.9180  valid IC +0.0557  RankIC +0.0599  (487s)
+2026-11-04 17:50:43    epoch   4  train loss 0.8250  valid IC -0.0244  RankIC -0.0255  (479s)
+2026-11-04 17:55:03    epoch   4  train loss 0.6891  valid IC +0.0660  RankIC +0.0822  (487s)
+2026-11-04 17:56:54    epoch   3  train loss 0.8791  valid IC +0.0655  RankIC +0.0654  (490s)
+2026-11-04 17:58:31    epoch   5  train loss 0.7941  valid IC -0.0171  RankIC -0.0124  (469s)
