@@ -19,6 +19,7 @@ import pandas as pd
 
 from xaifin.config import BENCHMARK_INDEX, RESULTS_ROOT, TOP_K
 from xaifin.data.loading import load_market, load_prices
+from xaifin.data.quality import MAX_DAILY_MOVE, MIN_PRICE
 
 TRADING_DAYS = 252
 
@@ -27,12 +28,19 @@ def asset_returns(universe: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Wide (date x ticker) close-to-close and open-to-close returns on adjusted prices.
 
     As FinBench: per ticker, rows without both prices are dropped, then pct_change over the ticker's
-    own consecutive rows.
+    own consecutive rows. One departure (decided 2026-11-04): an open the data-quality filter would
+    reject (below MIN_PRICE, or a close beyond MAX_DAILY_MOVE times it or below 1/MAX_DAILY_MOVE of it)
+    is not traded on, and the day earns its close-to-close return instead. The filter only checks
+    closes, so such opens reach the backtest: SBNY.US, quoted after its seizure, opens at 0.0003 and
+    closes at 0.05 on 2023-07-31 (+16,000%), which alone multiplied the S&P 500 L = 1 portfolios.
     """
     p = load_prices(universe, ("instrument", "date", "adj_close", "adj_open")).dropna()
     p = p.sort_values(["instrument", "date"])
     p["returns"] = p.groupby("instrument")["adj_close"].pct_change()
     p["open_to_close"] = (p["adj_close"] - p["adj_open"]) / p["adj_open"]
+    ratio = p["adj_close"] / p["adj_open"]
+    bad_open = (p["adj_open"] < MIN_PRICE) | (ratio > MAX_DAILY_MOVE) | (ratio < 1 / MAX_DAILY_MOVE)
+    p["open_to_close"] = p["open_to_close"].mask(bad_open, p["returns"])
     p = p.dropna(subset=["returns"])
     wide = lambda col: p.pivot(index="date", columns="instrument", values=col).sort_index()
     return wide("returns"), wide("open_to_close")

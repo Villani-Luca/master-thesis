@@ -105,7 +105,8 @@ In ordine. Ogni voce ha il criterio di "fatto".
   traceback nei log (in `logs/grid_h200/`); `export_results.py` fatto; portafogli fatti per le run con pickle.
   **In corso:** riaddestramento sulla RTX 5090 delle 117 run pre-griglia (vedi registro), poi
   `run_portfolio.py` (anche `--k 5`, `--force` sui 18 seed 42 senza parquet), notebook 03/04, `compare_finbench.py`.
-  Processi staccati: `logs/grid_retrain_117.out`, `logs/portfolio_k5.out`, `logs/portfolio_sxxp.out`.
+  Processi staccati: `logs/grid_retrain_117.out`, `logs/portfolio_fix.out` (ricalcolo dopo la regola sulle
+  aperture, vedi registro); finiti `logs/portfolio_k5.out`, `logs/portfolio_sxxp.out`.
   **Da fare, in ordine:**
   1. quando finiscono i portafogli: collaudare il notebook 04; capire perché l'equal weight di sxxp rende
      ~-2% l'anno contro +6% dell'indice (titoli OTC/Francoforte?);
@@ -159,4 +160,5 @@ In ordine. Ogni voce ha il criterio di "fatto".
 | 2026-11-04 | **Le run riaddestrate su H200 non coincidono con quelle della RTX 5090**: i seed 0/5 di L = 5 (persi, rifatti sulla H200) differiscono dagli originali in `metrics_summary.csv` del commit 34abdca (IC fino a 0,055; epoca tenuta diversa in 10–14 run su 14 per HIST, DiscoverPLF, FinFormer; FactorVAE quasi uguale). Stesso codice e stesso torch: è il non determinismo tra GPU diverse. Le osservazioni dei notebook 03/04 e il testo della tesi sui seed vanno aggiornati |
 | 2026-11-04 | Le 117 run pre-griglia avevano solo le copie CSV (né `model.pth` né pickle su questo PC): spostate in `results/legacy/pre_grid_rtx5090/` e **riaddestrate sulla RTX 5090** (`grid.py run --horizons 5 --universes dji nasdaq100 sx5e`, stesso torch 2.11.0+cu128), confrontando poi le metriche con quelle vecchie |
 | 2026-11-04 | Giorni con meno di k titoli (festività europee: sxxp ha 5–7 titoli su ~400 a Pasquetta e il 26/12): si tengono tutti gli n < k titoli a peso 1/n, come FinBench (`topk_holdings`); margine NaN in quel periodo |
+| 2026-11-04 | **Aperture inaffidabili nel backtest** (`backtest.asset_returns`): il filtro qualità guarda solo le chiusure, ma il primo giorno il portafoglio compra all'apertura. SBNY.US (dopo il fallimento) apre a 0,0003 e chiude a 0,05 il 31/07/2023 (+16.000%): tutti i portafogli sp500 L = 1 avevano CAGR +100–256%. Regola: un'apertura sotto `MIN_PRICE` o con chiusura/apertura oltre `MAX_DAILY_MOVE` (o sotto 1/`MAX_DAILY_MOVE`) non si usa, quel giorno vale il rendimento close-to-close. Coppie (titolo, giorno) toccate nel 2020–2024: dji 0, sx5e 0 (confronto con FinBench invariato), nasdaq100 557 (VBVT.US a 0,0001), sp500 36 (SBNY.US, FTR.US), sxxp 63 (ORRON.ST). Portafogli di nasdaq100, sp500, sxxp ricalcolati con `--force` (`logs/portfolio_fix.out`). Da dire nella tesi (cap. 7, protocollo del backtest) |
 | 2026-11-04 | Dati spostati da `code/data/data/<universo>` a `code/data/<universo>` (dove li cerca `config.DATA_ROOT`); `.venv` ricreato (torch 2.11.0+cu128) |
