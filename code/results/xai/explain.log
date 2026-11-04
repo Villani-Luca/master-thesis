@@ -52,3 +52,94 @@
 2026-11-04 17:32:20  [14/56] FinFormer nasdaq100 sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2293 s
 2026-11-04 17:46:22  [9/28] DiscoverPLF dji sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1981 s
 2026-11-04 17:57:20  [15/51] FactorVAE nasdaq100 sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1876 s
+2026-11-04 18:11:40  [15/56] FinFormer nasdaq100 sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2360 s
+2026-11-04 18:20:07  [10/28] DiscoverPLF dji sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2025 s
+2026-11-04 18:28:26  [16/51] FactorVAE nasdaq100 sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1866 s
+2026-11-04 18:50:34  [16/56] FinFormer nasdaq100 sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2335 s
+2026-11-04 18:59:16  [17/51] FactorVAE nasdaq100 sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1850 s
+2026-11-04 19:29:28  [17/56] FinFormer nasdaq100 sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2333 s
+2026-11-04 19:29:50  [18/51] FactorVAE nasdaq100 sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1834 s
+2026-11-04 20:00:22  [19/51] FactorVAE nasdaq100 sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1832 s
+2026-11-04 20:01:26  [11/28] DiscoverPLF nasdaq100 sl20_pl5 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 6079 s
+2026-11-04 20:07:27  [18/56] FinFormer nasdaq100 sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2279 s
+2026-11-04 20:17:15  [20/51] FactorVAE sx5e sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1013 s
+2026-11-04 20:32:56  [21/51] FactorVAE sx5e sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 940 s
+2026-11-04 20:42:17  [19/56] FinFormer nasdaq100 sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2090 s
+2026-11-04 20:47:30  [22/51] FactorVAE sx5e sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 874 s
+2026-11-04 21:02:02  [23/51] FactorVAE sx5e sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 872 s
+2026-11-04 21:14:47  [20/56] FinFormer nasdaq100 sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1950 s
+2026-11-04 21:16:40  [24/51] FactorVAE sx5e sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 878 s
+2026-11-04 21:24:26  [21/56] FinFormer sx5e sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 579 s
+2026-11-04 21:32:51  [12/28] DiscoverPLF nasdaq100 sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 5485 s
+2026-11-04 21:32:52  [25/51] FactorVAE sx5e sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 972 s
+2026-11-04 21:33:55  [22/56] FinFormer sx5e sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 569 s
+2026-11-04 21:43:27  [23/56] FinFormer sx5e sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 572 s
+2026-11-04 21:48:57  [26/51] FactorVAE sx5e sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 965 s
+2026-11-04 21:53:19  [24/56] FinFormer sx5e sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 592 s
+2026-11-04 22:02:59  [25/56] FinFormer sx5e sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 580 s
+2026-11-04 22:04:58  [27/51] FactorVAE sx5e sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 960 s
+2026-11-04 22:06:04  [28/51] MATCC dji sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 66 s
+2026-11-04 22:07:12  [29/51] MATCC dji sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 68 s
+2026-11-04 22:08:21  [30/51] MATCC dji sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 68 s
+2026-11-04 22:09:29  [31/51] MATCC dji sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 68 s
+2026-11-04 22:10:35  [32/51] MATCC dji sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 66 s
+2026-11-04 22:11:43  [33/51] MATCC dji sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 68 s
+2026-11-04 22:13:57  [26/56] FinFormer sx5e sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 657 s
+2026-11-04 22:15:07  [34/51] MATCC nasdaq100 sl20_pl5 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 204 s
+2026-11-04 22:18:35  [35/51] MATCC nasdaq100 sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 208 s
+2026-11-04 22:22:00  [36/51] MATCC nasdaq100 sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 206 s
+2026-11-04 22:25:25  [37/51] MATCC nasdaq100 sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 205 s
+2026-11-04 22:26:19  [27/56] FinFormer sx5e sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 742 s
+2026-11-04 22:28:48  [38/51] MATCC nasdaq100 sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 203 s
+2026-11-04 22:32:17  [39/51] MATCC nasdaq100 sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 209 s
+2026-11-04 22:35:44  [40/51] MATCC nasdaq100 sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 207 s
+2026-11-04 22:39:10  [41/51] MATCC nasdaq100 sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 207 s
+2026-11-04 22:39:15  [28/56] FinFormer sx5e sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 776 s
+2026-11-04 22:42:22  [42/51] MATCC nasdaq100 sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 192 s
+2026-11-04 22:45:32  [43/51] MATCC nasdaq100 sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 190 s
+2026-11-04 22:47:01  [44/51] MATCC sx5e sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 89 s
+2026-11-04 22:48:29  [45/51] MATCC sx5e sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 88 s
+2026-11-04 22:49:57  [46/51] MATCC sx5e sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 88 s
+2026-11-04 22:51:27  [47/51] MATCC sx5e sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 90 s
+2026-11-04 22:52:14  [29/56] HIST dji sl20_pl5 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 779 s
+2026-11-04 22:52:54  [48/51] MATCC sx5e sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 87 s
+2026-11-04 22:54:23  [49/51] MATCC sx5e sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 88 s
+2026-11-04 22:55:51  [50/51] MATCC sx5e sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 88 s
+2026-11-04 22:57:21  [51/51] MATCC sx5e sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 90 s
+2026-11-04 23:03:02  [30/56] HIST dji sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 648 s
+2026-11-04 23:09:24  [13/28] DiscoverPLF nasdaq100 sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 5792 s
+2026-11-04 23:12:07  reaggregate: 204 global files rebuilt
+2026-11-04 23:12:10  explain: 24 runs, methods=['intrinsic'], targets=['pred', 'topk_margin']
+2026-11-04 23:12:16  [1/24] MATCC dji sl20_pl5 seed0 y2022:  intrinsic, 27 days, 6 s
+2026-11-04 23:12:21  [2/24] MATCC dji sl20_pl5 seed0 y2023:  intrinsic, 27 days, 5 s
+2026-11-04 23:12:27  [3/24] MATCC dji sl20_pl5 seed0 y2024:  intrinsic, 27 days, 6 s
+2026-11-04 23:12:27  [4/24] MATCC dji sl20_pl5 seed5 y2022: done already
+2026-11-04 23:12:27  [31/56] HIST dji sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 565 s
+2026-11-04 23:12:33  [5/24] MATCC dji sl20_pl5 seed5 y2023:  intrinsic, 27 days, 6 s
+2026-11-04 23:12:38  [6/24] MATCC dji sl20_pl5 seed5 y2024:  intrinsic, 27 days, 6 s
+2026-11-04 23:12:56  [7/24] MATCC nasdaq100 sl20_pl5 seed0 y2020:  intrinsic, 27 days, 18 s
+2026-11-04 23:13:14  [8/24] MATCC nasdaq100 sl20_pl5 seed0 y2021:  intrinsic, 27 days, 18 s
+2026-11-04 23:13:32  [9/24] MATCC nasdaq100 sl20_pl5 seed0 y2022:  intrinsic, 27 days, 18 s
+2026-11-04 23:13:49  [10/24] MATCC nasdaq100 sl20_pl5 seed0 y2023:  intrinsic, 27 days, 18 s
+2026-11-04 23:14:07  [11/24] MATCC nasdaq100 sl20_pl5 seed0 y2024:  intrinsic, 27 days, 18 s
+2026-11-04 23:14:25  [12/24] MATCC nasdaq100 sl20_pl5 seed5 y2020:  intrinsic, 27 days, 18 s
+2026-11-04 23:14:43  [13/24] MATCC nasdaq100 sl20_pl5 seed5 y2021:  intrinsic, 27 days, 18 s
+2026-11-04 23:15:01  [14/24] MATCC nasdaq100 sl20_pl5 seed5 y2022:  intrinsic, 27 days, 18 s
+2026-11-04 23:15:18  [15/24] MATCC nasdaq100 sl20_pl5 seed5 y2023:  intrinsic, 27 days, 18 s
+2026-11-04 23:15:36  [16/24] MATCC nasdaq100 sl20_pl5 seed5 y2024:  intrinsic, 27 days, 18 s
+2026-11-04 23:15:43  [17/24] MATCC sx5e sl20_pl5 seed0 y2021:  intrinsic, 27 days, 7 s
+2026-11-04 23:15:50  [18/24] MATCC sx5e sl20_pl5 seed0 y2022:  intrinsic, 26 days, 7 s
+2026-11-04 23:15:57  [19/24] MATCC sx5e sl20_pl5 seed0 y2023:  intrinsic, 26 days, 7 s
+2026-11-04 23:16:04  [20/24] MATCC sx5e sl20_pl5 seed0 y2024:  intrinsic, 27 days, 7 s
+2026-11-04 23:16:11  [21/24] MATCC sx5e sl20_pl5 seed5 y2021:  intrinsic, 27 days, 7 s
+2026-11-04 23:16:18  [22/24] MATCC sx5e sl20_pl5 seed5 y2022:  intrinsic, 26 days, 7 s
+2026-11-04 23:16:25  [23/24] MATCC sx5e sl20_pl5 seed5 y2023:  intrinsic, 26 days, 7 s
+2026-11-04 23:16:32  [24/24] MATCC sx5e sl20_pl5 seed5 y2024:  intrinsic, 27 days, 7 s
+2026-11-04 23:22:12  [32/56] HIST dji sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 585 s
+2026-11-04 23:31:49  [33/56] HIST dji sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 577 s
+2026-11-04 23:40:57  [34/56] HIST dji sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 548 s
+2026-11-04 23:50:33  [35/56] HIST dji sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 576 s
+2026-11-05 00:00:09  [36/56] HIST dji sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 576 s
+2026-11-05 00:09:45  [37/56] HIST dji sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 576 s
+2026-11-05 00:19:08  [14/28] DiscoverPLF nasdaq100 sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 4184 s
+2026-11-05 00:19:13  [38/56] HIST dji sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 568 s

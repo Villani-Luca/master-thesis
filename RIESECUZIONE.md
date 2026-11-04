@@ -60,6 +60,10 @@ Stima: domani 5/11, pomeriggio o sera.
 
 Stima: tra stanotte (processo c) e domani sera (processo a). Non serve aspettare A.
 
+Stato: processo c (FactorVAE, MATCC, MASTER) finito il 4/11 alle ~23:00; per i suoi modelli B1 e B2 sono già
+fatti (`--reaggregate --models FactorVAE MATCC MASTER`, `--methods intrinsic --models MATCC MASTER`). Restano
+DiscoverPLF (processo a), FinFormer e HIST (processo b).
+
 - [ ] **B1. Ricostruire i file globali** (aggiunge la colonna `net`, che i processi partiti il 4/11 non scrivono):
   `python code/scripts/explain.py --reaggregate`
 - [ ] **B2. Pesi interni** di MASTER, MATCC, FinFormer (pochi secondi a run):
