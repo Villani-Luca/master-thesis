@@ -200,3 +200,8 @@
 2026-11-05 08:48:39  [21/28] DiscoverPLF sx5e sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1704 s
 2026-11-05 09:13:13  [22/28] DiscoverPLF sx5e sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1474 s
 2026-11-05 09:36:45  [23/28] DiscoverPLF sx5e sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1412 s
+2026-11-05 09:55:04  [24/28] DiscoverPLF sx5e sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1100 s
+2026-11-05 10:15:27  [25/28] DiscoverPLF sx5e sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1223 s
+2026-11-05 10:34:00  [26/28] DiscoverPLF sx5e sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1112 s
+2026-11-05 10:50:41  [27/28] DiscoverPLF sx5e sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1001 s
+2026-11-05 11:13:04  [28/28] DiscoverPLF sx5e sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1343 s
