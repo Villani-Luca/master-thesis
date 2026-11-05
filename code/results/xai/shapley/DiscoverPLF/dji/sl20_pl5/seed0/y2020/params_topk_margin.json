@@ -5,7 +5,7 @@
   "exact": true,
   "target": "topk_margin",
   "k": 5,
-  "rows": 737,
-  "days": 27,
-  "seconds": 9.8
+  "rows": 1446,
+  "days": 53,
+  "seconds": 8.2
 }

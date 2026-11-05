@@ -2,9 +2,11 @@
 # One-time setup on a Linux GPU server: Python 3.12 environment with CUDA torch, then a check of
 # the GPUs and the data. Run from anywhere:  bash code/scripts/remote/setup.sh
 # Other CUDA build (old driver):  TORCH_CUDA=cu126 bash code/scripts/remote/setup.sh
+# For explaining instead of training:  REQS=code/requirements-xai.txt bash code/scripts/remote/setup.sh
 set -euo pipefail
 cd "$(dirname "$0")/../../.."   # repository root
 TORCH_CUDA=${TORCH_CUDA:-cu128}
+REQS=${REQS:-code/requirements-train.txt}
 
 if ! command -v uv >/dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -15,7 +17,7 @@ export UV_CACHE_DIR=${UV_CACHE_DIR:-$PWD/.uv-cache}
 uv venv --python 3.12 .venv
 source .venv/bin/activate
 uv pip install torch --index-url "https://download.pytorch.org/whl/$TORCH_CUDA"
-uv pip install -r code/requirements-train.txt
+uv pip install -r "$REQS"
 uv pip install -e code --no-deps
 
 python - <<'EOF'

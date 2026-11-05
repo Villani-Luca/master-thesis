@@ -14,8 +14,9 @@ Targets (decision D4 of PIANO.md):
   the portfolio: in a cross-sectional model, moving x_i also moves the other scores and the boundary.
 
 Days: the prediction days the long-only portfolio trades on (portfolio.topk), on the L = 5 grid for
-every horizon, so that attributions of different horizons are explained on the same days; every
-other one of them (REBALANCE_STRIDE, decided 2026-11-04 to halve the cost), about 26 days a year.
+every horizon, so that attributions of different horizons are explained on the same days; all of them,
+about 52 a year (REBALANCE_STRIDE = 1, decided 2026-11-05 with the graduation moved to February; until
+then every other date at L = 5 and every fourth at L = 1 and 20, kept in results/xai_sampled_dates/).
 Baselines are set by each method (xai.gradient: the day's mean input by default).
 
 Storage, under results/xai/<method>/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/y<YEAR>/:
@@ -39,7 +40,7 @@ from xaifin.portfolio.topk import MAX_PREDICTION_AGE_DAYS, rebalance_periods
 
 TARGETS = ("pred", "topk_margin")
 REBALANCE_EVERY = 5  # L = 5 business days for every horizon (PIANO.md B2)
-REBALANCE_STRIDE = 2  # explain every other rebalance date
+REBALANCE_STRIDE = 1  # explain every rebalance date
 GRAD_CHUNK_BYTES = 2**30  # memory for the batched own-input gradients (N x [N, T, F] floats)
 
 

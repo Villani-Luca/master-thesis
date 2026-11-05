@@ -18,6 +18,24 @@ Errori: `grep -l Traceback logs/grid/*.log` e `grep Traceback logs/xai_*.err`.
 
 ---
 
+## Aggiornamento del 5/11 sera: XAI su tutte le date
+
+Le spiegazioni ora coprono **tutte** le date di ribilanciamento (PIANO.md, registro del 5/11). Le uscite a date campionate
+sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto quando il core è rispiegato:
+
+- [ ] **R1. Core su questo PC**: `grid.py run --xai --universes dji nasdaq100 sx5e --workers 5` (lanciato alle 18:26,
+  `logs/xai_core.out`; avanzamento: `python code/scripts/grid.py status --xai --universes dji nasdaq100 sx5e`). Prima
+  L = 5 (252 run), poi L = 1 e 20 (504). Su Windows FinFormer esce con 0xC0000409 a fine processo: il task risulta FAILED
+  nel log ma le uscite sono complete (lo conferma `status --xai`); rilanciare lo stesso comando rifà solo ciò che manca.
+- [ ] **R2. Shapley e LIME dji 2020** con tutte le date (`logs/xai_c2.out`, 18 run).
+- [ ] **R3. Quando L = 5 è finito**: notebook 05, 06, 07, 08 rieseguiti; Observations e diagnosi ricontrollate;
+  `thesis_figures.py res_inputs res_agreement res_agreement_models res_variance`; numeri dei cap. 6 e 9 aggiornati.
+- [ ] **R4. Verifica del campionamento** (una frase nel cap. 5): classifiche con tutte le date contro una su due / una su
+  quattro, per ogni run del core (`xai/` contro `xai_sampled_dates/`).
+- [ ] **R5. Quando L = 1 e 20 sono finiti**: notebook 07 e 08 con il fattore orizzonte (E4).
+
+Le voci C1, C2, C4, C4b, C5 qui sotto restano spuntate per la versione a date campionate; R1–R5 le sostituiscono.
+
 ## A. Quando finisce il riaddestramento (1242/1242)
 
 Stima: domani 5/11, pomeriggio o sera.
@@ -100,22 +118,26 @@ Stima: 6/11 sera – 7/11 mattina.
 - [ ] **C6. Tesi** (5/11: cap. 6 §6.2–6.7 scritti, tabelle `res_inputs`, `res_agreement`, `res_agreement_models`, `res_variance`; cap. 9 apertura e risposte alle RQ; introduzione: risposte in breve e contributo 2. Restano: cap. 5 valutazione e numeri `% TODO` dopo il notebook 06, i due `% TODO` sul sanity check nel cap. 6): sostituire i numeri marcati `% TODO` nei capitoli (`grep -n "TODO" latex-thesis/chapters/*.tex`),
   in particolare `05_xai_methodology.tex`; scrivere la sezione di valutazione (Step 6) e i risultati (cap. 6).
 
-## E. XAI sugli universi grandi (S&P 500, STOXX Europe 600), tutti gli orizzonti
+## E. XAI sugli universi grandi (S&P 500, STOXX Europe 600), tutti gli orizzonti: sulla H200
 
-Decisione del 2026-11-05 (PIANO.md, registro): XAI su 5 universi × 3 orizzonti. Log in `logs/xai4_*.out`, `logs/xai5_*.out`.
+Decisione del 2026-11-05 (PIANO.md, registro): XAI su 5 universi × 3 orizzonti. I tre universi core su questo PC
+(processi `xai3_*`), i due grandi sulla H200 del server del training (486 run). I processi `xai4_*` lanciati qui alle
+17:55 sono stati fermati alle 18:00 prima di finire un run: nessun file scritto.
 
-- [ ] **E1. L = 5, una data su due** (lanciati il 5/11 alle 17:55):
-  `explain.py --models MASTER MATCC --universes sp500 sxxp` (`xai4_a`, 54 run) e
-  `explain.py --models FactorVAE HIST FinFormer DiscoverPLF --universes sp500 sxxp` (`xai4_b`, 108 run).
-  Misurare i secondi per run sulle prime run e aggiornare la stima in PIANO.md (Calendario).
-- [ ] **E2. L = 1 e 20, una data su quattro**, da lanciare quando finiscono i processi `xai3_*` (un processo per ognuno che si libera):
-  ```
-  python code/scripts/explain.py --models MASTER MATCC --universes sp500 sxxp --horizons 1 20 --stride 4        # xai5_a
-  python code/scripts/explain.py --models FactorVAE HIST --universes sp500 sxxp --horizons 1 20 --stride 4      # xai5_b
-  python code/scripts/explain.py --models FinFormer DiscoverPLF --universes sp500 sxxp --horizons 1 20 --stride 4  # xai5_c
-  ```
-- [ ] **E3. Analisi**: notebook 07 e 08 con tutti gli universi e gli orizzonti (fattori universo e orizzonte nella
-  scomposizione della varianza), poi capitoli 6 e 9 e le tabelle `res_*` di `thesis_figures.py` (ora fissate a L = 5 e universi core).
+- [x] **E1. Pacchetto** (5/11): `C:\Users\villa\Downloads\xaifin_xai_bundle.zip` (1,4 GB: codice, i 486 checkpoint,
+  il run di riferimento MASTER dji 2020 per `check_xai.py`, guida `START_HERE.md` = `code/scripts/remote/START_HERE_XAI.md`)
+  e `xaifin_xai_data.zip` (dati di sp500, sxxp, dji, constituents; non serve se il server ha ancora i dati del training).
+  Ricostruirli con i due comandi nel docstring di `code/scripts/remote/make_bundle.py`.
+- [ ] **E2. Sul server**: Claude segue `START_HERE.md` (ambiente, `check_xai.py`, prova e misura, lancio di
+  `xai.sh`, cioè `grid.py run --xai --universes sp500 sxxp`, tutte le date). Farsi dare le misure del passo 6 (secondi per run, RAM)
+  e aggiornare la stima in PIANO.md.
+- [ ] **E3. Ricezione** ogni 2–3 giorni del pacchetto leggero (`xaifin_xai_light_*.tar.gz`, senza tensori delle
+  attribuzioni), alla fine di quello completo: estrarre dalla radice del repo (`tar -xzf xaifin_xai_light_<...>.tar.gz`).
+  Scrive solo in `code/results/xai/*/*/{sp500,sxxp}/` e `logs/xai_server/`. Controllo:
+  `python code/scripts/grid.py status --xai`; leggere `logs/xai_server/xai_check.txt`.
+- [ ] **E4. Analisi**: notebook 07 e 08 con tutti gli universi e gli orizzonti (fattori universo e orizzonte nella
+  scomposizione della varianza), poi capitoli 6 e 9 e le tabelle `res_*` di `thesis_figures.py` (ora fissate a L = 5
+  e universi core).
 
 ## D. Alla fine
 

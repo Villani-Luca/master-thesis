@@ -18,6 +18,14 @@ state is in logs/grid/status.json, and `touch logs/grid/STOP` lets the running t
 
 When two machines share the grid, give them different --universes or --horizons, so they never
 train the same task at the same time.
+
+With --xai the same commands explain the trained runs instead (scripts/explain.py, every method, both
+targets): a run is done when all its XAI outputs exist, a task explains every test year of its
+(model, universe, horizon, seed), on every rebalance date (explain.py's default), and logs go to
+logs/xai/. A task stopped in the middle keeps the outputs already written and redoes only the run it was on.
+
+    python code/scripts/grid.py status --xai --universes sp500 sxxp
+    python code/scripts/grid.py run --xai --universes sp500 sxxp --gpus 0 --workers 8 --max-ram 128
 """
 
 import argparse
@@ -51,21 +59,47 @@ def run_state(model, universe, sl_pl, seed, year) -> str:
     return "partial" if (run_dir / "resume.pt").exists() else "missing"
 
 
+def xai_state(model, universe, sl_pl, seed, year) -> str:
+    """'done' when every output of explain.py's default methods exists, 'partial' when some do."""
+    from xaifin.xai.base import TARGETS
+    from xaifin.xai.intrinsic import WEIGHTS
+
+    cell = Path(model, universe, f"sl{sl_pl[0]}_pl{sl_pl[1]}", f"seed{seed}", f"y{year}")
+    outputs = [Path(method) / cell / f"global_{t}.parquet" for method in ("ig_joint", "saliency") for t in TARGETS]
+    outputs.append(Path("permutation") / cell / "global.parquet")
+    if model in WEIGHTS:
+        outputs.append(Path("intrinsic") / cell / "weights.npz")
+    found = sum((RESULTS_ROOT / "xai" / p).exists() for p in outputs)
+    if found == len(outputs):
+        return "done"
+    if not (RESULTS_ROOT / "Regression" / cell / "model.pth").exists():
+        return "no checkpoint"
+    return "partial" if found else "missing"
+
+
 def task_args(index: int) -> list[str]:
     model, universe, (sl, pl), seed = TASKS[index]
     return ["--models", model, "--universes", universe, "--years", *map(str, test_years(universe)),
             "--seeds", str(seed), "--sl", str(sl), "--pl", str(pl)]
 
 
-def task_table(universes=None, models=None, horizons=None) -> pd.DataFrame:
+def xai_args(index: int) -> list[str]:
+    model, universe, (_, pl), seed = TASKS[index]
+    return ["--models", model, "--universes", universe, "--horizons", str(pl), "--seeds", str(seed),
+            "--years", *map(str, test_years(universe))]
+
+
+def task_table(universes=None, models=None, horizons=None, xai: bool = False) -> pd.DataFrame:
+    state = xai_state if xai else run_state
     rows = []
     for index, (model, universe, sl_pl, seed) in enumerate(TASKS):
         if ((universes and universe not in universes) or (models and model not in models)
                 or (horizons and sl_pl[1] not in horizons)):
             continue
-        states = [run_state(model, universe, sl_pl, seed, y) for y in test_years(universe)]
+        states = [state(model, universe, sl_pl, seed, y) for y in test_years(universe)]
         rows.append({"task": index, "model": model, "universe": universe, "L": sl_pl[1], "seed": seed,
-                     "done": states.count("done"), "partial": states.count("partial"), "years": len(states)})
+                     "done": states.count("done"), "partial": states.count("partial"), "years": len(states),
+                     "no_checkpoint": states.count("no checkpoint")})
     return pd.DataFrame(rows)
 
 
@@ -85,6 +119,8 @@ def compress(indices: list[int]) -> str:
 # longest tasks first: a long task started last would keep one worker busy while the others idle.
 MINUTES_PER_RUN = {"FactorVAE": 67, "DiscoverPLF": 24, "MATCC": 16, "HIST": 11, "FinFormer": 5, "MASTER": 2}
 UNIVERSE_WEIGHT = {"dji": 1, "sx5e": 1, "nasdaq100": 1.2, "sp500": 2, "sxxp": 2}
+# The same for explaining: seconds per explained day on the RTX 5090, NASDAQ-100, all methods (explain.log)
+XAI_SECONDS_PER_DAY = {"DiscoverPLF": 163, "FinFormer": 84, "FactorVAE": 68, "HIST": 65, "MATCC": 8, "MASTER": 4}
 
 
 # Peak RSS of one task in GiB, the highest measured over the six models on an H200 server (Oct 2026);
@@ -140,24 +176,33 @@ def parse_cpus(text: str) -> set[int]:
 
 
 def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, gpus: list[str] | None,
-              max_ram: float | None = None, cpus: set[int] | None = None) -> None:
-    """Train the tasks, each in its own train_rolling.py process, `workers` at a time on each GPU.
+              max_ram: float | None = None, cpus: set[int] | None = None, xai: bool = False,
+              ram_per_task: float | None = None) -> None:
+    """Train the tasks, each in its own train_rolling.py process, `workers` at a time on each GPU
+    (with `xai`, explain them with explain.py instead).
 
-    A task starts when a GPU slot is free and its expected peak RAM (PEAK_RAM_GIB, raised to what it
-    is seen using) fits in `max_ram` GiB together with the running ones. If the real RAM still grows
-    too close to `max_ram`, the youngest task is stopped and requeued: it resumes from its last epoch
-    with identical results. `cpus` pins every process to those CPU ids. While running, the state is in
-    logs/grid/status.json; creating logs/grid/STOP lets the running tasks finish and starts no new one.
-    Failed tasks are not retried (a Python error is to be reported, not hidden).
+    A task starts when a GPU slot is free and its expected peak RAM (PEAK_RAM_GIB or `ram_per_task`,
+    raised to what it is seen using) fits in `max_ram` GiB together with the running ones. If the real
+    RAM still grows too close to `max_ram`, the youngest task is stopped and requeued: it resumes from
+    its last epoch with identical results (explaining: from the run it was on). `cpus` pins every
+    process to those CPU ids. While running, the state is in logs/<grid|xai>/status.json; creating
+    logs/<grid|xai>/STOP lets the running tasks finish and starts no new one. Failed tasks are not
+    retried (a Python error is to be reported, not hidden).
     """
-    log_dir = CODE_ROOT.parent / "logs" / "grid"
+    log_dir = CODE_ROOT.parent / "logs" / ("xai" if xai else "grid")
     log_dir.mkdir(parents=True, exist_ok=True)
     status_file, stop_file = log_dir / "status.json", log_dir / "STOP"
     stop_file.unlink(missing_ok=True)  # left by the previous run
-    script = str(CODE_ROOT / "scripts" / "train_rolling.py")
-    waiting = sorted(tasks, key=lambda i: -MINUTES_PER_RUN[TASKS[i][0]] * UNIVERSE_WEIGHT[TASKS[i][1]])
+    script = str(CODE_ROOT / "scripts" / ("explain.py" if xai else "train_rolling.py"))
+    args_of = xai_args if xai else task_args
+    if xai:  # the main horizon first (its results are wanted first), then the longest tasks
+        cost = lambda i: (TASKS[i][2][1] != 5, -XAI_SECONDS_PER_DAY[TASKS[i][0]] * UNIVERSE_WEIGHT[TASKS[i][1]])
+    else:
+        cost = lambda i: -MINUTES_PER_RUN[TASKS[i][0]] * UNIVERSE_WEIGHT[TASKS[i][1]]
+    waiting = sorted(tasks, key=cost)
     slots = [gpu for _ in range(workers) for gpu in gpus or [None]]
-    expected = {i: RAM_MARGIN * PEAK_RAM_GIB_MODEL.get(TASKS[i][:2], PEAK_RAM_GIB[TASKS[i][1]]) for i in tasks}
+    expected = {i: RAM_MARGIN * (ram_per_task or PEAK_RAM_GIB_MODEL.get(TASKS[i][:2], PEAK_RAM_GIB[TASKS[i][1]]))
+                for i in tasks}
     running = {}  # task -> (process, gpu, start time, log file)
     stopped, ok, failed = set(), [], []
     head_waiting_since = None
@@ -170,15 +215,15 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
     def start(index: int) -> None:
         gpu = slots.pop()
         task_env = env | ({"CUDA_VISIBLE_DEVICES": gpu} if gpu is not None else {})
-        command = [sys.executable, script, *task_args(index)] + (["--device", device] if device else [])
+        command = [sys.executable, script, *args_of(index)] + (["--device", device] if device else [])
         log = open(log_dir / f"task{index}.log", "a", encoding="utf-8")
         process = subprocess.Popen(command, env=task_env, stdout=log, stderr=subprocess.STDOUT, preexec_fn=pin)
         running[index] = (process, gpu, datetime.now(), log)
         where = f" on GPU {gpu}" if gpu is not None else ""
-        say(f"start task {index}{where} (~{expected[index]:.0f} GiB): {' '.join(task_args(index))}")
+        say(f"start task {index}{where} (~{expected[index]:.0f} GiB): {' '.join(args_of(index))}")
 
     budget = f", RAM budget {max_ram:.0f} GiB" if max_ram else ""
-    say(f"{len(waiting)} tasks to train, at most {len(slots)} at a time{budget}; logs in {log_dir}")
+    say(f"{len(waiting)} tasks to {'explain' if xai else 'train'}, at most {len(slots)} at a time{budget}; logs in {log_dir}")
     try:
         while waiting or running:
             for index, (process, gpu, _, log) in list(running.items()):
@@ -191,7 +236,7 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
                 if index in stopped:
                     stopped.discard(index)
                     waiting.insert(0, index)
-                    say(f"requeued task {index} (stopped for RAM, resumes from its last epoch)")
+                    say(f"requeued task {index} (stopped for RAM, resumes from its last {'run' if xai else 'epoch'})")
                 elif code == 0:
                     ok.append(index)
                     say(f"done task {index}")
@@ -230,7 +275,7 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
             status_file.write_text(json.dumps({
                 "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}", "stop_file": stop, "ram_budget_gib": max_ram,
                 "ram_used_gib": round(sum(rss.values()), 1), "waiting": len(waiting), "ok": ok, "failed": failed,
-                "running": [{"task": i, "args": " ".join(task_args(i)), "gpu": gpu,
+                "running": [{"task": i, "args": " ".join(args_of(i)), "gpu": gpu,
                              "minutes": round((datetime.now() - t).total_seconds() / 60),
                              "rss_gib": round(rss.get(i, 0), 1)} for i, (_, gpu, t, _) in running.items()],
             }, indent=1))
@@ -260,30 +305,39 @@ def main() -> None:
                         help="run: GiB of RAM the tasks may use together (default: 80%% of the available RAM)")
     parser.add_argument("--cpus", default=None, help="run: pin every task to these CPU ids, e.g. 0-15")
     parser.add_argument("--device", default=None, help="run: cuda or cpu (default: cuda if available)")
+    parser.add_argument("--xai", action="store_true", help="explain the trained runs (explain.py) instead of training")
+    parser.add_argument("--ram-per-task", type=float, default=None,
+                        help="run: expected peak GiB of every task, instead of PEAK_RAM_GIB (e.g. as measured for --xai)")
     args = parser.parse_args()
 
     if args.command == "args":
-        print(" ".join(task_args(args.task)))
+        print(" ".join((xai_args if args.xai else task_args)(args.task)))
         return
 
-    table = task_table(args.universes, args.models, args.horizons)
+    table = task_table(args.universes, args.models, args.horizons, args.xai)
     unfinished = table.loc[table["done"] < table["years"], "task"].tolist()
     if args.command == "pending":
         print(compress(unfinished))
         return
     if args.command == "run":
+        if args.xai:  # a run without checkpoint cannot be explained: its task would never finish
+            unfinished = table.loc[(table["done"] < table["years"]) & (table["no_checkpoint"] == 0), "task"].tolist()
         run_tasks(unfinished, args.workers, args.threads, args.device, args.gpus,
-                  args.max_ram or ram_budget_gib(), parse_cpus(args.cpus) if args.cpus else None)
+                  args.max_ram or ram_budget_gib(), parse_cpus(args.cpus) if args.cpus else None, args.xai,
+                  args.ram_per_task)
         return
 
     runs = table.groupby(["universe", "L", "model"], sort=False)[["done", "partial", "years"]].sum()
     runs["done"] = runs["done"].astype(str) + "/" + (runs["years"] * 1).astype(str)
     grid = runs["done"].unstack("model")[[m for m in MODELS if m in runs.index.get_level_values("model")]]
-    print("Finished runs (test years x seeds) per cell:\n")
+    print(f"{'Explained' if args.xai else 'Finished'} runs (test years x seeds) per cell:\n")
     print(grid.to_string())
     done, total, partial = table["done"].sum(), table["years"].sum(), table["partial"].sum()
-    print(f"\n{done}/{total} runs finished ({done / total:.0%}), {partial} half-trained (will resume), "
-          f"{(table['done'] < table['years']).sum()} of {len(table)} tasks still to run")
+    missing = table["no_checkpoint"].sum()
+    print(f"\n{done}/{total} runs {'explained' if args.xai else 'finished'} ({done / total:.0%}), {partial} "
+          f"{'partly explained' if args.xai else 'half-trained (will resume)'}, "
+          f"{(table['done'] < table['years']).sum()} of {len(table)} tasks still to run"
+          + (f"; {missing} runs have no checkpoint and cannot be explained" if missing else ""))
 
 
 if __name__ == "__main__":

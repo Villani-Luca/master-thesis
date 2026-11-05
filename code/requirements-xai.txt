@@ -1,0 +1,4 @@
+# What explaining needs on a GPU server (code/scripts/explain.py, grid.py --xai): training's packages and captum
+# (the integration nodes of Integrated Gradients). torch comes separately: see code/scripts/remote/setup.sh.
+-r requirements-train.txt
+captum>=0.8,<1

@@ -563,3 +563,27 @@
 2026-11-05 17:56:31  [11/168] FinFormer dji sl5_pl1 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 385 s
 2026-11-05 17:58:05  [46/168] MASTER nasdaq100 sl60_pl20 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 13 days, 201 s
 2026-11-05 18:00:31  [4/54] DiscoverPLF dji sl5_pl1 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 1131 s
+2026-11-05 18:04:21  [12/252] FactorVAE dji sl5_pl1 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 665 s
+2026-11-05 18:04:25  [47/168] MASTER nasdaq100 sl60_pl20 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 380 s
+2026-11-05 18:06:40  [48/168] MASTER nasdaq100 sl60_pl20 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 135 s
+2026-11-05 18:08:02  [12/168] FinFormer dji sl5_pl1 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 691 s
+2026-11-05 18:08:49  [49/168] MASTER nasdaq100 sl60_pl20 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 129 s
+2026-11-05 18:11:01  [50/168] MASTER nasdaq100 sl60_pl20 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 132 s
+2026-11-05 18:12:27  [13/252] FactorVAE dji sl5_pl1 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 486 s
+2026-11-05 18:13:08  [51/168] MASTER nasdaq100 sl60_pl20 seed42 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 13 days, 127 s
+2026-11-05 18:13:12  [1/30] DiscoverPLF nasdaq100 sl5_pl1 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 3489 s
+2026-11-05 18:15:19  [52/168] MASTER nasdaq100 sl60_pl20 seed42 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 131 s
+2026-11-05 18:16:06  [13/168] FinFormer dji sl5_pl1 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 484 s
+2026-11-05 18:17:29  [53/168] MASTER nasdaq100 sl60_pl20 seed42 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 129 s
+2026-11-05 18:19:38  [54/168] MASTER nasdaq100 sl60_pl20 seed42 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 130 s
+2026-11-05 18:20:18  [14/252] FactorVAE dji sl5_pl1 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 471 s
+2026-11-05 18:21:49  [55/168] MASTER nasdaq100 sl60_pl20 seed42 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 131 s
+2026-11-05 18:22:51  [5/54] DiscoverPLF dji sl5_pl1 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 1340 s
+2026-11-05 18:24:08  explain: 1 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 18:24:38  [1/1] MASTER dji sl20_pl5 seed42 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 53 days, 30 s
+2026-11-05 18:26:13  explain: 18 runs, methods=['shapley', 'lime'], targets=['pred', 'topk_margin']
+2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']

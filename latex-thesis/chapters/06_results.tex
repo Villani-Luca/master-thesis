@@ -47,7 +47,7 @@ The six architectures therefore extract a small and unstable signal, whose sign 
 \section{What Drives the Predictions?}
 \label{sec:res_inputs}
 
-Every run of the core grid (six models, three universes, five or four test years, three seeds: 252 runs at $L = 5$) is explained with Integrated Gradients on every other rebalance date of its test year, for the score and for the top-$k$ margin (Chapter~\ref{ch:xai_method}). This section describes what the attributions of the score say, model by model; Table~\ref{tab:res_inputs} summarises them. The market inputs of MASTER and MATCC are left out of every share: with the average stock of the day as the baseline they are identical for all the stocks of a day, so their attribution is zero by construction (Section~\ref{sec:xm_baseline}), and their effect is read in the models' own weights instead.
+Every run of the core grid (six models, three universes, five or four test years, three seeds: 252 runs at $L = 5$) is explained with Integrated Gradients on every rebalance date of its test year, for the score and for the top-$k$ margin (Chapter~\ref{ch:xai_method}). This section describes what the attributions of the score say, model by model; Table~\ref{tab:res_inputs} summarises them. The market inputs of MASTER and MATCC are left out of every share: with the average stock of the day as the baseline they are identical for all the stocks of a day, so their attribution is zero by construction (Section~\ref{sec:xm_baseline}), and their effect is read in the models' own weights instead.
 
 \input{tables/res_inputs}
 

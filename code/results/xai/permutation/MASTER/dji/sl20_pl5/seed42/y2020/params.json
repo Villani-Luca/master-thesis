@@ -4,5 +4,6 @@
   "seed": 0,
   "unit": "family",
   "k": 5,
-  "days": 27
+  "days": 53,
+  "date_stride": 1
 }

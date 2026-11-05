@@ -2,10 +2,10 @@
 
     python code/scripts/explain.py --models MASTER --universes dji --years 2020
     python code/scripts/explain.py --methods ig saliency permutation --universes dji nasdaq100 sx5e
-    python code/scripts/explain.py --horizons 1 20 --stride 4    # other horizons, every 4th rebalance date
+    python code/scripts/explain.py --horizons 1 20               # the other horizons
 
 For every run with a checkpoint (default: L = 5, the three core universes, every seed and test
-year), on every other rebalance date of its test year (xai.base.explain_dates):
+year), on every rebalance date of its test year (xai.base.explain_dates; --stride n for every n-th):
 - ig, saliency: attributions_<target>.npz, params_<target>.json and global_<target>.parquet
   (xai.aggregate.global_importance) for both targets, pred and topk_margin;
 - permutation: permutation.parquet (one row per day, family, repeat) and global.parquet (per family);
@@ -54,7 +54,7 @@ def main() -> None:
     parser.add_argument("--targets", nargs="+", default=list(TARGETS), choices=list(TARGETS))
     parser.add_argument("--device", default=None, help="cuda or cpu (default: cuda if available)")
     parser.add_argument("--stride", type=int, default=REBALANCE_STRIDE,
-                        help="explain every n-th rebalance date (default: every other one)")
+                        help="explain every n-th rebalance date (default: every one)")
     parser.add_argument("--reaggregate", action="store_true", help="rebuild the global files of ig and saliency, then stop")
     args = parser.parse_args()
 

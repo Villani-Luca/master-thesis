@@ -1,6 +1,8 @@
 # Training su un server GPU
 
 Istruzioni per far girare il training della tesi su un server Linux con GPU NVIDIA (es. 2× H200).
+Per le **spiegazioni** (XAI) dei run già allenati la guida è invece [START_HERE_XAI.md](START_HERE_XAI.md)
+(script `xai.sh`, `pack_xai.sh`, `check_xai.py`; pacchetto creato con `make_bundle.py`, vedi il suo docstring).
 La guida passo passo, pensata anche per Claude Code, è `START_HERE.md` nella radice del pacchetto
 (qui: [START_HERE.md](START_HERE.md)); questo file è il riassunto.
 
