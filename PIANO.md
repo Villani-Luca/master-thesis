@@ -22,7 +22,8 @@ cosa fare, le decisioni prese e il registro. Aggiornato il 2026-10-22.
 
 ## Obiettivo e vincoli
 
-- **Scadenza: tesi completa (codice, analisi, scrittura) entro il 18/11/2026. Bozza al relatore
+- **Scadenza: tesi completa (codice, analisi, scrittura) entro il 18/11/2026 (obiettivo di lavoro; la
+  scadenza formale del file della tesi è il 19/11/2026, quindi un giorno di margine). Bozza al relatore
   verso il 10/11.**
 - Domanda di ricerca: come le feature guidano le predizioni e l'allocazione top-k, e se
   l'instabilità viene dai **dati** o dal **design dei modelli** (Step 7: è il risultato centrale e
@@ -212,13 +213,27 @@ In ordine. Ogni voce ha il criterio di "fatto".
 | ~4–9 nov | rientro griglia → D2; C2 esteso ai seed, C3, C4 |
 | **~10 nov** | **bozza al relatore**: metodologia, prestazioni, primi risultati XAI |
 | 10–17 nov | E1, E2; F4, F5; correzioni del relatore |
-| 18 nov | consegna |
+| 18 nov | consegna (scadenza formale del file: 19 nov) |
+
+Calendario rivisto il 2026-11-05 (rientro griglia e Step 5 fatti, D2 sezioni A e B chiuse):
+
+| Date | Lavoro |
+|---|---|
+| 5 nov sera | fine batch XAI seed 42; C2 (Shapley/LIME dji 2020) |
+| 6 nov | notebook 05, 06, 07, 08 rieseguiti; osservazioni; scelta dei metodi (Step 6), diagnosis (Step 7) |
+| 7–8 nov | tesi: cap. 5 §valutazione, cap. 6 §6.2–6.6, risposte alle RQ (cap. 9), TODO dell'introduzione |
+| 9 nov | rilettura, compilazione LaTeX, figure mancanti |
+| **10 nov** | **bozza completa al relatore** |
+| 10–14 nov | app (`3_Explain`, `4_Compare`) e cap. 8; copia dei risultati sul drive |
+| 14–17 nov | correzioni del relatore |
+| **18 nov** | **consegna** (margine: 19 nov) |
 
 ## Registro delle decisioni
 
 | Data | Decisione |
 |---|---|
 | 2026-10-22 | Scadenza 18/11, bozza ~10/11; scope tagliato (anche in THESIS_GUIDE.md) |
+| 2026-11-05 | La scadenza formale del file della tesi è il 19/11; si tiene il 18/11 come obiettivo di lavoro. Calendario rivisto (sezione Calendario) |
 | 2026-10-22 | L = 1 e L = 20 obbligatori; la griglia intera gira sulla H200 dell'amico con `launch_grid.py` |
 | 2026-10-22 | `grid.py`/`train.sh` del repo aggiornati con tetto RAM, watchdog, THREADS = 2 (non usati dalla run in corso, che ha il suo orchestratore) |
 | 2026-10-22 | Decisioni D1–D6 (tabella sopra) |
