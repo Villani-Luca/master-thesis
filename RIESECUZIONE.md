@@ -32,6 +32,11 @@ sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto qu
   `logs/xai/WORKERS` (numero di processi modificabile mentre gira); vale dal prossimo rilancio dello scheduler.
   5/11 19:12: `xai_extra1` (`logs/xai_extra1.out`): HIST, core, L = 1 e 20 (84 run), dalla coda dello scheduler.
   5/11 19:27: `xai_extra2` (`logs/xai_extra2.out`): FactorVAE, core, L = 1 e 20 (84 run), dalla coda dello scheduler.
+- [ ] **R1c. Valutazione dei metodi estesa** (5/11 sera): `code/scripts/evaluate.py` ripete sanity check e deletion
+  curve (IG e Saliency, 'own' e 'joint') su un run per modello × universo × orizzonte (seed 42, 2022, 5 date): 54 run
+  sul core, ~1–15 min l'uno; uscite in `code/results/xai/evaluation/`. Provato su MASTER dji L = 5 (sanity 0,90,
+  AOPC own IG 0,89 contro 0,001 a caso). Da lanciare quando c'è margine di GPU (`logs/xai_eval.out`); sugli universi
+  grandi lo fa il server dopo la griglia.
 - [x] **R2. Shapley e LIME**: dal 5/11 sera sono tra i metodi di default, quindi li fa lo scheduler su ogni run
   (il processo separato `xai_c2` è stato fermato). **Quando lo scheduler finisce, rilanciarlo una volta** (stesso
   comando di R1): i primi 5 task, partiti prima del cambio (DiscoverPLF L = 5), completano solo Shapley e LIME.

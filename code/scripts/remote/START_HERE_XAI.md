@@ -178,6 +178,13 @@ corso finiscono e non vengono sostituiti). Utile dopo i primi controlli, se GPU 
 **Fermarsi:** `touch logs/xai/STOP` non avvia processi nuovi e lascia finire quelli in corso;
 `tmux kill-session -t xai` ferma subito tutto (al rilancio si riparte dal run interrotto).
 
+**Quando la griglia è finita** (o se resta margine di GPU mentre gira), la valutazione dei metodi sugli
+universi grandi: un run per modello × universo × orizzonte, 36 run.
+
+```bash
+tmux new -s eval 'source .venv/bin/activate && python code/scripts/evaluate.py --universes sp500 sxxp'
+```
+
 ## Passo 9: controlli periodici
 
 Dopo che i primi processi a L = 5 sono finiti (per ricalibrare la stima dei tempi), poi una volta al giorno:
