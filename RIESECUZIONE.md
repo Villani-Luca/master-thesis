@@ -27,7 +27,14 @@ sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto qu
   `logs/xai_core.out`; avanzamento: `python code/scripts/grid.py status --xai --universes dji nasdaq100 sx5e`). Prima
   L = 5 (252 run), poi L = 1 e 20 (504). Su Windows FinFormer esce con 0xC0000409 a fine processo: il task risulta FAILED
   nel log ma le uscite sono complete (lo conferma `status --xai`); rilanciare lo stesso comando rifà solo ciò che manca.
-- [ ] **R2. Shapley e LIME dji 2020** con tutte le date (`logs/xai_c2.out`, 18 run).
+- [ ] **R1b. Processo extra** `xai_fast` (5/11, 19:00; `logs/xai_fast.out`): MASTER e MATCC, core, L = 1, 5 e 20,
+  tutti i metodi (252 run), presi dalla coda dello scheduler, che li salterà. Dal 5/11 `grid.py` legge
+  `logs/xai/WORKERS` (numero di processi modificabile mentre gira); vale dal prossimo rilancio dello scheduler.
+  5/11 19:12: `xai_extra1` (`logs/xai_extra1.out`): HIST, core, L = 1 e 20 (84 run), dalla coda dello scheduler.
+  5/11 19:27: `xai_extra2` (`logs/xai_extra2.out`): FactorVAE, core, L = 1 e 20 (84 run), dalla coda dello scheduler.
+- [x] **R2. Shapley e LIME**: dal 5/11 sera sono tra i metodi di default, quindi li fa lo scheduler su ogni run
+  (il processo separato `xai_c2` è stato fermato). **Quando lo scheduler finisce, rilanciarlo una volta** (stesso
+  comando di R1): i primi 5 task, partiti prima del cambio (DiscoverPLF L = 5), completano solo Shapley e LIME.
 - [ ] **R3. Quando L = 5 è finito**: notebook 05, 06, 07, 08 rieseguiti; Observations e diagnosi ricontrollate;
   `thesis_figures.py res_inputs res_agreement res_agreement_models res_variance`; numeri dei cap. 6 e 9 aggiornati.
 - [ ] **R4. Verifica del campionamento** (una frase nel cap. 5): classifiche con tutte le date contro una su due / una su
@@ -126,7 +133,8 @@ Decisione del 2026-11-05 (PIANO.md, registro): XAI su 5 universi × 3 orizzonti.
 
 - [x] **E1. Pacchetto** (5/11): `C:\Users\villa\Downloads\xaifin_xai_bundle.zip` (1,4 GB: codice, i 486 checkpoint,
   il run di riferimento MASTER dji 2020 per `check_xai.py`, guida `START_HERE.md` = `code/scripts/remote/START_HERE_XAI.md`)
-  e `xaifin_xai_data.zip` (dati di sp500, sxxp, dji, constituents; non serve se il server ha ancora i dati del training).
+  e, per i dati, `E:\Thesis\data.zip` (38 GB, del 19/10: tutti e 5 gli universi; confrontato il 5/11 con `code/data`,
+  i 40 file che servono al server sono identici per nome, dimensione e checksum). Il server non ha più i dati del training.
   Ricostruirli con i due comandi nel docstring di `code/scripts/remote/make_bundle.py`.
 - [ ] **E2. Sul server**: Claude segue `START_HERE.md` (ambiente, `check_xai.py`, prova e misura, lancio di
   `xai.sh`, cioè `grid.py run --xai --universes sp500 sxxp`, tutte le date). Farsi dare le misure del passo 6 (secondi per run, RAM)

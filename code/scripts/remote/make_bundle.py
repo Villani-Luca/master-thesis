@@ -32,7 +32,7 @@ UNUSED_DATA = ("_tech.csv", "_corr_matrix.npz", "_wikidata.json", "_wikidata_mat
                "_inc_matrix_sect_ind.npz")
 STORED = (".parquet", ".npz", ".zip", ".pth")  # compressed already: zipping them again costs time and saves nothing
 RUN_FILES = ("config.json", "model.pth", "metrics.json", "train_history.csv")  # what explaining a run reads, and its record
-XAI_METHODS = ("ig_joint", "saliency", "permutation", "intrinsic")  # explain.py's default methods
+XAI_METHODS = ("ig_joint", "saliency", "permutation", "intrinsic", "shapley", "lime")  # explain.py's default methods
 
 
 def wanted_data(path: Path) -> bool:

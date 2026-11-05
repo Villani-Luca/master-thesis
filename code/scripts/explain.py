@@ -11,8 +11,9 @@ year), on every rebalance date of its test year (xai.base.explain_dates; --strid
 - permutation: permutation.parquet (one row per day, family, repeat) and global.parquet (per family);
 - intrinsic (MASTER, MATCC, FinFormer only): weights.npz with the models' own gates and attention
   (xai.intrinsic.stack_weights);
-- shapley, lime (not run by default; PIANO.md B4: dji, test year 2020): values per stock and family,
-  attributions_<target>.npz (attr [rows, families]) and global_<target>.parquet (level family).
+- shapley, lime (exact Shapley values and LIME on the feature families; on every run since 2026-11-05,
+  until then on DJI 2020 only): values per stock and family, attributions_<target>.npz (attr [rows, families])
+  and global_<target>.parquet (level family).
 Outputs that exist are skipped (resumable); nothing is overwritten, except with --reaggregate, which
 rebuilds the global_<target>.parquet of ig and saliency from their saved attributions (after a change
 of xai.aggregate) without recomputing them. Several processes can share the
@@ -39,7 +40,7 @@ from xaifin.xai.shap_lime import FamilyLIME, FamilyShapley, family_global
 
 METHODS = {"ig": IntegratedGradients, "saliency": Saliency, "permutation": FamilyPermutation, "shapley": FamilyShapley,
            "lime": FamilyLIME, "intrinsic": None}
-DEFAULT_METHODS = ["ig", "saliency", "permutation", "intrinsic"]
+DEFAULT_METHODS = list(METHODS)
 GROUP_METHODS = ("shapley", "lime")
 
 

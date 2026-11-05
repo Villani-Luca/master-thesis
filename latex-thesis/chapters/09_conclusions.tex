@@ -39,13 +39,11 @@ The conclusions of this thesis are therefore about the models and their stabilit
 \paragraph{Portfolios.} The portfolios follow FinBench's long-only rule: equal weights, a fixed number of stocks, no transaction costs and the purchase at the open of each holding period. Turnover is reported, but the returns are gross. With daily rebalancing the purchase at the open removes the overnight returns, so the daily portfolios are comparable with their equal-weight benchmark but not with the index.
 
 \paragraph{Scope of the explanations.} The explanations cover the whole grid, every model, universe, horizon, test year and seed, on every weekly rebalance date. % TODO: confirm when the S&P 500 and STOXX Europe 600 runs explained on the H200 are in (RIESECUZIONE.md, section E).
-Exact Shapley values and LIME are computed on one universe and year only, as a check of the gradient attributions. The attributions depend on two choices discussed in Chapter~\ref{ch:xai_method}: the baseline, the average stock of the day, which makes the market features invisible to the gradient methods, and the joint integration path. Finally, the sanity check shows that for some models, HIST in particular, the attributions depend more on the architecture than on the trained weights (Section~\ref{sec:xm_evaluation}), which limits what their explanations can say about what the models learned.
+The attributions depend on two choices discussed in Chapter~\ref{ch:xai_method}: the baseline, the average stock of the day, which makes the market features invisible to the gradient methods, and the joint integration path. Finally, the sanity check shows that for some models, HIST in particular, the attributions depend more on the architecture than on the trained weights (Section~\ref{sec:xm_evaluation}), which limits what their explanations can say about what the models learned.
 
 % ===========================================================================
 \section{Future Work}
 \label{sec:conc_future}
-
-\paragraph{Wider explanations.} Exact Shapley values on feature families, computed here on one universe and year as a check, can be extended to the whole grid.
 
 \paragraph{Counterfactuals.} The margins of Chapter~\ref{ch:portfolio} measure how far each decision is from changing; counterfactual explanations would say which change of the inputs would change it. Because Alpha features are deterministic and strongly correlated functions of a few price series, plausible counterfactuals should perturb the prices and volumes and recompute the features, rather than move single features independently.
 

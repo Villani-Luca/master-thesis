@@ -587,3 +587,17 @@
 2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
 2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
 2026-11-05 18:26:15  explain: 5 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 18:37:55  [1/18] DiscoverPLF dji sl20_pl5 seed0 y2020: shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin, 53 days, 702 s
+2026-11-05 18:39:05  explain: 1 runs, methods=['ig', 'saliency', 'permutation', 'shapley', 'lime', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 18:43:34  [1/1] MASTER dji sl20_pl5 seed42 y2020: shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin, 53 days, 269 s
+2026-11-05 19:01:14  explain: 252 runs, methods=['ig', 'saliency', 'permutation', 'shapley', 'lime', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 19:06:55  [1/252] MASTER dji sl20_pl5 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin, shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin permutation intrinsic, 53 days, 340 s
+2026-11-05 19:12:33  explain: 84 runs, methods=['ig', 'saliency', 'permutation', 'shapley', 'lime', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 19:12:44  [2/252] MASTER dji sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin, shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin permutation intrinsic, 53 days, 349 s
+2026-11-05 19:19:02  [3/252] MASTER dji sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin, shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin permutation intrinsic, 53 days, 378 s
+2026-11-05 19:19:05  [1/5] DiscoverPLF dji sl20_pl5 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 53 days, 3171 s
+2026-11-05 19:19:06  [1/5] DiscoverPLF dji sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 53 days, 3172 s
+2026-11-05 19:25:46  [4/252] MASTER dji sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin, shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin permutation intrinsic, 53 days, 404 s
+2026-11-05 19:27:04  explain: 84 runs, methods=['ig', 'saliency', 'permutation', 'shapley', 'lime', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 19:33:14  [5/252] MASTER dji sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin, shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin permutation intrinsic, 53 days, 448 s
+2026-11-05 19:33:14  [6/252] MASTER dji sl20_pl5 seed42 y2020: done already

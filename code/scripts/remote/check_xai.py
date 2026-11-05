@@ -4,11 +4,12 @@
 
 The bundle ships one explained run as a reference, in xai_reference/ (MASTER, DJI, T = 20, L = 5, seed 42,
 test year 2020, explained on an RTX 5090), with its checkpoint and the DJI data. This script explains the
-same run here with scripts/explain.py (about a minute on a GPU; skipped if already done) and compares
+same run here with scripts/explain.py (about five minutes on a GPU; skipped if already done) and compares
 the outputs file by file:
 - attribution tensors of IG and Saliency, both targets: correlation and largest difference relative to the
   largest attribution;
 - global feature importance: Spearman correlation of the rankings;
+- Shapley values and LIME on the families: correlation of the values per stock and family;
 - permutation importance (seeded, so it should match) and MASTER's own weights: largest difference.
 Differences of floating-point size are expected across GPUs; what matters is that the rankings agree.
 The report is printed and written to xai_check.txt (to be sent back with the results).
@@ -62,6 +63,16 @@ def main() -> None:
             m = r[r["level"] == "feature"].merge(h[h["level"] == "feature"], on="name", suffixes=("_r", "_h"))
             rho = spearmanr(m["importance_r"], m["importance_h"]).statistic
             report(f"{method} {target} feature ranking", f"Spearman {rho:.4f} on {len(m)} features", rho >= MIN_SPEARMAN)
+
+    for method in ("shapley", "lime"):
+        for target in ("pred", "topk_margin"):
+            with np.load(REFERENCE / method / RUN / f"attributions_{target}.npz") as r, \
+                    np.load(RESULTS_ROOT / "xai" / method / RUN / f"attributions_{target}.npz") as h:
+                if r["attr"].shape != h["attr"].shape:
+                    report(f"{method} {target} values", f"different shapes {r['attr'].shape} vs {h['attr'].shape}", False)
+                    continue
+                corr = np.corrcoef(r["attr"].astype(np.float64).ravel(), h["attr"].astype(np.float64).ravel())[0, 1]
+                report(f"{method} {target} values", f"correlation {corr:.6f}", corr >= MIN_CORRELATION)
 
     r = pd.read_parquet(REFERENCE / "permutation" / RUN / "global.parquet").set_index("family")
     h = pd.read_parquet(RESULTS_ROOT / "xai" / "permutation" / RUN / "global.parquet").set_index("family")

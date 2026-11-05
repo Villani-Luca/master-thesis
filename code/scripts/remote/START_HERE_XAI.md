@@ -14,13 +14,16 @@ servono le **spiegazioni** dei run dei due universi grandi, **S&P 500 (`sp500`) 
 **Non si allena niente.** Per ogni run lo script carica il checkpoint (`model.pth`, già nel pacchetto)
 e, sui giorni in cui il portafoglio si ribilancia, calcola:
 Integrated Gradients (16 passaggi con gradiente per giorno) e Saliency, sia del punteggio sia del
-margine dal portafoglio top-k; permutation importance per famiglia di feature (7 famiglie × 5 ripetizioni);
-i pesi interni di MASTER, MATCC e FinFormer. I giorni sono **tutte** le date di ribilanciamento
+margine dal portafoglio top-k; valori di Shapley esatti e LIME sulle famiglie di feature (128 + 200
+passaggi del modello per giorno e target sui modelli Alpha158, 8 + 200 sugli Alpha360); permutation
+importance per famiglia (7 famiglie × 5 ripetizioni); i pesi interni di MASTER, MATCC e FinFormer. I giorni sono **tutte** le date di ribilanciamento
 settimanale (~52 l'anno), per ogni orizzonte, come per gli universi spiegati sul PC di Luca.
 
 Cosa aspettarsi (misure sul PC di Luca, RTX 5090 condivisa da 6 processi, NASDAQ-100, ~100 titoli),
 in secondi per giorno spiegato: DiscoverPLF 163, FinFormer 84, FactorVAE 68, HIST 65, MATCC 8, MASTER 4
-(MASTER su DJI, ~30 titoli, da solo sulla GPU: 53 giorni in 30 s).
+(MASTER su DJI, ~30 titoli, da solo sulla GPU: 53 giorni in 30 s). Shapley e LIME, su DJI, aggiungono
+per giorno: FactorVAE 45 s, DiscoverPLF 13, gli altri 2–3. Il loro costo cresce con il numero di titoli
+più lentamente di quello di IG.
 Il costo di un giorno cresce più che in proporzione al numero di titoli (ogni titolo è spiegato rispetto
 ai propri input, ma il modello vede tutti i titoli insieme): con 500–600 titoli aspettarsi da 4 a 25
 volte tanto. La **RAM** di un processo è dominata dal caricamento dei dati dell'universo, come nel
@@ -45,33 +48,39 @@ nproc; free -g; df -h .         # core, RAM, disco libero qui
 which tmux screen               # serve uno dei due
 ```
 
-Disco: servono **~350 GB liberi**. Ambiente ~8 GB, dati ~80 GB in CSV più le copie Parquet, risultati
+Disco: servono **~400 GB liberi**. Ambiente ~8 GB, `data.zip` 38 GB (cancellabile dopo l'estrazione e il
+passo 4), dati estratti ~100 GB in CSV più le copie Parquet, risultati
 fino a **~230 GB** a fine lavoro: i tensori delle attribuzioni (un valore per titolo, giorno, giorno passato
 e feature), per lo più quelli dei modelli Alpha158 a L = 20, che hanno 60 giorni di input. Se lo spazio
 non basta, **fermati e chiedi a Luca** prima di lanciare.
 
-Cerca anche la **cartella del training di ottobre** (`master-thesis/` con `code/data/sp500` e
-`code/data/sxxp`, ad esempio con `ls -d ~/*/code/data/sp500 ~/*/*/code/data/sp500 2>/dev/null`). Se c'è,
-i dati sono già sul server e il secondo zip (`xaifin_xai_data.zip`) non serve. **Non estrarre il
-pacchetto nuovo sopra quella cartella**: va in una cartella nuova.
+Secondo Luca la cartella del training di ottobre non è più sul server, quindi i dati arrivano con
+`data.zip`. Se ne trovi comunque una (`master-thesis/` con `code/data/sp500`), **non estrarre il pacchetto
+nuovo sopra quella cartella**: va in una cartella nuova.
 
 ## Passo 2: estrazione
 
-Due file, che si estraggono nella stessa cartella e formano `master-thesis/`:
+Due file:
 
 - `xaifin_xai_bundle.zip`: codice, checkpoint dei 486 run (più uno di DJI per il controllo del passo 5),
-  le spiegazioni di riferimento (`xai_reference/`) e questa guida;
-- `xaifin_xai_data.zip`: i dati di `sp500`, `sxxp`, `dji` e `constituents` (~25 GB compressi, ~80 GB estratti).
+  le spiegazioni di riferimento (`xai_reference/`) e questa guida; si estrae in `master-thesis/`;
+- `data.zip` (~38 GB compressi): i dati di tutti e cinque gli universi e `constituents`, sotto `data/`;
+  si estrae **dentro `master-thesis/code/`**, così che i file finiscano in `master-thesis/code/data/<universo>/`.
 
 ```bash
 mkdir -p ~/xai && cd ~/xai
 unzip /percorso/xaifin_xai_bundle.zip
-unzip /percorso/xaifin_xai_data.zip          # oppure, se i dati sono già sul server, vedi sotto
-cd master-thesis
+cd master-thesis/code && unzip /percorso/data.zip && cd ..   # crea code/data/sp500, code/data/sxxp, ...
+ls code/data                                                 # constituents dji nasdaq100 sp500 sx5e sxxp
 ```
 
-Se i dati sono nella cartella del training di ottobre, collegali invece di estrarre il secondo zip
-(i file Parquet già creati allora vengono riusati):
+Se `ls code/data` mostra una cartella `data` annidata (`code/data/data/...`), sposta il contenuto un
+livello sopra. Lo zip è stato confrontato file per file con i dati del PC di Luca: è lo stesso.
+NASDAQ-100 ed EURO STOXX 50 qui non servono (li spiega il PC di Luca): per risparmiare disco e il tempo
+della conversione in Parquet del passo 3, toglili con `rm -rf code/data/nasdaq100 code/data/sx5e`.
+
+Se invece i dati della cartella del training di ottobre fossero ancora sul server, si possono collegare
+invece di estrarre `data.zip` (i file Parquet già creati allora vengono riusati):
 
 ```bash
 mkdir -p code/data
@@ -110,7 +119,7 @@ pacchetto è incompleto: fermati e riporta.
 python code/scripts/remote/check_xai.py
 ```
 
-Spiega qui un run che Luca ha già spiegato (MASTER, DJI, L = 5, seed 42, 2020, tutte le 53 date: circa un minuto) e confronta i risultati
+Spiega qui un run che Luca ha già spiegato (MASTER, DJI, L = 5, seed 42, 2020, tutte le 53 date, tutti i metodi: circa 5 minuti) e confronta i risultati
 file per file. Deve finire con `RESULT: the explanations match the reference`. Piccole differenze
 numeriche tra GPU diverse sono normali; se compare `DIFF`, **fermati e manda a Luca `xai_check.txt`**
 prima di andare avanti.
@@ -162,6 +171,9 @@ tmux new -s xai 'GPUS=0 WORKERS=4 MAX_RAM=<GiB> RAM_PER_TASK=<GiB> CPUS=<core> b
 o `Ctrl-A D` (screen). Ogni processo scrive in `logs/xai/task<N>.log`; il terminale di tmux mostra
 partenze, fine e fermate per RAM. Dopo 30 minuti controlla `logs/xai/status.json` (RAM reale per
 processo), `free -g` e `nvidia-smi`.
+
+**Cambiare i processi per GPU senza fermare nulla:** `echo 6 > logs/xai/WORKERS` (con meno processi, quelli in
+corso finiscono e non vengono sostituiti). Utile dopo i primi controlli, se GPU e RAM hanno margine o sono al limite.
 
 **Fermarsi:** `touch logs/xai/STOP` non avvia processi nuovi e lascia finire quelli in corso;
 `tmux kill-session -t xai` ferma subito tutto (al rilancio si riparte dal run interrotto).

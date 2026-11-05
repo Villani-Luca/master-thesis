@@ -65,7 +65,8 @@ def xai_state(model, universe, sl_pl, seed, year) -> str:
     from xaifin.xai.intrinsic import WEIGHTS
 
     cell = Path(model, universe, f"sl{sl_pl[0]}_pl{sl_pl[1]}", f"seed{seed}", f"y{year}")
-    outputs = [Path(method) / cell / f"global_{t}.parquet" for method in ("ig_joint", "saliency") for t in TARGETS]
+    outputs = [Path(method) / cell / f"global_{t}.parquet" for method in ("ig_joint", "saliency", "shapley", "lime")
+               for t in TARGETS]
     outputs.append(Path("permutation") / cell / "global.parquet")
     if model in WEIGHTS:
         outputs.append(Path("intrinsic") / cell / "weights.npz")
@@ -186,13 +187,15 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
     RAM still grows too close to `max_ram`, the youngest task is stopped and requeued: it resumes from
     its last epoch with identical results (explaining: from the run it was on). `cpus` pins every
     process to those CPU ids. While running, the state is in logs/<grid|xai>/status.json; creating
-    logs/<grid|xai>/STOP lets the running tasks finish and starts no new one. Failed tasks are not
-    retried (a Python error is to be reported, not hidden).
+    logs/<grid|xai>/STOP lets the running tasks finish and starts no new one; writing a number to
+    logs/<grid|xai>/WORKERS changes `workers` (fewer: the running tasks finish, no new one takes their
+    place). Failed tasks are not retried (a Python error is to be reported, not hidden).
     """
     log_dir = CODE_ROOT.parent / "logs" / ("xai" if xai else "grid")
     log_dir.mkdir(parents=True, exist_ok=True)
-    status_file, stop_file = log_dir / "status.json", log_dir / "STOP"
+    status_file, stop_file, workers_file = log_dir / "status.json", log_dir / "STOP", log_dir / "WORKERS"
     stop_file.unlink(missing_ok=True)  # left by the previous run
+    workers_file.write_text(f"{workers}\n")
     script = str(CODE_ROOT / "scripts" / ("explain.py" if xai else "train_rolling.py"))
     args_of = xai_args if xai else task_args
     if xai:  # the main horizon first (its results are wanted first), then the longest tasks
@@ -205,6 +208,7 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
                 for i in tasks}
     running = {}  # task -> (process, gpu, start time, log file)
     stopped, ok, failed = set(), [], []
+    excess = 0  # slots to drop when their tasks end, after `workers` was lowered
     head_waiting_since = None
     env = os.environ | {"OMP_NUM_THREADS": str(threads), "MKL_NUM_THREADS": str(threads)}
     pin = (lambda: os.sched_setaffinity(0, cpus)) if cpus else None
@@ -231,7 +235,10 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
                 if code is None:
                     continue
                 log.close()
-                slots.append(gpu)
+                if excess:
+                    excess -= 1
+                else:
+                    slots.append(gpu)
                 del running[index]
                 if index in stopped:
                     stopped.discard(index)
@@ -254,6 +261,23 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
                 stopped.add(youngest)
                 say(f"RAM {sum(rss.values()):.0f} GiB > {KILL_SHARE:.0%} of {max_ram:.0f}: stopping task {youngest}")
 
+            try:
+                wanted = int(workers_file.read_text().strip())
+            except (OSError, ValueError):
+                wanted = workers
+            if wanted >= 1 and wanted != workers:
+                change = (wanted - workers) * len(gpus or [None])
+                if change > 0:
+                    slots += [gpu for _ in range(wanted - workers) for gpu in gpus or [None]]
+                else:
+                    for _ in range(-change):
+                        if slots:
+                            slots.pop()
+                        else:
+                            excess += 1
+                say(f"workers {workers} -> {wanted} per GPU")
+                workers = wanted
+
             stop = stop_file.exists()
             if stop and not running:
                 say(f"{stop_file} found: no new tasks started")
@@ -273,7 +297,7 @@ def run_tasks(tasks: list[int], workers: int, threads: int, device: str | None, 
                         break  # no more overtaking: let the RAM free up for it
 
             status_file.write_text(json.dumps({
-                "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}", "stop_file": stop, "ram_budget_gib": max_ram,
+                "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}", "stop_file": stop, "workers": workers, "ram_budget_gib": max_ram,
                 "ram_used_gib": round(sum(rss.values()), 1), "waiting": len(waiting), "ok": ok, "failed": failed,
                 "running": [{"task": i, "args": " ".join(args_of(i)), "gpu": gpu,
                              "minutes": round((datetime.now() - t).total_seconds() / 60),
