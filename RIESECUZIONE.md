@@ -24,7 +24,8 @@ Stima: domani 5/11, pomeriggio o sera.
 
 - [ ] **A1. Verifica della riproduzione**
   `python code/scripts/check_reproduction.py`
-  Atteso: `117/117 identical`. Se qualche run è "different", **fermarsi**: i numeri dei seed 42 già nei
+  Atteso: `117/117 identical`, **tranne le run MATCC** (non deterministiche anche sulla stessa GPU, vedi registro
+  2026-11-05): per MATCC registrare quante differiscono e di quanto, e usare le nuove. Se qualche run è "different", **fermarsi**: i numeri dei seed 42 già nei
   notebook e nella tesi andrebbero rivisti (scrivere nel registro di PIANO.md).
 - [ ] **A2. Portafogli delle run riaddestrate**
   ```
@@ -62,7 +63,8 @@ Stima: tra stanotte (processo c) e domani sera (processo a). Non serve aspettare
 
 Stato: processo c (FactorVAE, MATCC, MASTER) finito il 4/11 alle ~23:00; per i suoi modelli B1 e B2 sono già
 fatti (`--reaggregate --models FactorVAE MATCC MASTER`, `--methods intrinsic --models MATCC MASTER`). Restano
-DiscoverPLF (processo a), FinFormer e HIST (processo b).
+DiscoverPLF (processo a). Processo b (FinFormer, HIST) finito il 5/11 alle ~07:40: B1 fatto
+(`--reaggregate --models FinFormer HIST`), B2 fatto (pesi interni di 28 run FinFormer).
 
 - [ ] **B1. Ricostruire i file globali** (aggiunge la colonna `net`, che i processi partiti il 4/11 non scrivono):
   `python code/scripts/explain.py --reaggregate`

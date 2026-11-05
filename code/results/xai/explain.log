@@ -143,3 +143,57 @@
 2026-11-05 00:09:45  [37/56] HIST dji sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 576 s
 2026-11-05 00:19:08  [14/28] DiscoverPLF nasdaq100 sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 4184 s
 2026-11-05 00:19:13  [38/56] HIST dji sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 568 s
+2026-11-05 00:49:16  [39/56] HIST nasdaq100 sl20_pl5 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1803 s
+2026-11-05 01:21:17  [40/56] HIST nasdaq100 sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1921 s
+2026-11-05 01:35:26  [15/28] DiscoverPLF nasdaq100 sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 4578 s
+2026-11-05 01:52:10  [41/56] HIST nasdaq100 sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1853 s
+2026-11-05 02:22:08  [42/56] HIST nasdaq100 sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1798 s
+2026-11-05 02:48:36  [16/28] DiscoverPLF nasdaq100 sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 4390 s
+2026-11-05 02:51:46  [43/56] HIST nasdaq100 sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1778 s
+2026-11-05 03:27:24  [44/56] HIST nasdaq100 sl20_pl5 seed5 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2138 s
+2026-11-05 04:05:59  [45/56] HIST nasdaq100 sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 2315 s
+2026-11-05 04:19:04  [17/28] DiscoverPLF nasdaq100 sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 5428 s
+2026-11-05 04:35:10  [46/56] HIST nasdaq100 sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1751 s
+2026-11-05 04:59:32  [47/56] HIST nasdaq100 sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1462 s
+2026-11-05 05:19:07  [18/28] DiscoverPLF nasdaq100 sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 3603 s
+2026-11-05 05:24:19  [48/56] HIST nasdaq100 sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1487 s
+2026-11-05 05:40:50  [49/56] HIST sx5e sl20_pl5 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 990 s
+2026-11-05 05:57:53  [50/56] HIST sx5e sl20_pl5 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1023 s
+2026-11-05 06:14:53  [51/56] HIST sx5e sl20_pl5 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1020 s
+2026-11-05 06:32:40  [52/56] HIST sx5e sl20_pl5 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1067 s
+2026-11-05 06:49:00  [53/56] HIST sx5e sl20_pl5 seed5 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 980 s
+2026-11-05 06:51:44  [19/28] DiscoverPLF nasdaq100 sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 5558 s
+2026-11-05 07:05:54  [54/56] HIST sx5e sl20_pl5 seed5 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1013 s
+2026-11-05 07:22:53  [55/56] HIST sx5e sl20_pl5 seed5 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 1020 s
+2026-11-05 07:40:45  [56/56] HIST sx5e sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 1071 s
+2026-11-05 07:41:45  reaggregate: 224 global files rebuilt
+2026-11-05 07:41:47  explain: 28 runs, methods=['intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 07:41:58  [1/28] FinFormer dji sl20_pl5 seed0 y2020:  intrinsic, 27 days, 11 s
+2026-11-05 07:42:08  [2/28] FinFormer dji sl20_pl5 seed0 y2021:  intrinsic, 27 days, 10 s
+2026-11-05 07:42:19  [3/28] FinFormer dji sl20_pl5 seed0 y2022:  intrinsic, 27 days, 10 s
+2026-11-05 07:42:29  [4/28] FinFormer dji sl20_pl5 seed0 y2023:  intrinsic, 27 days, 10 s
+2026-11-05 07:42:39  [5/28] FinFormer dji sl20_pl5 seed0 y2024:  intrinsic, 27 days, 10 s
+2026-11-05 07:42:50  [6/28] FinFormer dji sl20_pl5 seed5 y2020:  intrinsic, 27 days, 10 s
+2026-11-05 07:43:00  [7/28] FinFormer dji sl20_pl5 seed5 y2021:  intrinsic, 27 days, 10 s
+2026-11-05 07:43:00  [8/28] FinFormer dji sl20_pl5 seed5 y2022: done already
+2026-11-05 07:43:10  [9/28] FinFormer dji sl20_pl5 seed5 y2023:  intrinsic, 27 days, 10 s
+2026-11-05 07:43:21  [10/28] FinFormer dji sl20_pl5 seed5 y2024:  intrinsic, 27 days, 10 s
+2026-11-05 07:43:58  [11/28] FinFormer nasdaq100 sl20_pl5 seed0 y2020:  intrinsic, 27 days, 37 s
+2026-11-05 07:44:35  [12/28] FinFormer nasdaq100 sl20_pl5 seed0 y2021:  intrinsic, 27 days, 37 s
+2026-11-05 07:45:13  [13/28] FinFormer nasdaq100 sl20_pl5 seed0 y2022:  intrinsic, 27 days, 38 s
+2026-11-05 07:45:52  [14/28] FinFormer nasdaq100 sl20_pl5 seed0 y2023:  intrinsic, 27 days, 39 s
+2026-11-05 07:46:32  [15/28] FinFormer nasdaq100 sl20_pl5 seed0 y2024:  intrinsic, 27 days, 40 s
+2026-11-05 07:47:12  [16/28] FinFormer nasdaq100 sl20_pl5 seed5 y2020:  intrinsic, 27 days, 40 s
+2026-11-05 07:47:52  [17/28] FinFormer nasdaq100 sl20_pl5 seed5 y2021:  intrinsic, 27 days, 40 s
+2026-11-05 07:48:33  [18/28] FinFormer nasdaq100 sl20_pl5 seed5 y2022:  intrinsic, 27 days, 41 s
+2026-11-05 07:49:14  [19/28] FinFormer nasdaq100 sl20_pl5 seed5 y2023:  intrinsic, 27 days, 41 s
+2026-11-05 07:49:56  [20/28] FinFormer nasdaq100 sl20_pl5 seed5 y2024:  intrinsic, 27 days, 42 s
+2026-11-05 07:50:12  [21/28] FinFormer sx5e sl20_pl5 seed0 y2021:  intrinsic, 27 days, 15 s
+2026-11-05 07:50:27  [22/28] FinFormer sx5e sl20_pl5 seed0 y2022:  intrinsic, 26 days, 15 s
+2026-11-05 07:50:42  [23/28] FinFormer sx5e sl20_pl5 seed0 y2023:  intrinsic, 26 days, 15 s
+2026-11-05 07:50:58  [24/28] FinFormer sx5e sl20_pl5 seed0 y2024:  intrinsic, 27 days, 16 s
+2026-11-05 07:51:13  [25/28] FinFormer sx5e sl20_pl5 seed5 y2021:  intrinsic, 27 days, 15 s
+2026-11-05 07:51:29  [26/28] FinFormer sx5e sl20_pl5 seed5 y2022:  intrinsic, 26 days, 15 s
+2026-11-05 07:51:44  [27/28] FinFormer sx5e sl20_pl5 seed5 y2023:  intrinsic, 26 days, 15 s
+2026-11-05 07:51:59  [28/28] FinFormer sx5e sl20_pl5 seed5 y2024:  intrinsic, 27 days, 15 s
+2026-11-05 08:20:15  [20/28] DiscoverPLF nasdaq100 sl20_pl5 seed5 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 5310 s

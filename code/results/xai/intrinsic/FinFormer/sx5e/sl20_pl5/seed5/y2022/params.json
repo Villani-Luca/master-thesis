@@ -1,0 +1,6 @@
+{
+  "method": "intrinsic",
+  "model": "FinFormer",
+  "days": 26,
+  "replay_max_diff": 0.0
+}
