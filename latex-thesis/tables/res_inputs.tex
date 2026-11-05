@@ -1,0 +1,27 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+& \textbf{MASTER} & \textbf{MATCC} & \textbf{FactorVAE} & \textbf{HIST} & \textbf{DiscoverPLF} & \textbf{FinFormer} \\
+\midrule
+\multicolumn{7}{@{}l}{\emph{Families (net share)}} \\
+position & 21 & 19 & 19 & -- & -- & -- \\
+momentum & 18 & 18 & 20 & 70 & 68 & 79 \\
+trend & 16 & 15 & 14 & -- & -- & -- \\
+volume & 14 & 13 & 13 & 29 & 27 & 18 \\
+volatility & 13 & 14 & 15 & -- & -- & -- \\
+price-volume & 10 & 13 & 11 & -- & -- & -- \\
+candle & 8 & 8 & 8 & 1 & 4 & 4 \\
+\midrule
+\multicolumn{7}{@{}l}{\emph{Days of the window (gross share)}} \\
+most recent day & 10 & 11 & 9 & 0 & 1 & 1 \\
+most recent 5 days & 52 & 31 & 35 & 1 & 4 & 7 \\
+oldest 5 days & 18 & 28 & 22 & 17 & 13 & 13 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{What the models rely on: IG of the score, core universes, $L = 5$, mean over the 42 runs of each model (\%). Families: net share of each family (market inputs left out); the Alpha360 set has three families. Days: gross share of the attribution received by the most recent day, the most recent five days and the oldest five days of the window, which is 20 days for the Alpha158 models and 60 for the Alpha360 models (uniform: 5\%, 25\% and 25\%, and 1.7\%, 8.3\% and 8.3\%).}
+\label{tab:res_inputs}
+\end{table}

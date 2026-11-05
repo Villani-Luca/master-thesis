@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Model} & \textbf{Mean RankIC} & \multicolumn{3}{c}{\textbf{Feature agreement (Spearman) with}} \\
+\cmidrule(lr){3-5}
+ & & another seed & another model & the next test year \\
+\midrule
+MASTER & +0.005 & 0.29 & 0.28 & 0.72 \\
+MATCC & +0.006 & 0.84 & 0.28 & 0.81 \\
+FactorVAE & -0.009 & 0.27 & 0.22 & 0.56 \\
+\midrule
+HIST & +0.012 & 0.95 & 0.37 & 0.95 \\
+DiscoverPLF & +0.006 & 0.84 & 0.35 & 0.81 \\
+FinFormer & +0.009 & 0.33 & 0.08 & 0.34 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Skill and stability of each model's explanations, core universes, $L = 5$. Mean test RankIC of the 42 runs; mean Spearman correlation between the feature importances (IG of the score, market inputs left out) of the run and of the same run with another seed, of another model of its feature group (same seed, universe and year), and of the next test year with the same seed. Above the line the Alpha158 group, below it the Alpha360 group.}
+\label{tab:res_agreement_models}
+\end{table}

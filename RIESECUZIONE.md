@@ -80,7 +80,7 @@ DiscoverPLF (processo a). Processo b (FinFormer, HIST) finito il 5/11 alle ~07:4
 
 Stima: 6/11 sera – 7/11 mattina.
 
-- [ ] **C1. XAI sulle run riaddestrate** (seed 42 e i MASTER a L = 5), in 3 processi come il primo batch:
+- [x] **C1. XAI sulle run riaddestrate** (seed 42 e i MASTER a L = 5), in 3 processi come il primo batch:
   ```
   python code/scripts/explain.py --models DiscoverPLF
   python code/scripts/explain.py --models FinFormer HIST
@@ -93,12 +93,29 @@ Stima: 6/11 sera – 7/11 mattina.
   rieseguire e scrivere le **Observations**.
 - [ ] **C4. Notebook 06** (Step 6): rieseguire; scegliere e motivare il metodo principale e la misura per
   famiglia (`importance` lorda o `net`).
-- [ ] **C4b. Notebook 08** (Step 8, anni e regimi): rieseguire (serve B1 per le quote nette) e scrivere le
+- [x] **C4b. Notebook 08** (5/11: rieseguito, Observations scritte; accordo per feature senza le feature di mercato) (Step 8, anni e regimi): rieseguire (serve B1 per le quote nette) e scrivere le
   **Observations**.
-- [ ] **C5. Notebook 07** (Step 7): rieseguire; scrivere la **diagnosi** dati vs modello. Tenere conto del
+- [ ] **C5. Notebook 07** (5/11: diagnosi scritta; rieseguito alle 17:45 con xai2_a finito, 252/252 run complete; resta da rieseguire dopo il notebook 06 solo se cambiano i numeri del sanity check) (Step 7): rieseguire; scrivere la **diagnosi** dati vs modello. Tenere conto del
   sanity check (HIST e in parte MASTER hanno attribuzioni simili a quelle del modello non allenato).
-- [ ] **C6. Tesi**: sostituire i numeri marcati `% TODO` nei capitoli (`grep -n "TODO" latex-thesis/chapters/*.tex`),
+- [ ] **C6. Tesi** (5/11: cap. 6 §6.2–6.7 scritti, tabelle `res_inputs`, `res_agreement`, `res_agreement_models`, `res_variance`; cap. 9 apertura e risposte alle RQ; introduzione: risposte in breve e contributo 2. Restano: cap. 5 valutazione e numeri `% TODO` dopo il notebook 06, i due `% TODO` sul sanity check nel cap. 6): sostituire i numeri marcati `% TODO` nei capitoli (`grep -n "TODO" latex-thesis/chapters/*.tex`),
   in particolare `05_xai_methodology.tex`; scrivere la sezione di valutazione (Step 6) e i risultati (cap. 6).
+
+## E. XAI sugli universi grandi (S&P 500, STOXX Europe 600), tutti gli orizzonti
+
+Decisione del 2026-11-05 (PIANO.md, registro): XAI su 5 universi × 3 orizzonti. Log in `logs/xai4_*.out`, `logs/xai5_*.out`.
+
+- [ ] **E1. L = 5, una data su due** (lanciati il 5/11 alle 17:55):
+  `explain.py --models MASTER MATCC --universes sp500 sxxp` (`xai4_a`, 54 run) e
+  `explain.py --models FactorVAE HIST FinFormer DiscoverPLF --universes sp500 sxxp` (`xai4_b`, 108 run).
+  Misurare i secondi per run sulle prime run e aggiornare la stima in PIANO.md (Calendario).
+- [ ] **E2. L = 1 e 20, una data su quattro**, da lanciare quando finiscono i processi `xai3_*` (un processo per ognuno che si libera):
+  ```
+  python code/scripts/explain.py --models MASTER MATCC --universes sp500 sxxp --horizons 1 20 --stride 4        # xai5_a
+  python code/scripts/explain.py --models FactorVAE HIST --universes sp500 sxxp --horizons 1 20 --stride 4      # xai5_b
+  python code/scripts/explain.py --models FinFormer DiscoverPLF --universes sp500 sxxp --horizons 1 20 --stride 4  # xai5_c
+  ```
+- [ ] **E3. Analisi**: notebook 07 e 08 con tutti gli universi e gli orizzonti (fattori universo e orizzonte nella
+  scomposizione della varianza), poi capitoli 6 e 9 e le tabelle `res_*` di `thesis_figures.py` (ora fissate a L = 5 e universi core).
 
 ## D. Alla fine
 

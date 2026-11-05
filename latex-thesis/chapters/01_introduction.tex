@@ -1,8 +1,7 @@
 % ---------------------------------------------------------------------------
 % Chapter 1 - Introduction
 % First draft, 2026-10-27. Numbers from notebooks 01, 03 and 04 (Steps 1, 3, 4).
-% To revise once the explainability results (Steps 5-8) are in: research
-% questions 1-4 and the contributions still describe planned work.
+% Answers to the research questions and contribution 2 added 2026-11-05 from Chapters 6 and 9.
 % ---------------------------------------------------------------------------
 
 \chapter{Introduction}
@@ -29,7 +28,7 @@ The central question of the thesis is whether the instability of stock forecasti
     \item \label{rq:allocation} How do attributions translate into allocation decisions, and how fragile is the composition of a long-only top-$k$ portfolio with respect to small changes in the predictions?
 \end{enumerate}
 
-% TODO: once Step 7 is done, add one sentence per RQ anticipating the answer.
+In short, the answers are the following. The Alpha158 models spread their attribution over all feature families, and the Alpha360 models follow the order in which their reference code feeds them the inputs rather than the calendar (RQ1). The models agree on the kind of information they use but not on the individual features, and for half of them a new seed changes the explanation as much as a new architecture (RQ2). The instability is therefore data-driven: a weak signal spread over redundant inputs, divided among them by training randomness (RQ3). Market regimes change the skill of the models but not their explanations (RQ4). Portfolio membership is explained by the same inputs as the score, but these inputs carry no measurable skill, and about half or more of the held positions are decided by the seed (RQ5).
 
 \section{Approach}
 \label{sec:intro_approach}
@@ -46,13 +45,13 @@ All of this is implemented in a single framework that wraps the six models behin
 The main contributions of this thesis are:
 \begin{enumerate}[noitemsep]
     \item \textbf{A unified and verified framework}, \texttt{xaifin}, that wraps six heterogeneous stock-ranking models behind one interface. An equivalence test shows that every wrapped model trains and predicts exactly as FinBench's own code, so that results obtained through the framework stand for the benchmark's models. Along the way, the work identifies and documents several issues of the reference implementations, among them a label leakage in the evaluation of FactorVAE, and errors in the market data such as tickers mapped to the wrong company.
-    \item \textbf{A systematic comparison of explanations} across architectures, seeds, periods and universes, based on attribution methods whose faithfulness and stability are evaluated, leading to a diagnosis of whether the instability of the models comes from the data or from their design.
+    \item \textbf{A systematic comparison of explanations} across architectures, seeds, periods and universes, based on attribution methods whose faithfulness and stability are evaluated. Comparing runs that differ in one factor only, and decomposing the variance of the attributions, shows that the models agree on the kind of information they use, while the seed decides among redundant features as much as the architecture does: the instability comes from the data, not from the design of the models.
     \item \textbf{A link between explanations and allocation}: the attribution of portfolio membership rather than of raw scores, the margins of held stocks from the top-$k$ boundary, and a measure of the fragility of portfolio decisions. Comparing each margin with the change that another random seed makes to the stock's score shows that about half or more of the positions of a portfolio are decided by training randomness, and this share predicts how much of the portfolio changes when the model is retrained.
     \item \textbf{Evidence on reproducibility}: training the same models twice on the same and on different GPUs shows that the runs are bit-identical on the same hardware, except for one model with non-deterministic kernels, but differ across GPU models by as much as a change of seed.
     \item \textbf{An interactive application} to load trained models, inspect their attributions and compare architectures.
 \end{enumerate}
 
-% TODO: revise contributions 2-4 once Steps 5-11 are complete.
+% TODO: revise contribution 5 once the application (Chapter 8) is complete.
 
 \section{Structure of the Thesis}
 \label{sec:intro_structure}

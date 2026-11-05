@@ -1,0 +1,29 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\textbf{Family} & \textbf{Mean share} & \textbf{Model} & \textbf{Universe} & \textbf{Year} & \textbf{Interactions} & \textbf{Seed} \\
+\midrule
+\multicolumn{7}{@{}l}{\emph{Alpha158 group (MASTER, MATCC, FactorVAE)}} \\
+candle & 8 & 6 & 0 & 19 & 33 & 42 \\
+momentum & 19 & 8 & 3 & 24 & 26 & 39 \\
+position & 20 & 5 & 7 & 1 & 30 & 57 \\
+price-volume & 11 & 23 & 20 & 4 & 40 & 14 \\
+trend & 15 & 17 & 4 & 11 & 8 & 60 \\
+volatility & 14 & 13 & 5 & 2 & 34 & 46 \\
+volume & 14 & 4 & 3 & 5 & 53 & 34 \\
+\midrule all, weighted &  & 11 & 6 & 9 & 31 & 43 \\
+\midrule
+\multicolumn{7}{@{}l}{\emph{Alpha360 group (HIST, DiscoverPLF, FinFormer)}} \\
+candle & 3 & 48 & 12 & 0 & 18 & 21 \\
+momentum & 72 & 47 & 2 & 6 & 17 & 29 \\
+volume & 25 & 56 & 2 & 6 & 13 & 23 \\
+\midrule all, weighted &  & 49 & 2 & 6 & 16 & 27 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Where the differences between explanations come from: share (\%) of the variance of each family's net IG share across the 126 runs of a feature group explained by the model, the universe and the test year (type II sums of squares), their interactions, and the seed (spread of the three seeds within each model, universe and year), core universes, $L = 5$. The last row of each group averages the families weighted by their mean share.}
+\label{tab:res_variance}
+\end{table}

@@ -13,6 +13,11 @@ the Step 1 summaries in results/data_summary/, notebook 01):
 Chapter 6 (performance, from the results store, notebook 03):
 - res_rankic: mean test RankIC per model and test year, one heatmap per universe (L = 5);
 - res_horizons: mean test RankIC per model at the three horizons, with standard errors.
+Chapter 6 (explanations, from results/xai/, IG of the score, core universes, L = 5, notebooks 07 and 08):
+- res_inputs (table): net family shares and the share of the most recent and oldest days, per model;
+- res_agreement (table): agreement of two runs that differ in one factor, families and features;
+- res_agreement_models (table): per model, RankIC and feature agreement with another seed, model and test year;
+- res_variance (table): variance decomposition of the net family shares, per feature group.
 Chapter 7 (portfolios, notebooks 04 and 09):
 - pf_performance, pf_fragility (tables): CAGR and Sharpe per model and universe; fragile holdings against seed turnover;
 - pf_equity: growth of 1 invested, seed 42, L = 5, DJI and NASDAQ-100;
@@ -200,6 +205,130 @@ def _metrics() -> pd.DataFrame:
     return collect_results()
 
 
+def _importance(level: str, value: str = "importance", target: str = "pred") -> pd.DataFrame:
+    """IG global importance of the core runs at L = 5 (notebook 07), without the market inputs (zero by construction)."""
+    from xaifin.analysis.variance import load_importance
+    from xaifin.data.features import market_names
+
+    t = load_importance("ig_joint", target, level, value)
+    t = t[(t["pred_len"] == 5) & t["universe"].isin(CORE_UNIVERSES)]
+    market = {(u, n) for u in CORE_UNIVERSES for n in [*market_names(u), "market"]}
+    return t[[(u, n) not in market for u, n in zip(t["universe"], t["name"])]]
+
+
+def _model_pairs(pairs: pd.DataFrame) -> pd.Series:
+    """Mean Spearman of each model with the other models (pairs counted for both)."""
+    p = pairs[pairs["factor"] == "model"]
+    return pd.concat([p.assign(m=p["a"]), p.assign(m=p["b"])]).groupby("m")["spearman"].mean()
+
+
+FACTOR_NAMES = {"seed": "another seed", "universe": "another universe", "year": "another test year",
+                "model": "another model of the group"}
+
+
+def res_inputs() -> Path:
+    """LaTeX table: per model, the net IG share of each family and the gross share of the most recent and oldest days
+    (notebooks 05 and 07)."""
+    family = _importance("family", "net")
+    family["share"] = family["importance"] / family.groupby(["model", "universe", "seed", "test_year"])["importance"].transform("sum")
+    families = family.pivot_table(index="name", columns="model", values="share", aggfunc="mean")
+    lag = _importance("lag")
+    lag["lag"] = lag["name"].astype(int)
+    lag["oldest"] = lag.groupby("model")["lag"].transform("max")
+    runs = ["model", "universe", "seed", "test_year"]
+    lags = pd.DataFrame({"most recent day": lag[lag["lag"] == 0].groupby(runs)["importance"].sum(),
+                         "most recent 5 days": lag[lag["lag"] < 5].groupby(runs)["importance"].sum(),
+                         "oldest 5 days": lag[lag["lag"] > lag["oldest"] - 5].groupby(runs)["importance"].sum()}).groupby("model").mean().T
+    models = viz.MODEL_ORDER
+    header = ["& " + " & ".join(f"\\textbf{{{m}}}" for m in models) + " \\\\"]
+    body = ["\\multicolumn{7}{@{}l}{\\emph{Families (net share)}} \\\\"]
+    order = families[models[0]].sort_values(ascending=False).index
+    for name in order:
+        cells = ["--" if pd.isna(families.loc[name, m]) else f"{100 * families.loc[name, m]:.0f}" for m in models]
+        body.append(f"{name.replace('_', '-')} & " + " & ".join(cells) + " \\\\")
+    body += ["\\midrule", "\\multicolumn{7}{@{}l}{\\emph{Days of the window (gross share)}} \\\\"]
+    for name, row in lags.iterrows():
+        body.append(f"{name} & " + " & ".join(f"{100 * row[m]:.0f}" for m in models) + " \\\\")
+    return _table("res_inputs", "@{}l" + "r" * len(models) + "@{}", header, body,
+                  "What the models rely on: IG of the score, core universes, $L = 5$, mean over the 42 runs of each model "
+                  "(\\%). Families: net share of each family (market inputs left out); the Alpha360 set has three families. "
+                  "Days: gross share of the attribution received by the most recent day, the most recent five days and the "
+                  "oldest five days of the window, which is 20 days for the Alpha158 models and 60 for the Alpha360 models "
+                  "(uniform: 5\\%, 25\\% and 25\\%, and 1.7\\%, 8.3\\% and 8.3\\%).")
+
+
+def res_agreement() -> Path:
+    """LaTeX table: agreement of the IG importance rankings of two runs that differ in one factor only (notebook 07)."""
+    from xaifin.analysis.variance import pair_agreement
+
+    family = _importance("family", "net")
+    family = pair_agreement(family[family["group"] == "alpha158"]).groupby("factor")["spearman"].mean()
+    p = pair_agreement(_importance("feature"))
+    feature = p.groupby("factor").agg(spearman=("spearman", "mean"), jaccard=("jaccard", "mean"), pairs=("spearman", "size"))
+    header = ["\\textbf{The two runs differ in} & \\textbf{Families (Alpha158)} & \\multicolumn{2}{c}{\\textbf{Features}} & "
+              "\\textbf{Pairs} \\\\", "\\cmidrule(lr){2-2} \\cmidrule(lr){3-4}", " & Spearman & Spearman & top-10 Jaccard & \\\\"]
+    body = [f"{FACTOR_NAMES[f]} & {family[f]:.2f} & {feature.loc[f, 'spearman']:.2f} & {feature.loc[f, 'jaccard']:.2f} & "
+            f"{feature.loc[f, 'pairs']} \\\\" for f in FACTOR_NAMES]
+    return _table("res_agreement", "@{}lrrrr@{}", header, body,
+                  "Agreement of the explanations of two runs that differ in one factor only, IG of the score, core universes, "
+                  "$L = 5$, mean over all such pairs. Families: net shares of the seven Alpha158 families (the Alpha360 "
+                  "models, with three families, always agree). Features: gross importance, within a feature group. "
+                  "The market inputs, whose attribution is zero by construction, are left out.")
+
+
+def res_agreement_models() -> Path:
+    """LaTeX table: per model, its skill and the feature-level agreement of its explanations with its other seeds, the
+    other models of its group and its next test year (notebooks 07 and 08)."""
+    from xaifin.analysis.variance import pair_agreement
+
+    p = pair_agreement(_importance("feature"))
+    seed = p[p["factor"] == "seed"].groupby("model")["spearman"].mean()
+    years = p[p["factor"] == "year"].astype({"a": int, "b": int})
+    next_year = years[(years["b"] - years["a"]).abs() == 1].groupby("model")["spearman"].mean()
+    metrics = _metrics()
+    rankic = metrics[(metrics["pred_len"] == 5) & metrics["universe"].isin(CORE_UNIVERSES)].groupby("model")["RankIC"].mean()
+    others = _model_pairs(p)
+    header = ["\\textbf{Model} & \\textbf{Mean RankIC} & \\multicolumn{3}{c}{\\textbf{Feature agreement (Spearman) with}} \\\\",
+              "\\cmidrule(lr){3-5}", " & & another seed & another model & the next test year \\\\"]
+    body = []
+    for model in viz.MODEL_ORDER:
+        if model == "HIST":
+            body.append("\\midrule")
+        body.append(f"{model} & {rankic[model]:+.3f} & {seed[model]:.2f} & {others[model]:.2f} & {next_year[model]:.2f} \\\\")
+    return _table("res_agreement_models", "@{}lrrrr@{}", header, body,
+                  "Skill and stability of each model's explanations, core universes, $L = 5$. Mean test RankIC of the 42 "
+                  "runs; mean Spearman correlation between the feature importances (IG of the score, market inputs left out) "
+                  "of the run and of the same run with another seed, of another model of its feature group (same seed, "
+                  "universe and year), and of the next test year with the same seed. Above the line the Alpha158 group, "
+                  "below it the Alpha360 group.")
+
+
+def res_variance() -> Path:
+    """LaTeX table: share of the variance of each family's net IG share across runs explained by each factor (notebook 07)."""
+    from xaifin.analysis.variance import decomposition
+
+    family = _importance("family", "net")
+    parts = ["model", "universe", "year", "interactions", "seed"]
+    header = ["\\textbf{Family} & \\textbf{Mean share} & " + " & ".join(f"\\textbf{{{c.capitalize()}}}" for c in parts) + " \\\\"]
+    body = []
+    for group, title in (("alpha158", "Alpha158 group (MASTER, MATCC, FactorVAE)"), ("alpha360", "Alpha360 group (HIST, DiscoverPLF, FinFormer)")):
+        d = decomposition(family[family["group"] == group]).set_index("name")
+        body.append(f"\\multicolumn{{7}}{{@{{}}l}}{{\\emph{{{title}}}}} \\\\")
+        for name, r in d.iterrows():
+            label = "all, weighted" if name.startswith("all") else name.replace("_", "-")
+            share = "" if pd.isna(r["mean_importance"]) else f"{100 * r['mean_importance']:.0f}"
+            cells = " & ".join(f"{100 * r[c]:.0f}" for c in parts)
+            body.append(("\\midrule " if name.startswith("all") else "") + f"{label} & {share} & {cells} \\\\")
+        if group == "alpha158":
+            body.append("\\midrule")
+    return _table("res_variance", "@{}lrrrrrr@{}", header, body,
+                  "Where the differences between explanations come from: share (\\%) of the variance of each family's net IG "
+                  "share across the 126 runs of a feature group explained by the model, the universe and the test year "
+                  "(type II sums of squares), their interactions, and the seed (spread of the three seeds within each "
+                  "model, universe and year), core universes, $L = 5$. The last row of each group averages the families "
+                  "weighted by their mean share.")
+
+
 def res_rankic() -> Path:
     """Model x test year heatmaps of the mean RankIC over seeds (L = 5), one per universe, on one shared scale."""
     runs = _metrics()
@@ -290,7 +419,8 @@ def pf_fragility_scatter() -> Path:
 
 
 FIGURES = {f.__name__: f for f in (data_labels, data_label_std, data_alpha158_corr, data_volatility, pf_performance,
-                                   pf_fragility, res_rankic, res_horizons, pf_equity, pf_fragility_scatter)}
+                                   pf_fragility, res_rankic, res_horizons, res_inputs, res_agreement, res_agreement_models, res_variance,
+                                   pf_equity, pf_fragility_scatter)}
 
 
 def main() -> None:

@@ -1,4 +1,4 @@
-# Piano di lavoro fino al 18/11/2026
+# Piano di lavoro (laurea il 09/02/2027)
 
 Documento di progetto per il periodo in cui la griglia di training gira sulla H200 dell'amico.
 Il lavoro descritto qui si fa sulla **macchina con CUDA** (quella degli stage 1–4).
@@ -22,14 +22,19 @@ cosa fare, le decisioni prese e il registro. Aggiornato il 2026-10-22.
 
 ## Obiettivo e vincoli
 
-- **Scadenza: tesi completa (codice, analisi, scrittura) entro il 18/11/2026 (obiettivo di lavoro; la
-  scadenza formale del file della tesi è il 19/11/2026, quindi un giorno di margine). Bozza al relatore
-  verso il 10/11.**
+- **Scadenza (aggiornata il 2026-11-05): seduta di laurea del 09/02/2027.** Domanda su Esse3 dall'11/12/2026
+  all'11/01/2027; altre due scadenze Esse3 il 19/01/2027 e il 28/01/2027 (da confermare quale sia il caricamento
+  del file: per analogia con la sessione di dicembre, 12 giorni prima della seduta, dovrebbe essere il 28/01).
+  La prenotazione per la seduta del 01/12/2026 va annullata su Esse3 (i 32 euro non si ripagano; vedi il
+  promemoria su ingmo.unimore.it). La vecchia scadenza del 18–19/11/2026 non vale più.
+- Il relatore chiede una tesi consistente (4–6 mesi di lavoro) e **lo XAI su tutti e 5 gli universi e su tutti e
+  3 gli orizzonti**; vuole vedere i risultati a pochi giorni di distanza, come per la griglia.
 - Domanda di ricerca: come le feature guidano le predizioni e l'allocazione top-k, e se
   l'instabilità viene dai **dati** o dal **design dei modelli** (Step 7: è il risultato centrale e
   non si taglia).
-- Tagliati per la scadenza (sviluppi futuri nella tesi): SHAP/LIME oltre dji y2020, Step 9.2,
-  Step 10, pagina app `5_Over_time`, riferimento LightGBM/TreeSHAP (salvo tempo avanzato).
+- Tagliati per la scadenza del 18/11 (sviluppi futuri nella tesi): SHAP/LIME oltre dji y2020, Step 9.2,
+  Step 10, pagina app `5_Over_time`, riferimento LightGBM/TreeSHAP. Con la laurea a febbraio si possono
+  riconsiderare: decidere con il relatore dopo i primi risultati sugli universi grandi.
 - Orizzonti L = 1, 5, 20 **obbligatori** per tutti e 5 gli universi (li produce la griglia H200).
 
 ## Stato reale (verificato il 2026-10-22)
@@ -234,11 +239,30 @@ riscrittura dei capitoli stabili (2, 3, 4, 7) dal 6/11 mentre si chiudono 5, 6, 
 relatore il 10/11; riscrittura di 5, 6, 8, 9 e introduzione il 10–14/11; correzioni 14–17/11; consegna 18/11.
 Seduta di laurea obiettivo: 1/12/2026; caricamento su Esse3 entro il 19/11.
 
+Calendario rivisto il 2026-11-05 sera (laurea il 09/02/2027, XAI su 5 universi × 3 orizzonti):
+
+| Date | Lavoro |
+|---|---|
+| 5–7 nov | fine XAI L = 1/20 sui 3 universi core (`xai3_*`); notebook 06; primi universi grandi a L = 5 (`xai4_a`: MASTER e MATCC, veloci) |
+| ~8–12 nov | **primi risultati al relatore**: core completo (L = 1, 5, 20) e primi universi grandi; tempi misurati dell'XAI su S&P 500 e STOXX Europe 600 |
+| nov – dic | XAI degli universi grandi: L = 5 una data su due (`xai4_*`), poi L = 1 e 20 una data su quattro (`xai5_*`, RIESECUZIONE.md sezione E); notebook 07 e 08 estesi ai fattori universo e orizzonte; capitoli 5–7 e 9 aggiornati; app e cap. 8 |
+| 11/12 – 11/01 | domanda di laurea su Esse3 |
+| **~metà gennaio** | **bozza completa al relatore**, prima delle scadenze Esse3 |
+| 19/01 e 28/01 | scadenze Esse3 (probabilmente il file della tesi il 28/01: da confermare) |
+| **09/02/2027** | **seduta di laurea** |
+
+Stima dei tempi (da misurare sulle prime run di `xai4_a`): universi grandi a L = 5 una data su due 2–6 settimane,
+L = 1 e 20 una data su quattro altrettanto, quindi 4–12 settimane in tutto. Se le misure danno il caso
+peggiore, ripiego: una data su quattro anche a L = 5 sugli universi grandi (da decidere con le misure).
+
 ## Registro delle decisioni
 
 | Data | Decisione |
 |---|---|
 | 2026-10-22 | Scadenza 18/11, bozza ~10/11; scope tagliato (anche in THESIS_GUIDE.md) |
+| 2026-11-05 | **Laurea spostata alla seduta del 09/02/2027** (accordo con il relatore: tesi consistente, 4–6 mesi di lavoro). **XAI su tutti e 5 gli universi e su tutti e 3 gli orizzonti** (richiesta del relatore). Stessa densità del core: L = 5 una data di ribilanciamento su due, L = 1 e 20 una su quattro. Lanciati alle 17:55 `xai4_a` (MASTER, MATCC; sp500 e sxxp, L = 5; 54 run) e `xai4_b` (FactorVAE, HIST, FinFormer, DiscoverPLF; 108 run); L = 1 e 20 sugli universi grandi dopo la fine di `xai3_*` (RIESECUZIONE.md, sezione E). Calendario rivisto sopra |
+| 2026-11-05 | **Step 7, correzione dei numeri dell'accordo per feature** (notebook 07 e 08 rieseguiti, diagnosi e Observations scritte). Due errori di misura, corretti: (a) `variance.pair_agreement` confrontava anche modelli di gruppi diversi a livello di feature, sui 3 nomi in comune (OPEN0, HIGH0, LOW0): ora `_feature_level` esclude le coppie che condividono meno di metà dei nomi; (b) le 63 feature di mercato (42 in Europa), a zero per costruzione con la baseline media, gonfiavano lo Spearman di MASTER e MATCC con zeri appaiati: ora escluse anche a livello di feature (come già la famiglia `market`). Numeri corretti, feature: seed 0,59, universo 0,60, anno 0,66, **modello 0,27** (prima 0,67/0,62/0,71/0,19); Jaccard top 10 tra modelli 0,10. Famiglie dentro Alpha158 (7 famiglie): modello 0,74, universo 0,79, seed 0,82, anno 0,84; in Alpha360 sempre 1 (3 famiglie, ordine dato dal numero di colonne: 296 momentum, 60 volume, 4 candle). **Per modello, feature, seed vs altri modelli del gruppo**: MASTER 0,29 vs 0,28, FactorVAE 0,27 vs 0,22, FinFormer 0,33 vs 0,09 (il seed conta quanto l'architettura); MATCC 0,84, HIST 0,95, DiscoverPLF 0,84 vs 0,28–0,37. **Stesso seed, anni consecutivi**: MASTER 0,72, FactorVAE 0,56 (contro 0,29 e 0,27 tra seed nello stesso anno): l'inizializzazione segna la spiegazione più della finestra di training. Drift tra anni senza mercato: feature 0,71 (calmo-calmo) vs 0,70 (con anno volatile). Scomposizione della varianza invariata (usava già le quote nette senza mercato) |
+| 2026-11-05 | **Step 7 (notebook 07 e 08, L = 5, 252 run, definitivi)**. (1) **Alpha360: le feature dominanti sono un artefatto dell'ordine delle colonne.** Le più importanti sono quelle che il layout mette negli ultimi passi della sequenza ricorrente (HIST: 52% dell'importanza negli ultimi 5 passi su 60, 0,9% nei primi 5; FinFormer 32%; DiscoverPLF 23%; uniforme 8%): DiscoverPLF ha in testa VWAP9, 19, 29, 39, 49, 59, tutte nel passo 59. (2) Accordo per fattore, feature: seed 0,67, anno 0,71, universo 0,62, **modello 0,19**; famiglie: tutte 0,90–0,94 (solo 3 famiglie in comune tra gruppi: misura grossolana). (3) Scomposizione della varianza delle quote per famiglia: Alpha158 **seed 43%**, interazioni 31%, modello 11%, anno 9%, universo 6%; Alpha360 modello 49%, seed 27%; tutti i modelli sulle famiglie comuni: modello 92% (ma è la composizione dei due set di input: momentum 18% vs 70%). Nessuna feature Alpha158 nel top 10 di metà delle run. (4) `pred` vs `topk_margin` identici (1,0); ΔRankIC vs cambio del top-k −0,12…0,13. (5) Regimi: quote delle famiglie quasi uguali tra anni volatili e calmi (scarti ≤ 3 punti); l'accordo tra anni consecutivi non cala nelle transizioni con un anno volatile (famiglie 0,93 vs 0,92, feature 0,74 vs 0,75); FinFormer è il meno stabile tra anni sulle feature (0,34) |
 | 2026-11-05 | **XAI esteso a L = 1 e L = 20 sui 3 universi core**, tutti i modelli e seed, una data di ribilanciamento su quattro (~13 giorni l'anno; `explain.py --horizons 1 20 --stride 4`, processi `logs/xai3_a|b|c.out`), per il fattore orizzonte dello Step 7. Gli universi grandi (S&P 500, STOXX Europe 600) restano senza spiegazioni: ~5× il costo del core per orizzonte, tutto su tutto ~3–4 settimane. Messaggio al relatore per confermare lo scopo |
 | 2026-11-05 | La scadenza formale del file della tesi è il 19/11; si tiene il 18/11 come obiettivo di lavoro. Calendario rivisto (sezione Calendario) |
 | 2026-10-22 | L = 1 e L = 20 obbligatori; la griglia intera gira sulla H200 dell'amico con `launch_grid.py` |

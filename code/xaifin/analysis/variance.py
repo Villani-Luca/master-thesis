@@ -86,7 +86,8 @@ def pair_agreement(table: pd.DataFrame, min_names: int = 3, **kwargs) -> pd.Data
 
 
 def _feature_level(a: pd.Series, b: pd.Series) -> bool:
-    return len(a.index.intersection(b.index)) == 0
+    # the groups share a few feature names (OPEN0, HIGH0, LOW0), but most names at every other level
+    return len(a.index.intersection(b.index)) < 0.5 * min(len(a), len(b))
 
 
 def decomposition(table: pd.DataFrame, common_names: bool = True) -> pd.DataFrame:

@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{The two runs differ in} & \textbf{Families (Alpha158)} & \multicolumn{2}{c}{\textbf{Features}} & \textbf{Pairs} \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-4}
+ & Spearman & Spearman & top-10 Jaccard & \\
+\midrule
+another seed & 0.82 & 0.59 & 0.32 & 252 \\
+another universe & 0.79 & 0.60 & 0.27 & 234 \\
+another test year & 0.84 & 0.66 & 0.30 & 468 \\
+another model of the group & 0.74 & 0.27 & 0.10 & 252 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Agreement of the explanations of two runs that differ in one factor only, IG of the score, core universes, $L = 5$, mean over all such pairs. Families: net shares of the seven Alpha158 families (the Alpha360 models, with three families, always agree). Features: gross importance, within a feature group. The market inputs, whose attribution is zero by construction, are left out.}
+\label{tab:res_agreement}
+\end{table}

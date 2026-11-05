@@ -1,28 +1,33 @@
 % ---------------------------------------------------------------------------
 % Chapter 9 - Conclusions
 % Limitations and future work written 2026-11-05 (PIANO.md registry of 2026-11-04/05, docs/thesis_topics.md
-% section 10). Section 9.1 (answers to the research questions) waits for the Step 7 diagnosis.
+% section 10). Opening and Section 9.1 written 2026-11-05 from Chapters 6 and 7 (final L = 5 results).
 % ---------------------------------------------------------------------------
 
 \chapter{Conclusions}
 \label{ch:conclusions}
 
-% TODO (after Chapter 6, RIESECUZIONE.md C5-C6): one short opening paragraph with the central answer.
+This thesis set out to find whether the instability of deep stock-ranking models, and of the portfolios built on them, comes from the data or from the design of the models. Six recent architectures were trained under one protocol on identical inputs, 1242 models in all, and 252 of them were explained day by day. The answer is that it comes from the data. All six models extract the same weak signal from the same kinds of information. How they divide the credit among redundant inputs is decided largely by the random seed, and the composition of their portfolios is decided by training noise acting on positions that sit close to the top-$k$ boundary. The architecture matters much less than the attention it receives in the literature would suggest.
 
 % ===========================================================================
 \section{Answers to the Research Questions}
 \label{sec:conc_answers}
 
-% TODO: one paragraph per research question of Section 1.2, with the evidence from Chapters 6 and 7:
-% RQ1 features, families and lags; RQ2 agreement across models and seeds; RQ3 the data-or-model diagnosis;
-% RQ4 periods and regimes; RQ5 allocation: score and portfolio drivers, fragility of the decisions (46-77% of the
-% held positions within their seed noise of the boundary, predicting the portfolio change between seeds).
+\paragraph{RQ1: which inputs drive the predictions?} The three Alpha158 models spread their attribution over all seven feature families, with position and momentum first (18--21\% of the net share each) and the candle last (8\%). They draw on short, medium and long windows alike and on the whole 20-day window, with the most weight on the last five days (31--52\%). Within each family the credit is shared among near-duplicate features, so single features can only be read by correlation group. The Alpha360 models put 68--79\% of their attribution on past prices and most of the rest on volume, and they follow the order in which a misplaced reshape of the reference code feeds them the columns, not the calendar: the most recent week receives 1--7\% of their attribution. The models' own attention does not agree with the attributions. MASTER's temporal attention puts 93\% of its weight on the last three days, where the gradients put 41\%, and the attention among stocks is almost uniform in every model that has one (Section~\ref{sec:res_inputs}).
+
+\paragraph{RQ2: do models and seeds rely on the same features?} On the kind of information, yes. Within the Alpha158 group the family rankings of two runs correlate at 0.74--0.84 whatever separates them, and every model ranks the three families shared by the two feature sets in the same order. On individual features, no. Two models of the same group correlate at 0.27 and share one of their ten most important features, two seeds of the same model at 0.59. For MASTER, FactorVAE and FinFormer, a new seed changes the feature ranking as much as a new architecture does, and within the Alpha158 group the seed accounts for 43\% of the variance of the family shares against 11\% for the architecture (Section~\ref{sec:res_agreement}).
+
+\paragraph{RQ3: data-driven or model-driven?} Data-driven. The models agree on what kind of information to use and all have a skill close to zero, which is the signature of a weak signal in the data. Where they disagree, on the features within a family, the data offer no basis for a choice, because those features are near-duplicates. The choice is then made by the seed, or for the Alpha360 models by the column order of the implementation. The stable but distinct explanations of MATCC, HIST and DiscoverPLF do not show different learned logics either: HIST's attributions are almost the same with untrained weights, and the Alpha360 differences follow the order in which each model reads the misplaced columns (Section~\ref{sec:res_diagnosis}). Training stops so early that some models stay close to their initial weights, and an explanation is shaped by its seed more than by a year of new training data.
+
+\paragraph{RQ4: how do periods and regimes matter?} They change what the models earn, not what they look at. The two high-volatility years behave in opposite ways. 2020 is the best year for five of the six models, and 2022 is negative for five of them, so volatility as such does not predict the skill (correlation $-0.06$ across universes and years). The family shares, however, move by at most about three points between calm and volatile years, and the explanations of consecutive years agree as much when a volatile year is involved as when both are calm (Section~\ref{sec:res_periods}).
+
+\paragraph{RQ5: how do explanations translate into allocation, and how fragile is it?} Portfolio membership has the same explanation as the score: attributing the margin to the top-$k$ boundary gives the same feature ranking. But the families that move the portfolio are not those that carry the skill. Shuffling one of the main families replaces a third to four fifths of the top $k$ and leaves the RankIC unchanged (Section~\ref{sec:res_portfolio}). The decisions are fragile. Between 46\% and 77\% of the held positions are closer to the boundary than the change that another seed makes to the stock's score, and this share predicts how much of the portfolio actually changes when the model is retrained (correlation 0.96, Section~\ref{sec:pf_results}). Two seeds of one model share only 4--49\% of their holdings, often not much more than two different models.
 
 % ===========================================================================
 \section{Limitations}
 \label{sec:conc_limitations}
 
-\paragraph{Explaining weak models.} The six models predict a small signal, whose sign changes with the year, the universe and the seed (Section~\ref{sec:res_performance}). Their explanations describe what the models rely on, not what drives stock returns: a feature that a model uses heavily may carry no predictive information, as the permutation importance of Chapter~\ref{ch:results} shows for most feature families. % TODO: verify on the final runs (preliminary: FactorVAE and MATCC).
+\paragraph{Explaining weak models.} The six models predict a small signal, whose sign changes with the year, the universe and the seed (Section~\ref{sec:res_performance}). Their explanations describe what the models rely on, not what drives stock returns: a feature that a model uses heavily may carry no predictive information, as the permutation importance of Chapter~\ref{ch:results} shows for every feature family: shuffling any of them changes the portfolio but not the RankIC.
 The conclusions of this thesis are therefore about the models and their stability, not about the economics of the features.
 
 \paragraph{Data.} The universe of each test year is built, as in FinBench, from the members of the index at the start of the year, so the training years contain only stocks that were still members later, a survivorship effect shared with the benchmark. The data-quality filter removes the clearest errors of the price files, but not all of them: the penny prices of \texttt{ORRON.ST} above the threshold and some post-failure prices of Signature Bank remain in the data, and opening prices are checked only in the backtest (Section~\ref{sec:pf_protocol}).

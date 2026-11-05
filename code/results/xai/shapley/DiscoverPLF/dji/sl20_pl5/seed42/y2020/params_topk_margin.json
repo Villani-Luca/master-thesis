@@ -1,0 +1,11 @@
+{
+  "method": "shapley",
+  "players": "families",
+  "absent": "day mean",
+  "exact": true,
+  "target": "topk_margin",
+  "k": 5,
+  "rows": 737,
+  "days": 27,
+  "seconds": 9.2
+}

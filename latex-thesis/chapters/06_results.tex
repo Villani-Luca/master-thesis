@@ -1,8 +1,9 @@
 % ---------------------------------------------------------------------------
 % Chapter 6 - Results
 % Section 6.1 written 2026-11-05 from notebook 03_rolling_training (final, 1242 runs).
-% Sections 6.2-6.6: structure only, to be filled from notebooks 05, 07, 08 once the explanations of the
-% three seeds are complete (RIESECUZIONE.md, section C). Figures and tables: code/scripts/thesis_figures.py.
+% Sections 6.2-6.7 written 2026-11-05 from notebooks 05, 07, 08 (252 runs at L = 5, all seeds) and the intrinsic
+% weights of the 42 runs per model; the sanity-check figures are from the trial runs of notebook 06 (TODO: final).
+% Tables: code/scripts/thesis_figures.py (res_inputs, res_agreement, res_agreement_models, res_variance).
 % ---------------------------------------------------------------------------
 
 \chapter{Results}
@@ -46,54 +47,77 @@ The six architectures therefore extract a small and unstable signal, whose sign 
 \section{What Drives the Predictions?}
 \label{sec:res_inputs}
 
-% TODO (notebooks 05 and 07, RIESECUZIONE.md C3, C5): for each model, the families, features and lags that IG
-% attributes the scores to (net family shares; gross shares in the appendix if useful); an example local explanation
-% (T x F heatmap of one stock-day, MASTER DJI 2020); the consistently dominant features per feature group, read
-% together with the correlation groups of Section 3.5 (near-duplicates share the credit); intrinsic weights against
-% IG (MASTER's gate, MATCC's market shift, FinFormer's fusion gate and series attention; inter-stock attention is
-% almost uniform; MATCC's temporal attention 91% on the last day vs about 10% of IG). Mention the findings already
-% established: HIST ignores today's candle values (OPEN0, HIGH0, LOW0, VWAP0) because of the column order; market
-% features get zero attribution by construction with the day-mean baseline.
+Every run of the core grid (six models, three universes, five or four test years, three seeds: 252 runs at $L = 5$) is explained with Integrated Gradients on every other rebalance date of its test year, for the score and for the top-$k$ margin (Chapter~\ref{ch:xai_method}). This section describes what the attributions of the score say, model by model; Table~\ref{tab:res_inputs} summarises them. The market inputs of MASTER and MATCC are left out of every share: with the average stock of the day as the baseline they are identical for all the stocks of a day, so their attribution is zero by construction (Section~\ref{sec:xm_baseline}), and their effect is read in the models' own weights instead.
+
+\input{tables/res_inputs}
+
+\paragraph{The Alpha158 models use every family, and use them alike.} The net shares of MASTER, MATCC and FactorVAE are spread over all seven families. Position (19--21\%) and momentum (18--20\%) come first, followed by trend, volume and volatility (13--16\% each), price-volume (10--13\%) and the candle (8\%). No family differs by more than about three percentage points between the three architectures. The gross shares rank position higher still (27\%), because its features often push in opposite directions within the same stock-day and cancel in the net share (Section~\ref{sec:xm_aggregation}). By horizon, the attribution is split between the long windows of 21--60 days (38\%), the medium ones (36--38\%) and the short ones of at most five days (24--26\%), so the models draw on the whole range of windows the feature set offers.
+
+\paragraph{Within a family, the credit is shared among near-duplicates.} The most important features of a run come in pairs and triples of the same operator over different windows, or of algebraically related operators: in MASTER's DJI run of 2020, for instance, VSUMN5 and VSUMD5, BETA20 and BETA30, RESI20 and RESI30, STD10 and STD60 all appear among the twenty most important features. These are the correlation groups of Section~\ref{sec:data_redundancy}. When two inputs carry the same information, a gradient method can split the credit between them in any proportion, so the individual features of Alpha158 have to be read by group. This is the root of the disagreement measured in the next section.
+
+\paragraph{The whole window is used, the last days most.} In a 20-day window, a uniform attribution would give each day 5\%. The Alpha158 models give the most recent day 9--11\% and the most recent five days 31\% (MATCC) to 52\% (MASTER), yet the oldest five days still receive 18--28\%. MATCC's profile is almost flat, with a slight rise at both ends.
+
+\paragraph{The Alpha360 models read their inputs in the wrong order.} Momentum carries 68--79\% of the net share of HIST, DiscoverPLF and FinFormer, volume 18--29\%, the candle 1--4\%. These shares largely mirror the number of columns of each family (296, 60 and 4 of 360), although volume receives somewhat more than its share of the columns. The days are another matter. The most recent five days of the 60-day window receive 1\% (HIST), 4\% (DiscoverPLF) and 7\% (FinFormer) of the attribution, against 8.3\% for a uniform profile, while the oldest five receive 13--17\%. HIST gives today's candle, the open, high, low and average price of the last day, practically nothing (0.8\%). The reason is the column order of the reference implementations (Section~\ref{sec:fw_issues}): the 360 columns are stored lag by lag but reshaped as if they were stored series by series, so the position of a value in the sequence read by the recurrent encoder is not its date. The attribution follows the encoder's order, not the calendar. The last five of the 60 steps the encoder reads receive 52\% of HIST's attribution and the first five 0.9\%; the figures are 32\% and 5.3\% for FinFormer, and 23\% and 7.5\% for DiscoverPLF. The features that dominate the Alpha360 rankings are those that the reshape places on the last step, such as VWAP59 and VWAP9 (Section~\ref{sec:res_agreement}). They are an artefact of the implementation, not a property of the market.
+
+\paragraph{The models' own weights tell a different story.} Over the 42 explained runs of each model, the intrinsic weights of Section~\ref{sec:xm_methods} show three things. First, the market acts through them. MASTER's feature gate rescales the features by a factor between 0.54 and 1.84 on average per run (0.39 to 2.82 at the extremes), with a day-to-day standard deviation of 0.12; MATCC's market filter shifts the standardised features by up to $\pm 2$, by 0.17 on average. On MASTER's DJI run of 2020 the features the gate up-weights are barely those IG finds important (Spearman 0.32, one feature in common in the top ten): the gate amplifies inputs that the rest of the network uses little. Second, \emph{attention is not attribution}. MASTER's final temporal attention puts 93\% of its weight on the last three days of the window (73--99.7\% across runs), and practically all of it on the last five, whereas IG gives those three days 41\% of the attribution. MATCC's temporal attention puts 63\% on the last day, where IG puts 11\%. Third, the attention among stocks is uniform. Its normalised entropy is 0.997 for MASTER, 1.000 for MATCC and 0.98 for FinFormer's dynamic attention, where 1 means every stock attends equally to every other. A uniform attention gives each stock the average representation of the day, a common market term rather than a selection of related stocks. Only FinFormer's static attention, restricted to the sector and industry graph, is concentrated (entropy 0.45). Its fusion gate takes 43\% of each stock's final representation from the other stocks, with almost no variation between stocks (standard deviation 0.014).
+
+% TODO: example of a local explanation (T x F heatmap of one stock-day, MASTER DJI 2020, notebook 05), if space allows.
 
 % ===========================================================================
 \section{Do the Explanations Agree?}
 \label{sec:res_agreement}
 
-% TODO (notebook 07, C5): agreement of the importance rankings between runs that differ in one factor only (seed,
-% model, year, universe), at the levels of families and features; model x model agreement per universe; the variance
-% decomposition table (model, universe, year, interactions, seed). Preliminary (FactorVAE and MATCC, seeds 0 and 5):
-% family agreement seed 0.86 > year 0.83 > universe 0.75 ~ model 0.74; feature agreement model 0.22; seed variance
-% about three times the model main effect.
+The global importance of a run is a vector over features or families. Two runs are compared only if they differ in exactly one factor, so that the agreement isolates the effect of that factor: another seed (same model, universe and year: training randomness), another model (same feature group, universe, year and seed: architecture), another test year (non-stationarity of the data and a shifted training window) or another universe. Agreement is measured with the rank correlations and overlaps of Section~\ref{sec:rw_eval}; Table~\ref{tab:res_agreement} reports the means over all such pairs.
+
+\input{tables/res_agreement}
+
+\paragraph{The models agree on the kind of information, not on the features.} Within the Alpha158 group, where all seven families can be compared, two runs rank the families with a Spearman correlation between 0.74 (another model) and 0.84 (another year). Across the two groups only three families are shared, and every model in every universe ranks them in the same order: momentum, volume, candle. At the level of single features the agreement collapses. Two seeds of the same model correlate at 0.59, two models of the same group at 0.27, and two models share on average one feature in their top ten (Jaccard 0.10). No Alpha158 feature is among the ten most important in half of the runs; in Alpha360, only VWAP59 and VWAP9 are, for the layout reason given above. The ordering of the factors is the same at both levels: another architecture changes the explanation most, another seed or universe less, another test year least.
+
+\paragraph{For half of the models, a new seed changes the explanation as much as a new architecture.} Table~\ref{tab:res_agreement_models} breaks the feature-level agreement down by model. MASTER agrees with its own other seeds (0.29) no more than with the other Alpha158 models (0.28), and the same holds for FactorVAE (0.27 and 0.22). FinFormer is unstable along every dimension: 0.33 with its other seeds, 0.09 with the other Alpha360 models, 0.34 with the next test year. For these three models the explanation of a single run says as much about its seed as about its architecture. MATCC, HIST and DiscoverPLF are stable across seeds (0.84--0.95) and still disagree with the other models of their group (0.28--0.37).
+
+\input{tables/res_agreement_models}
+
+\paragraph{The seed leaves a mark that outlasts the training window.} Two consecutive test years of the same model and seed are trained on windows that share three of their four training years, from the same initial weights and with the same order of the batches. For MASTER they agree at 0.72, against 0.29 for two seeds trained on exactly the same data; for FactorVAE, at 0.56 against 0.27. Changing the starting point of the optimisation moves the explanation much more than changing a quarter of the training data. A plausible mechanism is the selection rule: on a trial run, the epoch kept by FinBench's rule is so early that MASTER's, HIST's and FactorVAE's weights are only about 5\% away from their initial values (Section~\ref{sec:xm_evaluation}), so the trained model inherits much of the structure of its initialisation. % TODO: confirm with the final notebook 06.
+
+\paragraph{Most of the variance is training randomness.} Table~\ref{tab:res_variance} splits the variance of each family's net share across the runs of a feature group into the main effects of model, universe and test year, their interactions, and the residual spread of the three seeds within each model, universe and year. Within the Alpha158 group the seed is the largest source (43\%), followed by the interactions (31\%); the architecture accounts for 11\%, the test year for 9\% and the universe for 6\%. The seed dominates trend (60\%), position (57\%) and volatility (46\%); only for price-volume do the model and the universe (23% and 20%) matter more than the seed. Within the Alpha360 group the model accounts for half of the variance (49\%) and the seed for 27\%, but the differences between these models follow the order in which each one reads the misplaced columns. Pooling all six models on the three shared families would attribute 92\% of the variance to the model, but this only reflects the two input sets: 82\% of the Alpha360 columns are prices assigned to momentum.
+
+\input{tables/res_variance}
 
 % ===========================================================================
 \section{Score Drivers and Portfolio Drivers}
 \label{sec:res_portfolio}
 
-% TODO (notebooks 05-07): IG of the score and of the top-k margin are almost identical (Spearman ~1); permutation
-% importance separates ranking skill (drop in RankIC, about zero for every family) from portfolio impact (share of
-% the top-k replaced, 18-60%): the portfolio depends on families that carry no measurable skill. Link with the
-% fragility of Chapter 7.
+\paragraph{Portfolio membership has the same explanation as the score.} The top-$k$ margin of Equation~\ref{eq:xm_margin} is attributed to the same inputs as the score. For every model, IG of the two targets ranks the features identically (Spearman 1.00) and shares 97--100\% of the top ten. The margin is the score minus the score of the stock at the boundary, and a stock's own inputs barely move the other stocks' scores, so the two gradients coincide. Explaining why a stock is in the portfolio is therefore the same as explaining its score.
+
+\paragraph{The inputs that move the portfolio are not those that carry the skill.} Permutation importance separates two things that the gradients cannot: what a family does to the portfolio and what it contributes to the ranking skill. Shuffling a family across the stocks of a day replaces a large part of the portfolio. Momentum replaces 80--82\% of the top $k$ of the Alpha360 models. In the Alpha158 models, position, momentum and trend each replace 33--59\%, and even the candle, with 8\% of the attribution, replaces 19--28\%. The same shuffles leave the RankIC unchanged: the drop is at most 0.008 for every model and family, the size of the models' own RankIC, and in 14 of the 30 model--family pairs shuffling actually \emph{raises} it. Within each run, the ranking of the families by the drop in RankIC is unrelated to their ranking by portfolio impact (Spearman $-0.12$ to $0.13$ by model). The portfolio depends on inputs that carry no measurable predictive skill: the families decide which stocks are held, but not whether holding them pays. Chapter~\ref{ch:portfolio} measures how close these decisions are to being reversed.
 
 % ===========================================================================
 \section{Periods and Regimes}
 \label{sec:res_periods}
 
-% TODO (notebook 08, C4b): RankIC and excess returns in 2020 and 2022 against the calm years; family shares per year
-% and their shift between regimes; year-to-year drift of the explanations (transitions involving a volatile year
-% against calm ones).
+The test years cover two kinds of market (Section~\ref{sec:data_volatility}). The volatility of the indexes is 27--31\% in 2020 and 19--32\% in 2022, against 11--18\% in 2021, 2023 and 2024.
+
+\paragraph{High volatility is not one regime for the models.} 2020, the year of the COVID-19 crash and rebound, is the best test year for five of the six models (mean RankIC 0.023--0.038; only DiscoverPLF does better in 2023). 2022, the rate-driven bear market, is negative for five of the six (from $-0.001$ for HIST to $-0.043$ for FactorVAE; DiscoverPLF $+0.001$). Pooled into one ``high-volatility'' regime, the two years cancel out. Across universes and years, the mean RankIC is unrelated to the volatility of the index (correlation $-0.06$). What matters is the kind of market, not how much it moves. The portfolios split the same way. Against the equal-weight benchmark, MASTER, MATCC, FactorVAE and FinFormer gain 4--6\% in 2020, while HIST and DiscoverPLF lose 3--6\%. Every model loses in 2024, by 4.7--10.7\%. In the calm years only 30--44\% of the runs beat the benchmark, as expected from a skill close to zero and the cost of concentrating on $k$ stocks.
+
+\paragraph{The explanations do not change with the regime.} No net family share moves by more than about three percentage points between the calm and the volatile years. The shifts are small but consistent: the three Alpha158 models lose 1--3 points of momentum in the volatile years and gain 1.4--1.8 points of trend. Between two consecutive test years of the same model, universe and seed, the families agree at 0.92 when both years are calm and at 0.93 when one of them is volatile. For the features the figures are 0.71 and 0.70. The regime changes what the models earn, not what they look at. This is consistent with models fitted on four-year windows that span several regimes, and with the previous sections: the explanations are shaped by the redundancy of the inputs and by the training randomness, not by the market of the test year.
 
 % ===========================================================================
 \section{Data or Model? The Diagnosis}
 \label{sec:res_diagnosis}
 
-% TODO (notebook 07 and the sanity check of Section 5.7, C5): apply the diagnosis logic of the guide (Step 7):
-% models agree and IC is low -> data-limited signal; models disagree with similar IC -> Rashomon, model-driven;
-% seeds disagree as much as models -> explanations unstable, no architectural conclusion. Weigh it with the sanity
-% check (HIST's attributions are fixed by its architecture; MASTER's and MATCC's follow the input deviations) and
-% with the fragility of the decisions (Chapter 7).
+The research design of the thesis anticipated three outcomes. If the models agree and all of them have little skill, the instability comes from the data, which carry a weak signal. If they disagree with similar skill, there are several equally good explanations, and the instability comes from the models (a Rashomon set). If seeds disagree as much as models, the explanations themselves are not stable enough to support any conclusion about the architectures. The results of this chapter fall into the first case at the coarse level and into the third at the fine level, and they rule out the second.
+
+\paragraph{Data-driven at the level of information.} Trained on identical inputs, the six architectures extract the same signal, of the same weak strength: a mean RankIC between $-0.009$ and $0.012$, with no model consistently better than the others (Section~\ref{sec:res_performance}). They rely on the same kinds of information in the same order: momentum first, then volume, and the three Alpha158 models spread their attribution over the seven families with shares within about three points of each other. The regime of the test year changes the skill but not the explanation. This is what a weak, persistent signal looks like when several models fit it.
+
+\paragraph{Undetermined at the level of features.} Inside each family the inputs are near-duplicates of each other: the correlation groups of Alpha158, and in Alpha360 sixty lags of six series. The data cannot say which duplicate deserves the credit, so the choice is left to whatever else differs between two runs. For MASTER, FactorVAE and FinFormer, that is above all the seed: their explanations change as much with a new seed as with a new architecture, and the seed accounts for the largest share of the variance of the Alpha158 family shares. The guide's third case applies to them. A single run's explanation cannot be taken as the explanation of the architecture.
+
+\paragraph{No architecture has a logic of its own.} MATCC, HIST and DiscoverPLF give stable explanations across seeds that differ from those of their group, and on its face this is the Rashomon pattern. Two checks weaken that reading. First, HIST's stability is not learned: on the trial runs of Section~\ref{sec:xm_evaluation}, its attributions are almost the same with the trained and with the initial weights (Spearman 0.99), and those of MASTER and MATCC remain close to them (0.72--0.87), whereas FactorVAE, DiscoverPLF and FinFormer pass the check (0.34--0.47). % TODO: final numbers of notebook 06.
+Second, the differences within the Alpha360 group follow the order in which each model reads the misplaced columns of the reference implementations, an accident of the code rather than a design choice. Neither kind of difference is evidence that one architecture has learned a different relation between the inputs and the returns.
+
+The instability of the models therefore comes from the \textbf{data}: their signal is weak and is spread over redundant inputs. Training randomness, and in places the implementation, decide how it is divided among those inputs. The architecture matters far less than its prominence in the literature would suggest. Chapter~\ref{ch:portfolio} shows that the same holds for the decisions: the portfolio depends on the families that move the scores, these families carry no measurable skill, and a large share of the held positions sits closer to the top-$k$ boundary than the change another seed would make to the stock's score.
 
 % ===========================================================================
 \section{Summary}
 \label{sec:res_summary}
 
-% TODO: after Sections 6.2-6.6.
+The six models predict weekly returns with a skill close to zero, whose sign changes with the universe, the year and the seed. Their explanations agree on the kind of information they use. The Alpha158 models spread their attribution evenly over the seven families, and the Alpha360 models put 68--79\% of it on past prices. They disagree on the individual features, and for half of the models a new seed changes the feature ranking as much as a new architecture does. Within the Alpha158 group the seed is the largest source of variance of the family shares (43\%) and the architecture a minor one (11\%). The Alpha360 models attribute their predictions according to the order in which a misplaced reshape feeds them the columns, not according to the calendar. The models' own attention concentrates where the gradients do not, and attends uniformly across stocks. Portfolio membership has the same explanation as the score, yet the families that change the portfolio carry no measurable skill. Market regimes change the skill and the returns, not the explanations. The instability is a property of the data, weak and redundant as they are, together with the training randomness, more than of the architectures.
