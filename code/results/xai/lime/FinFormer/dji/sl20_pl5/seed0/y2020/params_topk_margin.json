@@ -1,0 +1,14 @@
+{
+  "method": "lime",
+  "players": "families",
+  "absent": "day mean",
+  "n_samples": 200,
+  "kernel_width": 0.75,
+  "ridge": 1.0,
+  "seed": 0,
+  "target": "topk_margin",
+  "k": 5,
+  "rows": 738,
+  "days": 27,
+  "seconds": 29.4
+}
