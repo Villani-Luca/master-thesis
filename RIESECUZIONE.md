@@ -89,7 +89,7 @@ Stima: 6/11 sera – 7/11 mattina.
   (salta da solo ciò che è già fatto; ora calcola anche `intrinsic` e la colonna `net`). ~12–18 ore.
 - [ ] **C2. Shapley e LIME** (Step 6, controllo di IG), DJI 2020, tutti i modelli:
   `python code/scripts/explain.py --methods shapley lime --universes dji --years 2020`
-- [ ] **C3. Notebook 05** (`05_xai_single_model.ipynb`, già impostato su MASTER dji L = 5 seed 42 y2020):
+- [x] **C3. Notebook 05** (5/11: rieseguito su MASTER dji seed 42 y2020, Observations scritte) (`05_xai_single_model.ipynb`, già impostato su MASTER dji L = 5 seed 42 y2020):
   rieseguire e scrivere le **Observations**.
 - [ ] **C4. Notebook 06** (Step 6): rieseguire; scegliere e motivare il metodo principale e la misura per
   famiglia (`importance` lorda o `net`).
