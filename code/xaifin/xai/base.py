@@ -152,7 +152,7 @@ def save_attributions(adapter: ModelAdapter, method: str, target: str, result: d
     np.savez_compressed(out / f"attributions_{target}.npz", attr=result["attr"].astype(np.float16), date=result["date"],
                         ticker=result["ticker"], score=result["score"].astype(np.float32),
                         feature_names=np.array(adapter.feature_names))
-    meta = {**params, "target": target, "k": TOP_K[adapter.cfg.universe], "date_stride": REBALANCE_STRIDE,
+    meta = {"date_stride": REBALANCE_STRIDE, **params, "target": target, "k": TOP_K[adapter.cfg.universe],
             "rows": int(len(result["ticker"])), "days": int(len(np.unique(result["date"]))),
             "seconds": round(result["seconds"], 1), "device": str(adapter.device)}
     (out / f"params_{target}.json").write_text(json.dumps(meta, indent=2))

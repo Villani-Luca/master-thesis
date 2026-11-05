@@ -471,3 +471,32 @@
 2026-11-05 16:40:49  [6/6] HIST dji sl20_pl5 seed5 y2020: shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin, 27 days, 85 s
 2026-11-05 16:40:55  [9/9] MATCC dji sl20_pl5 seed5 y2020: shapley/pred, shapley/topk_margin, lime/pred, lime/topk_margin, 27 days, 81 s
 2026-11-05 16:45:49  [35/42] DiscoverPLF sx5e sl20_pl5 seed42 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 27 days, 526 s
+2026-11-05 16:52:25  [36/42] DiscoverPLF sx5e sl20_pl5 seed42 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 396 s
+2026-11-05 16:56:52  explain: 84 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 16:56:52  explain: 252 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 16:56:52  explain: 168 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 17:00:38  [1/252] FactorVAE dji sl5_pl1 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 227 s
+2026-11-05 17:00:43  [1/168] FinFormer dji sl5_pl1 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 231 s
+2026-11-05 17:04:07  [37/42] DiscoverPLF sx5e sl20_pl5 seed42 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 26 days, 702 s
+2026-11-05 17:04:25  [2/252] FactorVAE dji sl5_pl1 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 226 s
+2026-11-05 17:04:36  [2/168] FinFormer dji sl5_pl1 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 233 s
+2026-11-05 17:06:22  [1/84] DiscoverPLF dji sl5_pl1 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 570 s
+2026-11-05 17:08:13  [3/252] FactorVAE dji sl5_pl1 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 229 s
+2026-11-05 17:08:34  [3/168] FinFormer dji sl5_pl1 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 237 s
+2026-11-05 17:12:11  [4/252] FactorVAE dji sl5_pl1 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 238 s
+2026-11-05 17:12:43  [4/168] FinFormer dji sl5_pl1 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 249 s
+2026-11-05 17:15:04  explain: 168 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 17:15:04  explain: 30 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 17:15:04  explain: 54 runs, methods=['ig', 'saliency', 'permutation', 'intrinsic'], targets=['pred', 'topk_margin']
+2026-11-05 17:15:04  [1/54] DiscoverPLF dji sl5_pl1 seed0 y2020: done already
+2026-11-05 17:15:30  [1/168] MASTER dji sl5_pl1 seed0 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 26 s
+2026-11-05 17:16:01  [2/168] MASTER dji sl5_pl1 seed0 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 31 s
+2026-11-05 17:16:24  [5/252] FactorVAE dji sl5_pl1 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation, 14 days, 252 s
+2026-11-05 17:16:32  [3/168] MASTER dji sl5_pl1 seed0 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 31 s
+2026-11-05 17:17:06  [4/168] MASTER dji sl5_pl1 seed0 y2023: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 34 s
+2026-11-05 17:17:26  [5/168] FinFormer dji sl5_pl1 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 283 s
+2026-11-05 17:17:37  [5/168] MASTER dji sl5_pl1 seed0 y2024: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 30 s
+2026-11-05 17:18:08  [6/168] MASTER dji sl5_pl1 seed42 y2020: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 31 s
+2026-11-05 17:18:36  explain: 3 runs, methods=['shapley', 'lime'], targets=['pred', 'topk_margin']
+2026-11-05 17:18:39  [7/168] MASTER dji sl5_pl1 seed42 y2021: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 32 s
+2026-11-05 17:19:15  [8/168] MASTER dji sl5_pl1 seed42 y2022: ig/pred, ig/topk_margin, saliency/pred, saliency/topk_margin permutation intrinsic, 14 days, 36 s

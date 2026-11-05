@@ -228,11 +228,18 @@ Calendario rivisto il 2026-11-05 (rientro griglia e Step 5 fatti, D2 sezioni A e
 | 14–17 nov | correzioni del relatore |
 | **18 nov** | **consegna** (margine: 19 nov) |
 
+Aggiornamento 2026-11-05: le bozze sono scritte in prosa rifinita; Luca le rivede e le riscrive a mano dove vuole
+(~24.000 parole, 8–12 giorni). Quindi:
+riscrittura dei capitoli stabili (2, 3, 4, 7) dal 6/11 mentre si chiudono 5, 6, 8, 9; bozza dei contenuti al
+relatore il 10/11; riscrittura di 5, 6, 8, 9 e introduzione il 10–14/11; correzioni 14–17/11; consegna 18/11.
+Seduta di laurea obiettivo: 1/12/2026; caricamento su Esse3 entro il 19/11.
+
 ## Registro delle decisioni
 
 | Data | Decisione |
 |---|---|
 | 2026-10-22 | Scadenza 18/11, bozza ~10/11; scope tagliato (anche in THESIS_GUIDE.md) |
+| 2026-11-05 | **XAI esteso a L = 1 e L = 20 sui 3 universi core**, tutti i modelli e seed, una data di ribilanciamento su quattro (~13 giorni l'anno; `explain.py --horizons 1 20 --stride 4`, processi `logs/xai3_a|b|c.out`), per il fattore orizzonte dello Step 7. Gli universi grandi (S&P 500, STOXX Europe 600) restano senza spiegazioni: ~5× il costo del core per orizzonte, tutto su tutto ~3–4 settimane. Messaggio al relatore per confermare lo scopo |
 | 2026-11-05 | La scadenza formale del file della tesi è il 19/11; si tiene il 18/11 come obiettivo di lavoro. Calendario rivisto (sezione Calendario) |
 | 2026-10-22 | L = 1 e L = 20 obbligatori; la griglia intera gira sulla H200 dell'amico con `launch_grid.py` |
 | 2026-10-22 | `grid.py`/`train.sh` del repo aggiornati con tetto RAM, watchdog, THREADS = 2 (non usati dalla run in corso, che ha il suo orchestratore) |

@@ -2,7 +2,7 @@
 
     python code/scripts/explain.py --models MASTER --universes dji --years 2020
     python code/scripts/explain.py --methods ig saliency permutation --universes dji nasdaq100 sx5e
-    python code/scripts/explain.py --horizons 1 20 --seeds 42
+    python code/scripts/explain.py --horizons 1 20 --stride 4    # other horizons, every 4th rebalance date
 
 For every run with a checkpoint (default: L = 5, the three core universes, every seed and test
 year), on every other rebalance date of its test year (xai.base.explain_dates):
@@ -31,7 +31,7 @@ import numpy as np
 from xaifin.config import CORE_UNIVERSES, RESULTS_ROOT, SEEDS, TEST_YEARS, TOP_K
 from xaifin.models.registry import ADAPTERS, find_runs, get_adapter, load_run, run_config
 from xaifin.xai.aggregate import global_importance, input_table
-from xaifin.xai.base import TARGETS, explain_dates, explain_run, load_attributions, save_attributions, xai_dir
+from xaifin.xai.base import REBALANCE_STRIDE, TARGETS, explain_dates, explain_run, load_attributions, save_attributions, xai_dir
 from xaifin.xai.gradient import IntegratedGradients, Saliency
 from xaifin.xai.intrinsic import WEIGHTS, run_weights, stack_weights
 from xaifin.xai.permutation import FamilyPermutation, summarize
@@ -53,6 +53,8 @@ def main() -> None:
     parser.add_argument("--years", nargs="+", type=int, default=TEST_YEARS)
     parser.add_argument("--targets", nargs="+", default=list(TARGETS), choices=list(TARGETS))
     parser.add_argument("--device", default=None, help="cuda or cpu (default: cuda if available)")
+    parser.add_argument("--stride", type=int, default=REBALANCE_STRIDE,
+                        help="explain every n-th rebalance date (default: every other one)")
     parser.add_argument("--reaggregate", action="store_true", help="rebuild the global files of ig and saliency, then stop")
     args = parser.parse_args()
 
@@ -86,14 +88,14 @@ def main() -> None:
             continue
         t0 = time.time()
         adapter = load_run(run.path, device=args.device)
-        k, dates = TOP_K[run.universe], explain_dates(adapter)
+        k, dates = TOP_K[run.universe], explain_dates(adapter, args.stride)
         for method, target in todo:
             explainer = explainers[method]
             result = explain_run(adapter, explainer, target, k, dates, log=lambda m: None)
             if method in GROUP_METHODS:
                 save_group_values(adapter, explainer, target, result, k)
                 continue
-            out = save_attributions(adapter, explainer.name, target, result, explainer.params())
+            out = save_attributions(adapter, explainer.name, target, result, {**explainer.params(), "date_stride": args.stride})
             global_importance(result["attr"], result["date"], input_table(adapter)).to_parquet(out / f"global_{target}.parquet")
         if todo_perm:
             perm = explainers["permutation"]
@@ -102,13 +104,13 @@ def main() -> None:
             out.mkdir(parents=True, exist_ok=True)
             rows.to_parquet(out / "permutation.parquet")
             summarize(rows).to_parquet(out / "global.parquet")
-            (out / "params.json").write_text(json.dumps({**perm.params(), "k": k, "days": len(dates)}, indent=2))
+            (out / "params.json").write_text(json.dumps({**perm.params(), "k": k, "days": len(dates), "date_stride": args.stride}, indent=2))
         if todo_intr:
             weights = run_weights(adapter, dates)
             out = xai_dir("intrinsic", adapter)
             out.mkdir(parents=True, exist_ok=True)
             np.savez_compressed(out / "weights.npz", **stack_weights(weights))
-            (out / "params.json").write_text(json.dumps({"method": "intrinsic", "model": run.model, "days": len(dates),
+            (out / "params.json").write_text(json.dumps({"method": "intrinsic", "model": run.model, "days": len(dates), "date_stride": args.stride,
                                                          "replay_max_diff": weights["max_diff"]}, indent=2))
         log(f"{label}: {', '.join(f'{m}/{t}' for m, t in todo)}{' permutation' if todo_perm else ''}"
             f"{' intrinsic' if todo_intr else ''}, "
