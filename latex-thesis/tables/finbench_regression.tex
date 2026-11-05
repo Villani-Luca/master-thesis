@@ -1,6 +1,6 @@
 \begin{table}[tb]
 \centering
-\caption{Regression error of our runs and of FinBench~\cite{pederzoli2026finbench} (horizon $L=5$, lookback $T=20$), averaged over the test years and the seeds 0, 5, 42; $\pm$: standard deviation between seeds. $\Delta$: our error relative to FinBench's; the lower error is in bold. $^\dagger$Our SX5E test years are 2021--2024 (constituent history starts in September 2020), FinBench's 2020--2024.}
+\caption{Regression error of our runs and of FinBench~\cite{pederzoli2026finbench} at each horizon $L$ (with its lookback $T$), averaged over the test years and the seeds 0, 5, 42; $\pm$: standard deviation between seeds. $\Delta$: our error relative to FinBench's; the lower error is in bold. $^\dagger$Our SX5E and SXXP test years are 2021--2024 (constituent history starts in September 2020), FinBench's 2020--2024.}
 \begin{adjustbox}{max width=\textwidth}
 {\normalsize
 \setlength{\tabcolsep}{6pt}
@@ -11,26 +11,41 @@
 \cmidrule(lr){3-5} \cmidrule(lr){6-8}
  & & Ours & FinBench & $\Delta$ & Ours & FinBench & $\Delta$ \\
 \midrule
+\multicolumn{8}{l}{\textit{Horizon $L=5$, lookback $T=20$}} \\
 \multirow{6}{*}{DJI} & MASTER & \textbf{0.980} {\scriptsize$\pm$0.001} & 1.249 & -21.5\% & \textbf{0.746} {\scriptsize$\pm$0.000} & 0.859 & -13.1\% \\
- & MATCC & 1.491 {\scriptsize$\pm$0.009} & \textbf{1.130} & +32.0\% & 0.942 {\scriptsize$\pm$0.003} & \textbf{0.818} & +15.1\% \\
+ & MATCC & 1.501 {\scriptsize$\pm$0.005} & \textbf{1.130} & +32.8\% & 0.945 {\scriptsize$\pm$0.003} & \textbf{0.818} & +15.5\% \\
  & FactorVAE & \textbf{0.888} {\scriptsize$\pm$0.003} & 0.971 & -8.5\% & \textbf{0.725} {\scriptsize$\pm$0.002} & 0.758 & -4.4\% \\
- & HIST & \textbf{0.985} {\scriptsize$\pm$0.021} & 0.997 & -1.2\% & 0.748 {\scriptsize$\pm$0.009} & \textbf{0.747} & +0.2\% \\
- & DiscoverPLF & \textbf{1.187} {\scriptsize$\pm$0.068} & 1.211 & -2.0\% & \textbf{0.827} {\scriptsize$\pm$0.024} & 0.830 & -0.3\% \\
- & FinFormer & 2.467 {\scriptsize$\pm$0.428} & \textbf{1.657} & +48.9\% & 1.230 {\scriptsize$\pm$0.124} & \textbf{0.982} & +25.3\% \\
+ & HIST & \textbf{0.996} {\scriptsize$\pm$0.042} & 0.997 & -0.1\% & 0.752 {\scriptsize$\pm$0.017} & \textbf{0.747} & +0.7\% \\
+ & DiscoverPLF & \textbf{1.125} {\scriptsize$\pm$0.061} & 1.211 & -7.1\% & \textbf{0.804} {\scriptsize$\pm$0.022} & 0.830 & -3.2\% \\
+ & FinFormer & 2.261 {\scriptsize$\pm$0.562} & \textbf{1.657} & +36.4\% & 1.175 {\scriptsize$\pm$0.172} & \textbf{0.982} & +19.6\% \\
 \midrule
 \multirow{6}{*}{NASDAQ 100} & MASTER & \textbf{1.015} {\scriptsize$\pm$0.001} & 1.017 & -0.2\% & \textbf{0.718} {\scriptsize$\pm$0.001} & 0.720 & -0.3\% \\
- & MATCC & 1.731 {\scriptsize$\pm$0.020} & \textbf{1.713} & +1.1\% & 0.989 {\scriptsize$\pm$0.004} & \textbf{0.981} & +0.8\% \\
+ & MATCC & 1.734 {\scriptsize$\pm$0.033} & \textbf{1.713} & +1.2\% & 0.989 {\scriptsize$\pm$0.010} & \textbf{0.981} & +0.8\% \\
  & FactorVAE & \textbf{0.903} {\scriptsize$\pm$0.002} & 0.918 & -1.6\% & \textbf{0.718} {\scriptsize$\pm$0.000} & 0.725 & -0.9\% \\
- & HIST & 1.035 {\scriptsize$\pm$0.015} & \textbf{1.030} & +0.4\% & 0.723 {\scriptsize$\pm$0.006} & \textbf{0.721} & +0.3\% \\
- & DiscoverPLF & 1.154 {\scriptsize$\pm$0.039} & \textbf{1.104} & +4.5\% & 0.766 {\scriptsize$\pm$0.013} & \textbf{0.737} & +4.0\% \\
- & FinFormer & 2.403 {\scriptsize$\pm$0.180} & \textbf{1.458} & +64.8\% & 1.161 {\scriptsize$\pm$0.072} & \textbf{0.867} & +33.9\% \\
+ & HIST & 1.034 {\scriptsize$\pm$0.022} & \textbf{1.030} & +0.4\% & 0.722 {\scriptsize$\pm$0.008} & \textbf{0.721} & +0.2\% \\
+ & DiscoverPLF & 1.157 {\scriptsize$\pm$0.041} & \textbf{1.104} & +4.8\% & 0.767 {\scriptsize$\pm$0.013} & \textbf{0.737} & +4.0\% \\
+ & FinFormer & 2.237 {\scriptsize$\pm$0.416} & \textbf{1.458} & +53.4\% & 1.135 {\scriptsize$\pm$0.116} & \textbf{0.867} & +31.0\% \\
 \midrule
 \multirow{6}{*}{SX5E$^\dagger$} & MASTER & \textbf{1.004} {\scriptsize$\pm$0.001} & 1.097 & -8.4\% & \textbf{0.752} {\scriptsize$\pm$0.000} & 0.792 & -5.1\% \\
- & MATCC & 1.644 {\scriptsize$\pm$0.033} & \textbf{1.495} & +10.0\% & 0.995 {\scriptsize$\pm$0.014} & \textbf{0.941} & +5.8\% \\
- & FactorVAE & \textbf{0.944} {\scriptsize$\pm$0.002} & 0.960 & -1.7\% & \textbf{0.758} {\scriptsize$\pm$0.001} & 0.764 & -0.8\% \\
- & HIST & \textbf{1.068} {\scriptsize$\pm$0.047} & 1.113 & -4.0\% & \textbf{0.779} {\scriptsize$\pm$0.019} & 0.796 & -2.2\% \\
- & DiscoverPLF & 1.212 {\scriptsize$\pm$0.034} & \textbf{1.149} & +5.5\% & 0.836 {\scriptsize$\pm$0.012} & \textbf{0.811} & +3.1\% \\
- & FinFormer & 2.604 {\scriptsize$\pm$0.401} & \textbf{1.430} & +82.1\% & 1.293 {\scriptsize$\pm$0.126} & \textbf{0.922} & +40.2\% \\
+ & MATCC & 1.647 {\scriptsize$\pm$0.037} & \textbf{1.495} & +10.1\% & 0.995 {\scriptsize$\pm$0.013} & \textbf{0.941} & +5.7\% \\
+ & FactorVAE & \textbf{0.944} {\scriptsize$\pm$0.002} & 0.960 & -1.6\% & \textbf{0.758} {\scriptsize$\pm$0.001} & 0.764 & -0.8\% \\
+ & HIST & \textbf{1.094} {\scriptsize$\pm$0.100} & 1.113 & -1.7\% & \textbf{0.787} {\scriptsize$\pm$0.038} & 0.796 & -1.1\% \\
+ & DiscoverPLF & 1.191 {\scriptsize$\pm$0.014} & \textbf{1.149} & +3.6\% & 0.827 {\scriptsize$\pm$0.007} & \textbf{0.811} & +2.0\% \\
+ & FinFormer & 2.670 {\scriptsize$\pm$0.753} & \textbf{1.430} & +86.7\% & 1.281 {\scriptsize$\pm$0.179} & \textbf{0.922} & +39.0\% \\
+\midrule
+\multirow{6}{*}{S\&P 500} & MASTER & \textbf{1.034} {\scriptsize$\pm$0.003} & 1.037 & -0.2\% & 0.735 {\scriptsize$\pm$0.001} & \textbf{0.727} & +1.1\% \\
+ & MATCC & 1.427 {\scriptsize$\pm$0.048} & \textbf{1.271} & +12.3\% & 0.889 {\scriptsize$\pm$0.018} & \textbf{0.824} & +7.9\% \\
+ & FactorVAE & \textbf{0.882} {\scriptsize$\pm$0.001} & 0.889 & -0.8\% & \textbf{0.712} {\scriptsize$\pm$0.000} & 0.715 & -0.5\% \\
+ & HIST & 1.005 {\scriptsize$\pm$0.002} & 1.005 & -0.0\% & 0.720 {\scriptsize$\pm$0.001} & \textbf{0.711} & +1.3\% \\
+ & DiscoverPLF & \textbf{1.075} {\scriptsize$\pm$0.009} & 1.088 & -1.2\% & 0.748 {\scriptsize$\pm$0.003} & \textbf{0.744} & +0.6\% \\
+ & FinFormer & 2.326 {\scriptsize$\pm$0.215} & \textbf{1.677} & +38.7\% & 1.171 {\scriptsize$\pm$0.074} & \textbf{0.950} & +23.3\% \\
+\midrule
+\multirow{6}{*}{SXXP$^\dagger$} & MASTER & \textbf{1.030} {\scriptsize$\pm$0.001} & 1.051 & -2.0\% & \textbf{0.710} {\scriptsize$\pm$0.000} & 0.717 & -1.0\% \\
+ & MATCC & 1.115 {\scriptsize$\pm$0.061} & \textbf{1.047} & +6.5\% & \textbf{0.746} {\scriptsize$\pm$0.027} & 0.752 & -0.8\% \\
+ & FactorVAE & 0.849 {\scriptsize$\pm$0.002} & \textbf{0.836} & +1.5\% & 0.697 {\scriptsize$\pm$0.001} & \textbf{0.691} & +0.9\% \\
+ & HIST & \textbf{1.005} {\scriptsize$\pm$0.008} & 1.008 & -0.3\% & 0.697 {\scriptsize$\pm$0.003} & \textbf{0.693} & +0.5\% \\
+ & DiscoverPLF & 1.048 {\scriptsize$\pm$0.011} & \textbf{1.006} & +4.2\% & \textbf{0.714} {\scriptsize$\pm$0.004} & 0.717 & -0.4\% \\
+ & FinFormer & 2.216 {\scriptsize$\pm$0.048} & \textbf{1.544} & +43.5\% & 1.094 {\scriptsize$\pm$0.015} & \textbf{0.889} & +23.1\% \\
 \bottomrule
 \end{tabular}
 }

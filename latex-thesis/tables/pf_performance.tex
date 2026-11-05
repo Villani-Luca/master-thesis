@@ -1,0 +1,25 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lrrrrrrrrrr@{}}
+\toprule
+\textbf{Portfolio} & \multicolumn{2}{c}{\textbf{DJI}} & \multicolumn{2}{c}{\textbf{NASDAQ-100}} & \multicolumn{2}{c}{\textbf{S\&P 500}} & \multicolumn{2}{c}{\textbf{EURO STOXX 50}} & \multicolumn{2}{c}{\textbf{STOXX Europe 600}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11}
+ & CAGR & Sharpe & CAGR & Sharpe & CAGR & Sharpe & CAGR & Sharpe & CAGR & Sharpe \\
+\midrule
+MASTER & \textbf{+7.8} & 0.43 & +9.0 & 0.43 & +3.1 & 0.25 & \textbf{+12.0} & 0.68 & \textbf{+5.5} & 0.35 \\
+MATCC & +5.4 & 0.34 & +5.4 & 0.33 & +4.1 & 0.29 & +9.9 & 0.58 & -8.2 & -0.27 \\
+FactorVAE & \textbf{+11.4} & 0.57 & -5.7 & 0.02 & \textbf{+9.7} & 0.44 & +5.3 & 0.37 & -7.5 & -0.24 \\
+HIST & +4.7 & 0.31 & +9.4 & 0.43 & +0.6 & 0.19 & +9.7 & 0.57 & \textbf{+9.9} & 0.50 \\
+DiscoverPLF & \textbf{+8.0} & 0.44 & +5.9 & 0.34 & \textbf{+11.8} & 0.50 & +10.7 & 0.62 & +3.0 & 0.24 \\
+FinFormer & -0.1 & 0.11 & +8.0 & 0.39 & +0.4 & 0.19 & +6.8 & 0.44 & +1.8 & 0.19 \\
+\midrule
+equal weight & +5.9 & 0.39 & +9.6 & 0.51 & +9.2 & 0.51 & +10.9 & 0.72 & +5.3 & 0.43 \\
+index & +8.7 & 0.51 & +20.2 & 0.84 & +13.4 & 0.70 & +8.2 & 0.54 & +6.0 & 0.49 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Long-only top-$k$ portfolios at $L = 5$ (seed 42), 2020--2024 (2021--2024 for the European universes): compound annual growth (\%) and Sharpe ratio of each model's portfolio, of the equal-weight portfolio of all the stocks the model ranks, and of the index. In bold, the CAGRs above the equal-weight benchmark.}
+\label{tab:pf_performance}
+\end{table}

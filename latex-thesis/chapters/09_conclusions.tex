@@ -1,15 +1,50 @@
 % ---------------------------------------------------------------------------
-% Chapter 9 - stub, 2026-10-27. Planned content: docs/thesis_topics.md, section 10 (chapter 9 here).
-% Fed by: Step 7 diagnosis; limitations in docs/thesis_topics.md section 10 (chapter 9 here).
+% Chapter 9 - Conclusions
+% Limitations and future work written 2026-11-05 (PIANO.md registry of 2026-11-04/05, docs/thesis_topics.md
+% section 10). Section 9.1 (answers to the research questions) waits for the Step 7 diagnosis.
 % ---------------------------------------------------------------------------
 
 \chapter{Conclusions}
 \label{ch:conclusions}
 
-\textit{To be written.}
+% TODO (after Chapter 6, RIESECUZIONE.md C5-C6): one short opening paragraph with the central answer.
 
-% Future work to discuss here (cut for the 18 November deadline, latex-thesis/notes/01):
-% SHAP/LIME on the whole grid; input-space counterfactuals; data-perturbation tests
-% (price noise, family ablation with retraining, delayed data, universe swap); monthly
-% attribution series; LightGBM/TreeSHAP reference; retraining the Alpha360 models with
-% chronologically ordered inputs (Section \ref{sec:fw_issues}).
+% ===========================================================================
+\section{Answers to the Research Questions}
+\label{sec:conc_answers}
+
+% TODO: one paragraph per research question of Section 1.2, with the evidence from Chapters 6 and 7:
+% RQ1 features, families and lags; RQ2 agreement across models and seeds; RQ3 the data-or-model diagnosis;
+% RQ4 periods and regimes; RQ5 allocation: score and portfolio drivers, fragility of the decisions (46-77% of the
+% held positions within their seed noise of the boundary, predicting the portfolio change between seeds).
+
+% ===========================================================================
+\section{Limitations}
+\label{sec:conc_limitations}
+
+\paragraph{Explaining weak models.} The six models predict a small signal, whose sign changes with the year, the universe and the seed (Section~\ref{sec:res_performance}). Their explanations describe what the models rely on, not what drives stock returns: a feature that a model uses heavily may carry no predictive information, as the permutation importance of Chapter~\ref{ch:results} shows for most feature families. % TODO: verify on the final runs (preliminary: FactorVAE and MATCC).
+The conclusions of this thesis are therefore about the models and their stability, not about the economics of the features.
+
+\paragraph{Data.} The universe of each test year is built, as in FinBench, from the members of the index at the start of the year, so the training years contain only stocks that were still members later, a survivorship effect shared with the benchmark. The data-quality filter removes the clearest errors of the price files, but not all of them: the penny prices of \texttt{ORRON.ST} above the threshold and some post-failure prices of Signature Bank remain in the data, and opening prices are checked only in the backtest (Section~\ref{sec:pf_protocol}).
+
+\paragraph{Inherited design choices.} To keep the results comparable with FinBench, some properties of the reference implementations were kept rather than corrected. The Alpha360 models read their 360 inputs in an order that does not follow time (Section~\ref{sec:fw_issues}), with the consequence that HIST ignores the values of the last day's price bar; FactorVAE's label covers the lookback rather than the horizon; and the rules that select the final weights of each model barely relate validation and test performance. A model retrained without these choices could behave, and be explained, differently.
+
+\paragraph{Reproducibility.} Training is seeded and reproducible on the same GPU, with one exception: MATCC uses non-deterministic GPU kernels, and its runs differ slightly when repeated. Across GPU models training is not reproducible even with the same code and seed; most runs of two of the three seeds at the main horizon were trained on a different GPU from those of the third (Section~\ref{sec:fw_reproduction}). Since the hardware acts as one more source of training randomness, part of what this thesis measures as seed variability is variability of the hardware.
+
+\paragraph{Portfolios.} The portfolios follow FinBench's long-only rule: equal weights, a fixed number of stocks, no transaction costs and the purchase at the open of each holding period. Turnover is reported, but the returns are gross. With daily rebalancing the purchase at the open removes the overnight returns, so the daily portfolios are comparable with their equal-weight benchmark but not with the index.
+
+\paragraph{Scope of the explanations.} The explanations cover the main horizon on the three core universes, every model, test year and seed, on every other weekly rebalance date. Exact Shapley values and LIME are computed on one universe and year only, as a check of the gradient attributions. The attributions depend on two choices discussed in Chapter~\ref{ch:xai_method}: the baseline, the average stock of the day, which makes the market features invisible to the gradient methods, and the joint integration path. Finally, the sanity check shows that for some models, HIST in particular, the attributions depend more on the architecture than on the trained weights (Section~\ref{sec:xm_evaluation}), which limits what their explanations can say about what the models learned.
+
+% ===========================================================================
+\section{Future Work}
+\label{sec:conc_future}
+
+\paragraph{Wider explanations.} The same pipeline can explain the daily and monthly horizons and the two large universes, which are already trained, and compute Shapley values on feature families for the whole grid, at a cost of one or two seconds per day and model.
+
+\paragraph{Counterfactuals.} The margins of Chapter~\ref{ch:portfolio} measure how far each decision is from changing; counterfactual explanations would say which change of the inputs would change it. Because Alpha features are deterministic and strongly correlated functions of a few price series, plausible counterfactuals should perturb the prices and volumes and recompute the features, rather than move single features independently.
+
+\paragraph{Robustness to the data.} Perturbing the inputs, by adding noise to the prices, removing a feature family and retraining, delaying the data or swapping the universe, would separate the dependence of the models on the data from their dependence on the training randomness more directly than the comparisons of this thesis.
+
+\paragraph{Correcting the inherited choices.} Retraining the Alpha360 models with their inputs in chronological order, FactorVAE with a label over the horizon, and every model with a selection rule that relates to the test performance would show which of the instabilities observed here belong to the architectures and which to their reference implementations. A tree-based model explained with exact TreeSHAP would give a reference of what the data allow.
+
+\paragraph{Reducing fragility.} Since about half of the held positions are decided by training randomness, a natural remedy is to average the scores of several seeds before ranking the stocks. The fragility measure of Chapter~\ref{ch:portfolio} predicts how much such an ensemble should stabilise the portfolio, and the prediction can be tested directly.

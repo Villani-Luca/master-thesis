@@ -1,0 +1,22 @@
+\begin{table}[htbp]
+\centering
+\small
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+\textbf{Model} & \multicolumn{2}{c}{\textbf{DJI}} & \multicolumn{2}{c}{\textbf{NASDAQ-100}} & \multicolumn{2}{c}{\textbf{EURO STOXX 50}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+ & fragile & changed & fragile & changed & fragile & changed \\
+\midrule
+MASTER & 61 & 57 & 67 & 62 & 56 & 51 \\
+MATCC & 66 & 64 & 77 & 72 & 63 & 57 \\
+FactorVAE & 47 & 40 & 55 & 47 & 46 & 40 \\
+HIST & 48 & 43 & 56 & 49 & 60 & 52 \\
+DiscoverPLF & 52 & 47 & 56 & 50 & 55 & 49 \\
+FinFormer & 76 & 69 & 67 & 53 & 63 & 55 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\caption{Fragility of the allocation decisions at $L = 5$. \emph{Fragile}: share (\%) of the held positions whose margin to the top-$k$ boundary is smaller than the seed noise of the stock's score on that day (standard deviation of its daily z-score across the three seeds). \emph{Changed}: share (\%) of the portfolio that differs between two seeds, averaged over pairs of seeds and rebalances.}
+\label{tab:pf_fragility}
+\end{table}

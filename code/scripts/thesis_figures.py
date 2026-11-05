@@ -10,6 +10,13 @@ the Step 1 summaries in results/data_summary/, notebook 01):
 - data_label_std (table): standard deviation of the label per year, before and after the filter;
 - data_alpha158_corr: |Spearman rho| between the Alpha158 features in cluster order, NASDAQ-100;
 - data_volatility: 20-day realized volatility of the market indexes, US and Europe.
+Chapter 6 (performance, from the results store, notebook 03):
+- res_rankic: mean test RankIC per model and test year, one heatmap per universe (L = 5);
+- res_horizons: mean test RankIC per model at the three horizons, with standard errors.
+Chapter 7 (portfolios, notebooks 04 and 09):
+- pf_performance, pf_fragility (tables): CAGR and Sharpe per model and universe; fragile holdings against seed turnover;
+- pf_equity: growth of 1 invested, seed 42, L = 5, DJI and NASDAQ-100;
+- pf_fragility_scatter: share of fragile holdings against the turnover observed between seeds.
 """
 
 import argparse
@@ -20,7 +27,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 from xaifin import viz
-from xaifin.config import CODE_ROOT, CORE_UNIVERSES, STUDY_END, STUDY_START, UNIVERSE_NAMES, UNIVERSES
+from xaifin.config import CODE_ROOT, CORE_UNIVERSES, RESULTS_ROOT, STUDY_END, STUDY_START, TOP_K, UNIVERSE_NAMES, UNIVERSES
 from xaifin.data.summary import summarize
 
 THESIS = CODE_ROOT.parent / "latex-thesis"
@@ -124,7 +131,166 @@ def data_volatility() -> Path:
     return save(fig, "data_volatility", 620)
 
 
-FIGURES = {f.__name__: f for f in (data_labels, data_label_std, data_alpha158_corr, data_volatility)}
+def _table(name: str, columns: str, header: list[str], body: list[str], caption: str) -> Path:
+    tex = "\n".join(["\\begin{table}[htbp]", "\\centering", "\\small", "\\begin{adjustbox}{max width=\\textwidth}",
+                     f"\\begin{{tabular}}{{{columns}}}", "\\toprule", *header, "\\midrule", *body, "\\bottomrule",
+                     "\\end{tabular}", "\\end{adjustbox}", f"\\caption{{{caption}}}", f"\\label{{tab:{name}}}", "\\end{table}", ""])
+    TABLES.mkdir(parents=True, exist_ok=True)
+    out = TABLES / f"{name}.tex"
+    out.write_text(tex, encoding="utf-8")
+    return out
+
+
+def pf_performance() -> Path:
+    """LaTeX table: CAGR and Sharpe of the seed-42 portfolios at L = 5 per model and universe, with the benchmarks
+    (results/analysis/portfolio_summary.csv, notebook 04)."""
+    s = pd.read_csv(RESULTS_ROOT / "analysis" / "portfolio_summary.csv")
+    rows = [*viz.MODEL_ORDER, "equal weight", "index"]
+    names = {u: UNIVERSE_NAMES[u].replace("&", "\\&") for u in UNIVERSES}
+    header = ["\\textbf{Portfolio} & " + " & ".join(f"\\multicolumn{{2}}{{c}}{{\\textbf{{{names[u]}}}}}" for u in UNIVERSES) + " \\\\",
+              " ".join(f"\\cmidrule(lr){{{2 + 2 * i}-{3 + 2 * i}}}" for i in range(len(UNIVERSES))),
+              " & " + " & ".join("CAGR & Sharpe" for _ in UNIVERSES) + " \\\\"]
+    body = []
+    for row in rows:
+        if row == "equal weight":
+            body.append("\\midrule")
+        cells = []
+        for u in UNIVERSES:
+            r = s[(s["universe"] == u) & (s["portfolio"] == row)]
+            ew = s[(s["universe"] == u) & (s["portfolio"] == "equal weight")].iloc[0]
+            if r.empty:
+                cells += ["--", "--"]
+                continue
+            r = r.iloc[0]
+            bold = row in viz.MODEL_ORDER and r["CAGR"] > ew["CAGR"]
+            cagr = f"{100 * r['CAGR']:+.1f}"
+            cells += [f"\\textbf{{{cagr}}}" if bold else cagr, f"{r['Sharpe']:.2f}"]
+        body.append(f"{row} & " + " & ".join(cells) + " \\\\")
+    return _table("pf_performance", "@{}l" + "rr" * len(UNIVERSES) + "@{}", header, body,
+                  "Long-only top-$k$ portfolios at $L = 5$ (seed 42), 2020--2024 (2021--2024 for the European universes): "
+                  "compound annual growth (\\%) and Sharpe ratio of each model's portfolio, of the equal-weight portfolio of all "
+                  "the stocks the model ranks, and of the index. In bold, the CAGRs above the equal-weight benchmark.")
+
+
+def pf_fragility() -> Path:
+    """LaTeX table: share of held positions closer to the boundary than their seed noise, against the turnover observed
+    between seeds (results/analysis/decision_fragility.csv, notebook 09)."""
+    f = pd.read_csv(RESULTS_ROOT / "analysis" / "decision_fragility.csv")
+    universes = [u for u in CORE_UNIVERSES if u in set(f["universe"])]
+    header = ["\\textbf{Model} & " + " & ".join(f"\\multicolumn{{2}}{{c}}{{\\textbf{{{UNIVERSE_NAMES[u]}}}}}" for u in universes) + " \\\\",
+              " ".join(f"\\cmidrule(lr){{{2 + 2 * i}-{3 + 2 * i}}}" for i in range(len(universes))),
+              " & " + " & ".join("fragile & changed" for _ in universes) + " \\\\"]
+    body = []
+    for model in viz.MODEL_ORDER:
+        cells = []
+        for u in universes:
+            r = f[(f["model"] == model) & (f["universe"] == u)].iloc[0]
+            cells += [f"{100 * r['share_below_noise']:.0f}", f"{100 * r['observed seed turnover']:.0f}"]
+        body.append(f"{model} & " + " & ".join(cells) + " \\\\")
+    return _table("pf_fragility", "@{}l" + "rr" * len(universes) + "@{}", header, body,
+                  "Fragility of the allocation decisions at $L = 5$. \\emph{Fragile}: share (\\%) of the held positions whose "
+                  "margin to the top-$k$ boundary is smaller than the seed noise of the stock's score on that day (standard "
+                  "deviation of its daily z-score across the three seeds). \\emph{Changed}: share (\\%) of the portfolio that "
+                  "differs between two seeds, averaged over pairs of seeds and rebalances.")
+
+
+def _metrics() -> pd.DataFrame:
+    from xaifin.training.rolling import collect_results
+
+    return collect_results()
+
+
+def res_rankic() -> Path:
+    """Model x test year heatmaps of the mean RankIC over seeds (L = 5), one per universe, on one shared scale."""
+    runs = _metrics()
+    runs = runs[runs["pred_len"] == 5]
+    cells = runs.groupby(["universe", "model", "test_year"])["RankIC"].mean().reset_index()
+    limit = float(cells["RankIC"].abs().max())
+    order = [*CORE_UNIVERSES, *[u for u in UNIVERSES if u not in CORE_UNIVERSES]]
+    fig = make_subplots(rows=2, cols=3, subplot_titles=[UNIVERSE_NAMES[u] for u in order], horizontal_spacing=0.04,
+                        vertical_spacing=0.14, shared_yaxes=True)
+    for i, universe in enumerate(order):
+        heat = viz.metric_heatmap(cells[cells["universe"] == universe], "RankIC", "").data[0]
+        heat.update(zmin=-limit, zmax=limit, showscale=i == 0, textfont=dict(size=10, color=LIGHT["text"]),
+                    colorbar=dict(title=dict(text="RankIC"), thickness=10, x=1.0, len=0.9))
+        fig.add_trace(heat, row=i // 3 + 1, col=i % 3 + 1)
+    fig.update_yaxes(autorange="reversed", showgrid=False)
+    fig.update_xaxes(type="category", showline=False)
+    viz._style(fig, "", False)
+    fig.update_annotations(font=dict(size=13, color=LIGHT["text"]))
+    return save(fig, "res_rankic", 560)
+
+
+def res_horizons() -> Path:
+    """Mean RankIC per model at L = 1, 5, 20 (over universes, years and seeds), error bars = standard error of the mean.
+    The horizon is ordinal, so it takes three steps of the sequential ramp rather than categorical hues."""
+    runs = _metrics()
+    stats = runs.groupby(["pred_len", "model"])["RankIC"].agg(["mean", "sem"]).reset_index()
+    ramp = LIGHT["ramp"]
+    fig = go.Figure()
+    for pred_len, color in zip((1, 5, 20), (ramp[2], ramp[4], ramp[6])):
+        d = stats[stats["pred_len"] == pred_len].set_index("model").reindex(viz.MODEL_ORDER)
+        fig.add_trace(go.Bar(x=viz.MODEL_ORDER, y=d["mean"], name=f"L = {pred_len}", marker_color=color,
+                             error_y=dict(type="data", array=d["sem"], color=LIGHT["text2"], thickness=1.2, width=4)))
+    fig.add_hline(y=0, line=dict(color=LIGHT["axis"], width=1))
+    fig.update_layout(barmode="group", bargap=0.25, bargroupgap=0.08)
+    fig.update_yaxes(title_text="Mean test RankIC", tickformat="+.3f")
+    viz._style(fig, "", False)
+    return save(fig, "res_horizons", 380)
+
+
+def pf_equity() -> Path:
+    """Growth of 1 invested in the seed-42 portfolios at L = 5 and in the two benchmarks, DJI and NASDAQ-100."""
+    import json
+
+    from xaifin.portfolio.backtest import find_portfolios
+
+    portfolios = find_portfolios()
+    portfolios = portfolios[(portfolios["pred_len"] == 5) & (portfolios["seed"] == 42) & (portfolios["k"] == portfolios["universe"].map(TOP_K))]
+    panels = ["dji", "nasdaq100"]
+    fig = make_subplots(rows=2, cols=1, vertical_spacing=0.1, subplot_titles=[UNIVERSE_NAMES[u] for u in panels])
+    fig.update_annotations(font=dict(size=13, color=LIGHT["text"]), x=0, xanchor="left")
+    for row, universe in enumerate(panels, 1):
+        curves = {}
+        for r in portfolios[portfolios["universe"] == universe].itertuples():
+            ret = pd.read_parquet(r.path / "returns.parquet").set_index("date")
+            curves[r.model] = (1 + ret["portfolio"]).cumprod()
+            bench = ret
+        curves = pd.DataFrame({m: curves[m] for m in viz.MODEL_ORDER if m in curves})
+        curves["equal weight"], curves["index"] = (1 + bench["equal_weight"]).cumprod(), (1 + bench["index"]).cumprod()
+        for trace in viz.equity_chart(curves, "").data:
+            fig.add_trace(trace.update(showlegend=row == 1), row=row, col=1)
+        fig.add_hline(y=1, line=dict(color=LIGHT["axis"], width=1), row=row, col=1)
+        fig.update_yaxes(title_text="Value of 1", row=row, col=1)
+    viz._style(fig, "", False)
+    fig.update_layout(legend=dict(orientation="h", x=0, xanchor="left", y=-0.08, yanchor="top"), margin=dict(b=80))
+    return save(fig, "pf_equity", 700)
+
+
+def pf_fragility_scatter() -> Path:
+    """Share of holdings within their seed noise of the boundary against the share of the portfolio that changes
+    between seeds; model = fixed color slot, universe = marker symbol; the dotted diagonal is equality."""
+    f = pd.read_csv(RESULTS_ROOT / "analysis" / "decision_fragility.csv")
+    symbols = dict(zip(CORE_UNIVERSES, ("circle", "square", "diamond")))
+    fig = go.Figure()
+    for i, model in enumerate(viz.MODEL_ORDER):
+        d = f[f["model"] == model]
+        fig.add_trace(go.Scatter(x=d["share_below_noise"], y=d["observed seed turnover"], mode="markers", name=model,
+                                 marker=dict(color=LIGHT["series"][i], size=11, symbol=[symbols[u] for u in d["universe"]],
+                                             line=dict(color="white", width=2))))
+    for universe, symbol in symbols.items():  # legend entries for the symbols, in neutral ink
+        fig.add_trace(go.Scatter(x=[None], y=[None], mode="markers", name=UNIVERSE_NAMES[universe],
+                                 marker=dict(color=LIGHT["muted"], size=10, symbol=symbol)))
+    fig.add_shape(type="line", x0=0.35, y0=0.35, x1=0.8, y1=0.8, line=dict(color=LIGHT["muted"], dash="dot", width=1))
+    fig.update_xaxes(title_text="Held positions closer to the boundary than their seed noise", tickformat=".0%", range=[0.35, 0.8])
+    fig.update_yaxes(title_text="Portfolio changed between two seeds", tickformat=".0%", range=[0.35, 0.8])
+    viz._style(fig, "", False)
+    fig.update_layout(legend=dict(orientation="v", x=1.02, xanchor="left", y=1, yanchor="top"))
+    return save(fig, "pf_fragility_scatter", 560)
+
+
+FIGURES = {f.__name__: f for f in (data_labels, data_label_std, data_alpha158_corr, data_volatility, pf_performance,
+                                   pf_fragility, res_rankic, res_horizons, pf_equity, pf_fragility_scatter)}
 
 
 def main() -> None:

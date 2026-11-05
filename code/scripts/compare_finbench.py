@@ -12,7 +12,9 @@ seeds, against finbench_table7.csv. Produce them first with
     python code/scripts/run_portfolio.py --k 5
 
 Writes results/analysis/finbench_comparison_{regression,portfolio}.csv and the thesis tables
-latex-thesis/tables/finbench_{regression,portfolio}.tex.
+latex-thesis/tables/finbench_{regression,portfolio}.tex (main horizon L = 5, for the body of the thesis) and
+finbench_{regression,portfolio}_horizons.tex (the three horizons, for the appendix). The portfolio tables keep
+the universes of FinBench's Table 7 (DJI, NASDAQ-100, EURO STOXX 50).
 """
 
 import json
@@ -28,6 +30,7 @@ TABLES = CODE_ROOT.parent / "latex-thesis" / "tables"
 UNIVERSE_NAMES = {"dji": "DJI", "nasdaq100": "NASDAQ 100", "sx5e": "SX5E", "sp500": "S\\&P 500", "sxxp": "SXXP"}
 MODEL_ORDER = ["MASTER", "MATCC", "FactorVAE", "HIST", "DiscoverPLF", "FinFormer"]
 PORTFOLIO_K = 5
+MAIN_PRED_LEN = 5  # the horizon of the tables in the body of the thesis
 
 
 def years_label(years) -> str:
@@ -67,6 +70,7 @@ def portfolio() -> pd.DataFrame:
                                                  seeds=("seed", "size"), index_CAGR=("index_CAGR", "mean"),
                                                  test_years=("test_years", "first")).reset_index()
     finbench = pd.read_csv(ANALYSIS / "finbench_table7.csv")
+    table = table[table["universe"].isin(finbench["universe"])]
     benchmark = finbench[finbench["model"] == "Benchmark"].drop(columns="model").rename(columns={"CAGR": "FB_index_CAGR"})
     finbench = finbench[finbench["model"] != "Benchmark"].rename(columns={"CAGR": "FB_CAGR"})
     table = table.merge(finbench, on=["model", "universe", "pred_len"], how="left")
@@ -109,7 +113,7 @@ def table_tex(body: list[str], columns: str, header: list[str], caption: str, la
         "\\end{tabular}", "}", "\\end{adjustbox}", f"\\label{{{label}}}", "\\end{table}", ""])
 
 
-def regression_tex(table: pd.DataFrame) -> str:
+def regression_tex(table: pd.DataFrame, label: str = "tab:finbench_regression") -> str:
     body, horizon = [], None
     for (pred_len, universe), g in table.groupby(["pred_len", "universe"], sort=False):
         if body:
@@ -134,12 +138,12 @@ def regression_tex(table: pd.DataFrame) -> str:
                "at each horizon $L$ (with its lookback $T$), "
                "averaged over the test years and the seeds 0, 5, 42; $\\pm$: standard deviation between seeds. "
                "$\\Delta$: our error relative to FinBench's; the lower error is in bold. "
-               "$^\\dagger$Our SX5E test years are 2021--2024 (constituent history starts in September 2020), "
+               "$^\\dagger$Our SX5E and SXXP test years are 2021--2024 (constituent history starts in September 2020), "
                "FinBench's 2020--2024.")
-    return table_tex(body, "llrrrrrr", header, caption, "tab:finbench_regression")
+    return table_tex(body, "llrrrrrr", header, caption, label)
 
 
-def portfolio_tex(table: pd.DataFrame) -> str:
+def portfolio_tex(table: pd.DataFrame, label: str = "tab:finbench_portfolio") -> str:
     body, horizon = [], None
     for (pred_len, universe), g in table.groupby(["pred_len", "universe"], sort=False):
         if body:
@@ -159,14 +163,16 @@ def portfolio_tex(table: pd.DataFrame) -> str:
                "over the seeds 0, 5, 42 ($\\pm$: standard deviation between seeds). Index: CAGR of the universe's "
                "index over the same days. --: not reported by FinBench. "
                "$^\\dagger$Our SX5E test years are 2021--2024, FinBench's 2020--2024.")
-    return table_tex(body, "llrr", header, caption, "tab:finbench_portfolio")
+    return table_tex(body, "llrr", header, caption, label)
 
 
 def main() -> None:
     TABLES.mkdir(parents=True, exist_ok=True)
     reg = ordered(regression())
     reg.to_csv(ANALYSIS / "finbench_comparison_regression.csv", index=False)
-    (TABLES / "finbench_regression.tex").write_text(regression_tex(reg), encoding="utf-8")
+    (TABLES / "finbench_regression.tex").write_text(regression_tex(reg[reg["pred_len"] == MAIN_PRED_LEN]), encoding="utf-8")
+    (TABLES / "finbench_regression_horizons.tex").write_text(regression_tex(reg, "tab:finbench_regression_horizons"),
+                                                             encoding="utf-8")
     with pd.option_context("display.width", 200, "display.precision", 3):
         print(reg[["universe", "model", "pred_len", "seeds", "test_years", "MSE", "MSE_sd", "FB_MSE", "delta_MSE_pct",
                    "MAE", "MAE_sd", "FB_MAE", "delta_MAE_pct"]].to_string(index=False))
@@ -178,7 +184,9 @@ def main() -> None:
         return
     port = ordered(port)
     port.to_csv(ANALYSIS / "finbench_comparison_portfolio.csv", index=False)
-    (TABLES / "finbench_portfolio.tex").write_text(portfolio_tex(port), encoding="utf-8")
+    (TABLES / "finbench_portfolio.tex").write_text(portfolio_tex(port[port["pred_len"] == MAIN_PRED_LEN]), encoding="utf-8")
+    (TABLES / "finbench_portfolio_horizons.tex").write_text(portfolio_tex(port, "tab:finbench_portfolio_horizons"),
+                                                            encoding="utf-8")
     with pd.option_context("display.width", 200, "display.precision", 3):
         print()
         print(port[["universe", "model", "pred_len", "seeds", "test_years", "CAGR", "CAGR_sd", "FB_CAGR",

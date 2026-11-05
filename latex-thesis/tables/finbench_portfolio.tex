@@ -1,0 +1,41 @@
+\begin{table}[tb]
+\centering
+\caption{CAGR of the long-only top-5 portfolios (equal weights, rebalanced every $L$ trading days, the model's horizon) of our runs and of FinBench~\cite{pederzoli2026finbench} (Table 7), as a fraction; ours averaged over the seeds 0, 5, 42 ($\pm$: standard deviation between seeds). Index: CAGR of the universe's index over the same days. --: not reported by FinBench. $^\dagger$Our SX5E test years are 2021--2024, FinBench's 2020--2024.}
+\begin{adjustbox}{max width=\textwidth}
+{\normalsize
+\setlength{\tabcolsep}{6pt}
+
+\begin{tabular}{llrr}
+\toprule
+\textbf{Universe} & \textbf{Model} & \textbf{Ours} & \textbf{FinBench} \\
+\midrule
+\multicolumn{4}{l}{\textit{Horizon $L=5$, lookback $T=20$}} \\
+\multirow{7}{*}{DJI} & Index & 0.09 & 0.08 \\
+ & MASTER & 0.12 {\scriptsize$\pm$0.04} & -- \\
+ & MATCC & 0.02 {\scriptsize$\pm$0.03} & 0.02 \\
+ & FactorVAE & 0.12 {\scriptsize$\pm$0.02} & -- \\
+ & HIST & 0.04 {\scriptsize$\pm$0.04} & 0.03 \\
+ & DiscoverPLF & 0.05 {\scriptsize$\pm$0.02} & -- \\
+ & FinFormer & 0.03 {\scriptsize$\pm$0.06} & 0.05 \\
+\midrule
+\multirow{7}{*}{NASDAQ 100} & Index & 0.20 & 0.19 \\
+ & MASTER & 0.09 {\scriptsize$\pm$0.02} & -- \\
+ & MATCC & 0.04 {\scriptsize$\pm$0.07} & 0.05 \\
+ & FactorVAE & -0.09 {\scriptsize$\pm$0.06} & -- \\
+ & HIST & 0.01 {\scriptsize$\pm$0.12} & -0.07 \\
+ & DiscoverPLF & -0.00 {\scriptsize$\pm$0.12} & -- \\
+ & FinFormer & 0.03 {\scriptsize$\pm$0.11} & 0.02 \\
+\midrule
+\multirow{7}{*}{SX5E$^\dagger$} & Index & 0.08 & 0.06 \\
+ & MASTER & 0.07 {\scriptsize$\pm$0.06} & -- \\
+ & MATCC & 0.09 {\scriptsize$\pm$0.05} & 0.11 \\
+ & FactorVAE & 0.06 {\scriptsize$\pm$0.07} & -- \\
+ & HIST & 0.09 {\scriptsize$\pm$0.02} & 0.10 \\
+ & DiscoverPLF & 0.15 {\scriptsize$\pm$0.05} & -- \\
+ & FinFormer & 0.05 {\scriptsize$\pm$0.04} & 0.03 \\
+\bottomrule
+\end{tabular}
+}
+\end{adjustbox}
+\label{tab:finbench_portfolio}
+\end{table}

@@ -22,12 +22,14 @@ Errori: `grep -l Traceback logs/grid/*.log` e `grep Traceback logs/xai_*.err`.
 
 Stima: domani 5/11, pomeriggio o sera.
 
-- [ ] **A1. Verifica della riproduzione**
+- [x] **A1. Verifica della riproduzione** → 5/11 11:45: 99/117 identiche; le 18 diverse sono tutte e sole le MATCC
+  (RankIC ±0,008 in media, max 0,024; MSE ±0,016; un cambio di segno su 18). Registro di PIANO.md.
   `python code/scripts/check_reproduction.py`
   Atteso: `117/117 identical`, **tranne le run MATCC** (non deterministiche anche sulla stessa GPU, vedi registro
   2026-11-05): per MATCC registrare quante differiscono e di quanto, e usare le nuove. Se qualche run è "different", **fermarsi**: i numeri dei seed 42 già nei
   notebook e nella tesi andrebbero rivisti (scrivere nel registro di PIANO.md).
-- [ ] **A2. Portafogli delle run riaddestrate**
+- [x] **A2. Portafogli delle run riaddestrate** (5/11: L = 5 core ricalcolati con k di default e k = 5; 432
+  portafogli con parquet, nessun rendimento giornaliero > 50%)
   ```
   python code/scripts/run_portfolio.py
   python code/scripts/run_portfolio.py --k 5 --universes dji nasdaq100 sx5e
@@ -37,25 +39,28 @@ Stima: domani 5/11, pomeriggio o sera.
   ricalcola uguali. Se si vuole limitare il `--force` al solo L = 5, va bene anche rifare tutto: dji e sx5e
   non cambiano con la regola delle aperture, nasdaq100 è già ricalcolato.
   Controllo: nessun portafoglio con rendimenti giornalieri > 50% (il controllo fatto il 4/11 è in PIANO.md).
-- [ ] **A3. Notebook 03** (`code/notebooks/03_rolling_training.ipynb`): rieseguire tutto. Rigenera
+- [x] **A3. Notebook 03** (5/11: rieseguito, 1242 run in `metrics_summary.csv`, Observations riscritte) (`code/notebooks/03_rolling_training.ipynb`): rieseguire tutto. Rigenera
   `code/results/analysis/metrics_summary.csv` con tutte le 1242 run. Riscrivere le **Observations**: i seed 0/5
   a L = 5 sono quelli della H200 (diversi dagli originali persi), più la nuova sezione 7 sugli orizzonti.
-- [ ] **A4. Notebook 04** (`04_portfolio_baseline.ipynb`): rieseguire tutto (rigenera `portfolio_summary.csv`,
+- [x] **A4. Notebook 04** (5/11: rieseguito, Observations riscritte) (`04_portfolio_baseline.ipynb`): rieseguire tutto (rigenera `portfolio_summary.csv`,
   `portfolio_margins.csv`, `portfolio_horizons.csv`). Riscrivere le **Observations** (nuova sezione 6 sugli
   orizzonti; a L = 1 portafogli ed equal weight perdono il rendimento notturno, vedi registro).
-- [ ] **A4b. Notebook 09** (`09_decision_fragility.ipynb`, Step 9.1): rieseguire con i tre seed (salva
+- [x] **A4b. Notebook 09** (5/11: rieseguito con i tre seed, Observations scritte) (`09_decision_fragility.ipynb`, Step 9.1): rieseguire con i tre seed (salva
   `results/analysis/decision_fragility.csv`) e scrivere le **Observations**.
-- [ ] **A5. Confronto con FinBench**: `python code/scripts/compare_finbench.py` (dopo A3, perché legge
+- [x] **A5. Confronto con FinBench** (5/11: tabelle principali a L = 5 e complete per l'appendice `*_horizons.tex`;
+  portafogli solo sugli universi della Table 7): `python code/scripts/compare_finbench.py` (dopo A3, perché legge
   `metrics_summary.csv`). Scrive `latex-thesis/tables/finbench_regression.tex` e `finbench_portfolio.tex`
   con i tre orizzonti.
-- [ ] **A6. Tesi, `04_framework.tex`**:
+- [x] **A6. Tesi, `04_framework.tex`** (5/11: paragrafi su training, riproducibilità, confronto FinBench su tre
+  orizzonti e Table 7, riassunto; nuova appendice `98_appendix.tex` con le tabelle per orizzonte):
   - riscrivere il paragrafo "252 runs ... 88 hours on a single RTX 5090": 117 run sulla RTX 5090, 1125 sulla
     H200 NVL (~12 giorni, ~919 ore-GPU sommate sulle run); training riproducibile sulla stessa GPU (A1), non tra
     GPU diverse (i seed 0/5 rifatti sulla H200);
   - aggiornare il testo sulla Table finbench_regression ("Of the 18 model--universe pairs ..."), ora con tre
     orizzonti;
   - chiudere il TODO sul confronto con la Table 7 (`finbench_portfolio.tex`).
-- [ ] **A7. Tesi, cap. 7 (portafogli)**: regola sulle aperture inaffidabili (SBNY) e l'effetto apertura a L = 1.
+- [x] **A7. Tesi, cap. 7 (portafogli)** (5/11: protocollo e sezione dei risultati con le tabelle `pf_performance`
+  e `pf_fragility` da `thesis_figures.py`): regola sulle aperture inaffidabili (SBNY) e l'effetto apertura a L = 1.
 
 ## B. Quando finiscono i 3 processi del batch XAI
 
@@ -66,9 +71,9 @@ fatti (`--reaggregate --models FactorVAE MATCC MASTER`, `--methods intrinsic --m
 DiscoverPLF (processo a). Processo b (FinFormer, HIST) finito il 5/11 alle ~07:40: B1 fatto
 (`--reaggregate --models FinFormer HIST`), B2 fatto (pesi interni di 28 run FinFormer).
 
-- [ ] **B1. Ricostruire i file globali** (aggiunge la colonna `net`, che i processi partiti il 4/11 non scrivono):
+- [x] **B1. Ricostruire i file globali** (aggiunge la colonna `net`, che i processi partiti il 4/11 non scrivono):
   `python code/scripts/explain.py --reaggregate`
-- [ ] **B2. Pesi interni** di MASTER, MATCC, FinFormer (pochi secondi a run):
+- [x] **B2. Pesi interni** di MASTER, MATCC, FinFormer (pochi secondi a run):
   `python code/scripts/explain.py --methods intrinsic`
 
 ## C. Quando A e B sono finiti

@@ -49,7 +49,34 @@ where $s_{(j)}$ is the $j$-th highest score of the day. A held stock leaves the 
 \section{Results}
 \label{sec:pf_results}
 
-% TODO (RIESECUZIONE.md A4): performance per universe and horizon against the benchmarks (notebook 04 sections 2 and 6),
-% overlap between models and between seeds (sections 4-5), distribution of the margins (section 3),
-% comparison with FinBench's Table 7 (also in Chapter 4), fragility of the decisions against seed noise (Step 9.1).
-\textit{To be written once the portfolios of the full grid are computed.}
+% Sources: notebooks 04_portfolio_baseline and 09_decision_fragility (2026-11-05); tables from code/scripts/thesis_figures.py.
+
+\paragraph{Few portfolios beat holding the whole universe.} Table~\ref{tab:pf_performance} reports the portfolios of seed 42 at the main horizon. On the DJI three models grow faster than the equal-weight benchmark (5.9\% a year) and have a higher Sharpe ratio: MASTER, FactorVAE and DiscoverPLF. On the NASDAQ-100 no model does; the index itself grows by 20\% a year, driven by a handful of large technology stocks that an equal-weight selection of ten stocks rarely holds. On the S\&P 500 FactorVAE and DiscoverPLF grow faster than the benchmark but with a lower Sharpe ratio; on the EURO STOXX 50 only MASTER, by one point; on the STOXX Europe 600 MASTER and HIST, and only HIST on a risk-adjusted basis. Across universes the models' growth ranges from $-8\%$ to $+12\%$ a year. Holding five or ten stocks instead of the whole universe makes the portfolios more volatile (24\% against 19\% on the DJI, 31--36\% against 22--24\% on the two large US universes) and exposes them to deeper drawdowns, down to $-59\%$ on the NASDAQ-100.
+
+\input{tables/pf_performance.tex}
+
+\paragraph{The market decides the year.} In 2022, 28 of the 30 portfolios of seed 42 lose money, between $-47\%$ and $+4\%$; in 2023 all 30 gain. The yearly result follows the market far more than the model's choice of stocks. The portfolios also trade a lot: each weekly rebalance replaces 27\% to 90\% of the stocks held. The other horizons do not change the picture: the share of portfolios with a higher Sharpe ratio than the equal-weight benchmark is 39\% with daily rebalancing, 18\% with weekly and 24\% with monthly rebalancing, and on average the portfolios grow 0.3, 2.9 and 2.7 points a year less than the benchmark. With daily rebalancing both portfolios and benchmark earn only open-to-close returns (Section~\ref{sec:pf_protocol}), so their growth rates are not comparable with those of the other horizons or of the index.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/results/pf_equity.pdf}
+    \caption{Growth of one unit invested in the top-$k$ portfolios of seed 42 at $L = 5$, in the equal-weight portfolio of all the candidate stocks (dashed) and in the index (dotted), for the DJI ($k = 5$) and the NASDAQ-100 ($k = 10$). All portfolios fall with the market in March 2020 and through 2022.}
+    \label{fig:pf_equity}
+\end{figure}
+
+\paragraph{Different models choose different stocks.} Two models of the same seed share on average 18\% of their stocks on the DJI and the EURO STOXX 50, 15\% on the NASDAQ-100 and 6--7\% on the two large universes, against 9\%, 11\%, 5\% and about 1\% for two random portfolios of the same size. The models therefore agree more than chance, but their portfolios are mostly different. The closest pairs share their feature set: MASTER and FactorVAE (Alpha158; 25\% on the DJI and the EURO STOXX 50), HIST and DiscoverPLF (27\% on the EURO STOXX 50) and HIST and FinFormer (25\% on the NASDAQ-100) (Alpha360), a first indication that the input data shapes the choices, which Chapter~\ref{ch:results} examines through the explanations.
+
+\paragraph{The same model with another seed also chooses different stocks.} Two seeds of one model share between 4\% and 49\% of their stocks, depending on the model and the universe: MATCC 4--29\%, MASTER 13--35\%, FinFormer 16--38\%, HIST 21--49\%, DiscoverPLF 24--41\% and FactorVAE 30--48\%. This is only somewhat more than two different models share. The growth of a model's three seeds differs by 7 points a year for the median model and universe and by up to 14 points (HIST on the STOXX Europe 600), so that a ranking of the models by return can change with the seed: any comparison of architectures has to average over seeds and report their spread.
+
+\paragraph{Why the portfolios change: decisions within training noise.} The margins of Section~\ref{sec:pf_fragility} explain this instability. The median held stock is only 0.12 to 0.64 standard deviations of the day's scores away from being replaced, and 11--45\% of the holdings are within 0.1 standard deviations of the boundary. Retraining the model with another seed moves a stock's score in the cross-section by 0.37 to 0.86 standard deviations (median over stock-days, per model and universe). Table~\ref{tab:pf_fragility} and Figure~\ref{fig:pf_fragility} compare the two: between 46\% (FactorVAE) and 77\% (MATCC) of the held positions are closer to the boundary than their seed noise, i.e.\ whether they are held depends on training luck. This share predicts the share of the portfolio that actually changes between two seeds, 40--72\%, with a correlation of 0.96 across models and universes; with three seeds it overstates it by about six points, because the spread of three seeds is larger than the difference between two of them. FactorVAE, whose selection rule keeps an almost untrained model, is the least fragile; MATCC and FinFormer are the most fragile. The instability of the allocation between seeds is therefore not a separate phenomenon: it is the training noise of the scores acting on positions that are close to the boundary.
+
+\input{tables/pf_fragility.tex}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{images/results/pf_fragility_scatter.pdf}
+    \caption{For each model (color) and universe (marker), the share of the held positions whose margin to the top-$k$ boundary is smaller than the seed noise of their score, against the share of the portfolio that actually differs between two seeds ($L = 5$, three seeds). The dotted line is equality.}
+    \label{fig:pf_fragility}
+\end{figure}
+
+% Counterfactuals (Step 9.2) are future work (Chapter 9).

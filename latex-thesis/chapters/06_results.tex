@@ -1,9 +1,99 @@
 % ---------------------------------------------------------------------------
-% Chapter 6 - stub, 2026-10-27. Planned content: docs/thesis_topics.md, section 6.
-% Fed by: Steps 3, 5, 7, 8 (notebooks 03, 05, 07, 08).
+% Chapter 6 - Results
+% Section 6.1 written 2026-11-05 from notebook 03_rolling_training (final, 1242 runs).
+% Sections 6.2-6.6: structure only, to be filled from notebooks 05, 07, 08 once the explanations of the
+% three seeds are complete (RIESECUZIONE.md, section C). Figures and tables: code/scripts/thesis_figures.py.
 % ---------------------------------------------------------------------------
 
 \chapter{Results}
 \label{ch:results}
 
-\textit{To be written.}
+This chapter reports what the models predict and what drives their predictions. Section~\ref{sec:res_performance} measures the predictive skill of the six models across universes, years, seeds and horizons: the signal is the starting point of every later question. Section~\ref{sec:res_inputs} describes which inputs the models rely on, Section~\ref{sec:res_agreement} whether different seeds, models, years and universes rely on the same ones, Section~\ref{sec:res_portfolio} whether the inputs that drive the scores also drive the portfolio, and Section~\ref{sec:res_periods} how all this changes with the market regime. Section~\ref{sec:res_diagnosis} brings the results together to answer the central question of the thesis: whether the instability of the predictions comes from the data or from the models.
+
+% ===========================================================================
+\section{How Well Do the Models Predict?}
+\label{sec:res_performance}
+
+All the models are evaluated on the test years of the rolling protocol with the rank information coefficient (RankIC), the daily Spearman correlation between the scores and the realised returns, averaged over the test year. A model with no skill has an expected RankIC of zero and a positive RankIC in about half of its runs.
+
+\paragraph{The signal is weak everywhere.} At the main horizon ($L = 5$), each model's mean RankIC over its 69 runs (five universes, five or four test years, three seeds) lies between $-0.008$ (FactorVAE) and $+0.008$ (HIST). RankIC is positive in 41\% (FactorVAE) to 64\% (MATCC, FinFormer) of the runs. Since the labels of consecutive days overlap, the significance of a run is judged on non-overlapping weeks, with the $t$-statistic $\mathrm{RankICIR} \cdot \sqrt{252 / L}$: for every model except FactorVAE, at most 3 of 69 runs have $|t| \geq 2$. FactorVAE has more significant runs (30\%), but most of them are negative; its label covers $T$ rather than $L$ days (Section~\ref{sec:fw_issues}).
+
+\paragraph{The universe matters more than the model.} Figure~\ref{fig:res_rankic} shows the mean RankIC of each model and test year. On the DJI every model's average RankIC is positive (0.015 to 0.031); on the S\&P 500 it is small and positive (0.001 to 0.010); on the NASDAQ-100 it ranges from $-0.033$ (FactorVAE) to $+0.010$; on the two European universes most models are at or below zero. The sign changes from year to year within most rows; 2022, the rate-driven bear market, is negative for 18 of the 30 model--universe pairs, and for all six models on the NASDAQ-100. No model wins consistently: the best model of a universe and year is FactorVAE, HIST or MATCC in five of the 23 cells each, MASTER in four, FinFormer in three and DiscoverPLF in one, and the best run of a cell reaches a RankIC between 0.009 and 0.096.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/results/res_rankic.pdf}
+    \caption{Mean test RankIC over the three seeds, per model and test year, at $L = 5$. Blue: the scores rank the stocks in the right direction on average over the year; red: in the wrong direction. The European universes have no 2020 test year (Section~\ref{sec:data_universes}).}
+    \label{fig:res_rankic}
+\end{figure}
+
+\paragraph{Training luck is comparable to the differences between models.} Each cell of the grid is trained with three seeds, which change only the initial weights, the order of the training days and the dropout masks. Within a universe and year, the standard deviation of one model's RankIC across its seeds is 0.007--0.015, against 0.011--0.024 across the six models: training luck is half to two thirds of the differences between architectures. In 17\% (DJI) to 58\% (STOXX Europe 600) of the cells, the three seeds of a model do not even agree on the sign of the RankIC. FactorVAE's seeds agree the most, because its selection rule keeps an almost untrained model; FinFormer's disagree in 57\% of its cells.
+
+\paragraph{Validation does not predict the test year.} Each model keeps its weights with FinBench's rule (Section~\ref{sec:fw_training}). Across runs, the validation IC of the kept epoch and the test IC are barely related (correlation $-0.19$ to $0.22$ by model), and validation scores are optimistic: 0.005--0.032 on average against $-0.006$ to $0.007$ on the test year.
+
+\paragraph{Shorter horizons carry more signal.} Figure~\ref{fig:res_horizons} compares the three horizons. With $L = 1$ the RankIC is positive in 68--84\% of the runs of every model but FactorVAE (46\%), and significantly so in a third of MASTER's runs and a quarter of MATCC's and FactorVAE's. With $L = 20$ the models predict nothing: the mean RankIC is at or below zero for all but DiscoverPLF, positive in 42--54\% of the runs, and almost never significant. The spread between seeds grows with the horizon (0.007, 0.010 and 0.015 for $L = 1$, 5 and 20), as does the spread between models, because a longer horizon leaves fewer independent periods in a test year.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{images/results/res_horizons.pdf}
+    \caption{Mean test RankIC of each model at the three horizons, over universes, test years and seeds (69 runs per model and horizon); error bars: standard error of the mean.}
+    \label{fig:res_horizons}
+\end{figure}
+
+The six architectures therefore extract a small and unstable signal, whose sign changes with the period, the universe, the horizon and even the seed. This is the setting in which their explanations are examined: if the predictions themselves are this fragile, the explanations may be too, and the question is whether their disagreement reflects the data or the models.
+
+% ===========================================================================
+\section{What Drives the Predictions?}
+\label{sec:res_inputs}
+
+% TODO (notebooks 05 and 07, RIESECUZIONE.md C3, C5): for each model, the families, features and lags that IG
+% attributes the scores to (net family shares; gross shares in the appendix if useful); an example local explanation
+% (T x F heatmap of one stock-day, MASTER DJI 2020); the consistently dominant features per feature group, read
+% together with the correlation groups of Section 3.5 (near-duplicates share the credit); intrinsic weights against
+% IG (MASTER's gate, MATCC's market shift, FinFormer's fusion gate and series attention; inter-stock attention is
+% almost uniform; MATCC's temporal attention 91% on the last day vs about 10% of IG). Mention the findings already
+% established: HIST ignores today's candle values (OPEN0, HIGH0, LOW0, VWAP0) because of the column order; market
+% features get zero attribution by construction with the day-mean baseline.
+
+% ===========================================================================
+\section{Do the Explanations Agree?}
+\label{sec:res_agreement}
+
+% TODO (notebook 07, C5): agreement of the importance rankings between runs that differ in one factor only (seed,
+% model, year, universe), at the levels of families and features; model x model agreement per universe; the variance
+% decomposition table (model, universe, year, interactions, seed). Preliminary (FactorVAE and MATCC, seeds 0 and 5):
+% family agreement seed 0.86 > year 0.83 > universe 0.75 ~ model 0.74; feature agreement model 0.22; seed variance
+% about three times the model main effect.
+
+% ===========================================================================
+\section{Score Drivers and Portfolio Drivers}
+\label{sec:res_portfolio}
+
+% TODO (notebooks 05-07): IG of the score and of the top-k margin are almost identical (Spearman ~1); permutation
+% importance separates ranking skill (drop in RankIC, about zero for every family) from portfolio impact (share of
+% the top-k replaced, 18-60%): the portfolio depends on families that carry no measurable skill. Link with the
+% fragility of Chapter 7.
+
+% ===========================================================================
+\section{Periods and Regimes}
+\label{sec:res_periods}
+
+% TODO (notebook 08, C4b): RankIC and excess returns in 2020 and 2022 against the calm years; family shares per year
+% and their shift between regimes; year-to-year drift of the explanations (transitions involving a volatile year
+% against calm ones).
+
+% ===========================================================================
+\section{Data or Model? The Diagnosis}
+\label{sec:res_diagnosis}
+
+% TODO (notebook 07 and the sanity check of Section 5.7, C5): apply the diagnosis logic of the guide (Step 7):
+% models agree and IC is low -> data-limited signal; models disagree with similar IC -> Rashomon, model-driven;
+% seeds disagree as much as models -> explanations unstable, no architectural conclusion. Weigh it with the sanity
+% check (HIST's attributions are fixed by its architecture; MASTER's and MATCC's follow the input deviations) and
+% with the fragility of the decisions (Chapter 7).
+
+% ===========================================================================
+\section{Summary}
+\label{sec:res_summary}
+
+% TODO: after Sections 6.2-6.6.
