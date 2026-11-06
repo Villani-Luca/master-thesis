@@ -1,0 +1,9 @@
+{
+  "method": "permutation",
+  "n_repeats": 5,
+  "seed": 0,
+  "unit": "family",
+  "k": 5,
+  "days": 54,
+  "date_stride": 1
+}

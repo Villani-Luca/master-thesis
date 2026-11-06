@@ -32,11 +32,29 @@ sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto qu
   `logs/xai/WORKERS` (numero di processi modificabile mentre gira); vale dal prossimo rilancio dello scheduler.
   5/11 19:12: `xai_extra1` (`logs/xai_extra1.out`): HIST, core, L = 1 e 20 (84 run), dalla coda dello scheduler.
   5/11 19:27: `xai_extra2` (`logs/xai_extra2.out`): FactorVAE, core, L = 1 e 20 (84 run), dalla coda dello scheduler.
+  5/11 21:25: **cache delle coalizioni** in `xai/shap_lime.py`: ogni coalizione si valuta una volta per run, giorno e
+  target, e LIME (200 estrazioni fra 128 o 8 coalizioni possibili) riusa quelle di Shapley. Valori identici (differenza
+  0 su MASTER e HIST), Shapley+LIME 2–2,4 volte più veloci. I tre processi extra sono stati riavviati con il codice nuovo
+  (`logs/xai_fast2.out`, `xai_extra1b.out`, `xai_extra2b.out`; saltano ciò che era già scritto). Pacchetto H200 ricostruito.
+  5/11 23:12: `xai_fast2` fermato (memoria GPU 31,9 GB stabile; era l'extra con più memoria, 3,4 GB su NASDAQ-100).
+  MASTER e MATCC: DJI completo per MASTER su tutti gli orizzonti, il resto da riprendere con lo stesso comando
+  quando la memoria torna sotto 26 GB (i 3 DiscoverPLF NASDAQ-100 dello scheduler tengono 22,5 GB).
+  6/11 10:22: `xai_extra1b` (HIST L = 1/20) fermato per memoria GPU 31,7 GB stabile (era l'extra con più memoria, 1,0 GB,
+  appena passato a NASDAQ-100). Fatti: HIST DJI L = 1 e L = 20 completi (30 run). Da riprendere con lo stesso comando
+  (`explain.py --models HIST --universes dji nasdaq100 sx5e --horizons 1 20`) quando la memoria torna sotto 26 GB.
+  6/11 12:11: ripresa di MASTER e MATCC come `xai_fast3` (PID 27576, `logs/xai_fast3.out`; memoria GPU 19,3 GB,
+  GPU all'82%). HIST L = 1/20 resta da riprendere (`logs/xai_extra1c.out`).
+  6/11 13:42: valutazione estesa (`xai_eval`, PID 20148 e lanciatore 38564) fermata per memoria GPU 31,56 GB stabile
+  (11 letture in un minuto; era l'extra con più memoria, 5,0 GB). Fatti 7/54 (DJI L = 5 per 6 modelli, DiscoverPLF
+  NASDAQ-100 L = 5). Memoria scesa a 27,0 GB. Da riprendere con lo stesso comando quando la memoria torna sotto 26 GB
+  (salta i run con summary.json).
 - [ ] **R1c. Valutazione dei metodi estesa** (5/11 sera): `code/scripts/evaluate.py` ripete sanity check e deletion
   curve (IG e Saliency, 'own' e 'joint') su un run per modello × universo × orizzonte (seed 42, 2022, 5 date): 54 run
   sul core, ~1–15 min l'uno; uscite in `code/results/xai/evaluation/`. Provato su MASTER dji L = 5 (sanity 0,90,
   AOPC own IG 0,89 contro 0,001 a caso). Da lanciare quando c'è margine di GPU (`logs/xai_eval.out`); sugli universi
-  grandi lo fa il server dopo la griglia.
+  grandi lo fa il server dopo la griglia. **Lanciata il 6/11 alle 11:58** (PID 38564, staccata; GPU all'82% e 18 GB
+  di memoria GPU dopo la fine dei task DiscoverPLF NASDAQ-100 L = 5). Fermata alle 13:42 per memoria GPU (vedi R1b),
+  a 7/54; da riprendere.
 - [x] **R2. Shapley e LIME**: dal 5/11 sera sono tra i metodi di default, quindi li fa lo scheduler su ogni run
   (il processo separato `xai_c2` è stato fermato). **Quando lo scheduler finisce, rilanciarlo una volta** (stesso
   comando di R1): i primi 5 task, partiti prima del cambio (DiscoverPLF L = 5), completano solo Shapley e LIME.

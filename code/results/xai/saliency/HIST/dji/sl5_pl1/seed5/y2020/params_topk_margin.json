@@ -1,0 +1,10 @@
+{
+  "date_stride": 1,
+  "method": "saliency",
+  "target": "topk_margin",
+  "k": 5,
+  "rows": 1475,
+  "days": 54,
+  "seconds": 48.8,
+  "device": "cuda"
+}

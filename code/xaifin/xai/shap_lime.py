@@ -28,20 +28,31 @@ from xaifin.xai.base import target_scores
 from xaifin.xai.permutation import family_columns
 
 
+# The value of a coalition is deterministic (absent families at the day mean), so each one is computed once per
+# run, day and target: LIME's random coalitions repeat (200 draws among 2^P = 128 or 8) and are the ones
+# Shapley has already evaluated. Only the run being explained is kept.
+_cache: dict = {"run": None, "values": {}}
+
+
 def _masked_scores(adapter: ModelAdapter, batch: DayBatch, target: str, k: int, columns: list[np.ndarray],
                    coalitions: np.ndarray) -> np.ndarray:
     """t [len(coalitions), N]: the target with the families of each coalition present, the others at the day mean."""
+    if _cache["run"] is not adapter:
+        _cache["run"], _cache["values"] = adapter, {}
+    values = _cache["values"]
     x = batch.x.to(adapter.device)
     base = x.mean(0, keepdim=True).expand_as(x)
-    out = []
     with torch.no_grad():
         for coalition in coalitions:
+            key = (batch.date, target, k, coalition.tobytes())
+            if key in values:
+                continue
             xm = x.clone()
             for present, cols in zip(coalition, columns):
                 if not present:
                     xm[:, :, cols] = base[:, :, cols]
-            out.append(target_scores(adapter.forward(xm, batch.extras), target, k).cpu().numpy())
-    return np.stack(out)
+            values[key] = target_scores(adapter.forward(xm, batch.extras), target, k).cpu().numpy()
+    return np.stack([values[(batch.date, target, k, c.tobytes())] for c in coalitions])
 
 
 class FamilyShapley:
