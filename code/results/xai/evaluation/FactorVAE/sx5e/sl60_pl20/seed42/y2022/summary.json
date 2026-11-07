@@ -1,0 +1,25 @@
+{
+  "days": [
+    "2022-01-06",
+    "2022-04-07",
+    "2022-07-07",
+    "2022-10-06",
+    "2022-12-30"
+  ],
+  "k": 10,
+  "weight_change": 0.04884856939315796,
+  "scores_trained_vs_untrained": 0.06673349339735893,
+  "sanity_feature_median": 0.42366300956964503,
+  "sanity_input_median": 0.5883173223339947,
+  "aopc": {
+    "IG joint attribution": 0.24647446508918489,
+    "IG joint random": -0.0024992014763743748,
+    "IG own attribution": 0.24727558906229058,
+    "IG own random": -0.0025241834411693534,
+    "Saliency joint attribution": -0.00959096534310707,
+    "Saliency joint random": -0.0024992014763743748,
+    "Saliency own attribution": -0.009556716897067377,
+    "Saliency own random": -0.0025241834411693534
+  },
+  "seconds": 1620.9
+}

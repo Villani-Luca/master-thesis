@@ -57,13 +57,37 @@ sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto qu
   sopra ~1 GB = GPU satura) oltre alla soglia di 31,5 GB.
   6/11 19:26: MASTER e MATCC ripresi come `xai_fast4` (`logs/xai_fast4.out`; memoria GPU 18,9 GB dopo la fine di
   FinFormer NASDAQ-100 L = 5 seed 0 e 5).
-- [ ] **R1c. Valutazione dei metodi estesa** (5/11 sera): `code/scripts/evaluate.py` ripete sanity check e deletion
+  7/11 04:43: HIST L = 1/20 ripreso come `xai_extra1c` (`logs/xai_extra1c.out`; memoria GPU 13,1 GB dopo la fine
+  della valutazione estesa).
+- [x] **R1c. Valutazione dei metodi estesa** (5/11 sera): `code/scripts/evaluate.py` ripete sanity check e deletion
   curve (IG e Saliency, 'own' e 'joint') su un run per modello × universo × orizzonte (seed 42, 2022, 5 date): 54 run
   sul core, ~1–15 min l'uno; uscite in `code/results/xai/evaluation/`. Provato su MASTER dji L = 5 (sanity 0,90,
   AOPC own IG 0,89 contro 0,001 a caso). Da lanciare quando c'è margine di GPU (`logs/xai_eval.out`); sugli universi
   grandi lo fa il server dopo la griglia. **Lanciata il 6/11 alle 11:58** (PID 38564, staccata; GPU all'82% e 18 GB
   di memoria GPU dopo la fine dei task DiscoverPLF NASDAQ-100 L = 5). Fermata alle 13:42 per memoria GPU (vedi R1b),
   a 7/54; da riprendere. **Ripresa il 6/11 alle 17:56** (PID 25440, `logs/xai_eval2.out`; memoria GPU 25,6 GB).
+  **Finita il 7/11 alle 04:28: 54/54.** Mediane (sanity = Spearman delle attribuzioni addestrato vs pesi casuali per
+  feature, alto = la spiegazione dipende dal modello; AOPC = calo dell'uscita togliendo gli input per importanza):
+
+  | Modello | sanity | AOPC IG own | a caso | AOPC Saliency own | a caso | AOPC IG joint | a caso |
+  |---|---|---|---|---|---|---|---|
+  | DiscoverPLF | 0,44 | 0,313 | 0,003 | −0,015 | 0,003 | −0,003 | 0,000 |
+  | FactorVAE | 0,42 | 0,244 | −0,003 | −0,009 | −0,003 | 0,241 | −0,002 |
+  | FinFormer | 0,37 | 0,482 | −0,014 | −0,124 | −0,014 | 0,474 | −0,059 |
+  | HIST | 0,98 | 0,039 | 0,001 | 0,001 | 0,001 | 0,009 | 0,001 |
+  | MASTER | 0,87 | 0,894 | 0,001 | −0,014 | 0,001 | 0,692 | 0,002 |
+  | MATCC | 0,71 | 1,825 | −0,011 | −0,060 | −0,011 | 0,642 | 0,000 |
+
+  Per universo (sanity / AOPC IG own): DJI 0,59 / 0,48, NASDAQ-100 0,60 / 0,28, EURO STOXX 50 0,46 / 0,49; per
+  orizzonte: L = 1 0,59 / 0,22, L = 5 0,47 / 0,54, L = 20 0,52 / 0,52. Sanity da 0,23 (FinFormer DJI L = 1) a 0,98.
+  Esito: **IG own batte il caso in 54/54 run** (scarto mediano +0,41); IG joint in 49/54 (non su DiscoverPLF, dove il
+  percorso congiunto non sposta l'uscita); **Saliency no: sopra il caso solo in 12/54, scarto mediano −0,009**, cioè il
+  gradiente locale non ordina gli input per effetto sull'uscita (già visto nella prova su MASTER DJI, −0,007). HIST
+  supera sempre il sanity (0,97–0,98) ma con AOPC piccolo (0,02–0,07, tranne EURO STOXX 50 L = 5 con 0,58): la sua
+  uscita cambia poco togliendo input singoli. Casi con AOPC a caso lontano da 0: DiscoverPLF NASDAQ-100 L = 20
+  (−0,107) e FinFormer NASDAQ-100 L = 20 (+0,104), IG comunque molto sopra. Da riportare nel cap. 5/6 (sanity e
+  faithfulness su tutto il core al posto della sola prova; Saliency come metodo di confronto, non affidabile per
+  l'ordinamento).
 - [x] **R1d. Shapley/LIME dei 24 DiscoverPLF L = 5 parziali** (6/11 16:30): DJI seed 0 e 5 (+ seed 42 2020) e
   NASDAQ-100 (15) hanno IG, Saliency e permutation, non Shapley/LIME (fatti dal codice vecchio dello scheduler).
   Costano poco (~18 s per metodo e target, `params_*.json`; explain.py salta i metodi già scritti), ma lo scheduler
