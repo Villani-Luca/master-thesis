@@ -48,13 +48,31 @@ sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto qu
   (11 letture in un minuto; era l'extra con più memoria, 5,0 GB). Fatti 7/54 (DJI L = 5 per 6 modelli, DiscoverPLF
   NASDAQ-100 L = 5). Memoria scesa a 27,0 GB. Da riprendere con lo stesso comando quando la memoria torna sotto 26 GB
   (salta i run con summary.json).
+  6/11 16:57: `xai_fast3` (PID 38452 e lanciatore 27576) fermato. La memoria GPU letta era 31,44 GB, poco sotto la
+  soglia, ma era satura: 5,3 GB già spostati nella memoria condivisa (RAM di sistema), di cui 4,1 GB del solo
+  `xai_fast3` (MASTER NASDAQ-100 L = 20, 7,0 GB dedicati), e tutti i run andavano 1,7–2x più lenti (FinFormer
+  EURO STOXX 50 2830 s invece di 1420, FinFormer DJI 3191 invece di 1840). Dopo lo stop: 25,0 GB, 0,55 GB condivisi.
+  Fatti: MASTER completo su DJI e NASDAQ-100 L = 1/5, più NASDAQ-100 L = 20 seed 0 2020. Da riprendere con lo stesso
+  comando (`logs/xai_fast3.out`). Da qui conta anche la memoria condivisa ('\GPU Adapter Memory(*)\Shared Usage'
+  sopra ~1 GB = GPU satura) oltre alla soglia di 31,5 GB.
+  6/11 19:26: MASTER e MATCC ripresi come `xai_fast4` (`logs/xai_fast4.out`; memoria GPU 18,9 GB dopo la fine di
+  FinFormer NASDAQ-100 L = 5 seed 0 e 5).
 - [ ] **R1c. Valutazione dei metodi estesa** (5/11 sera): `code/scripts/evaluate.py` ripete sanity check e deletion
   curve (IG e Saliency, 'own' e 'joint') su un run per modello × universo × orizzonte (seed 42, 2022, 5 date): 54 run
   sul core, ~1–15 min l'uno; uscite in `code/results/xai/evaluation/`. Provato su MASTER dji L = 5 (sanity 0,90,
   AOPC own IG 0,89 contro 0,001 a caso). Da lanciare quando c'è margine di GPU (`logs/xai_eval.out`); sugli universi
   grandi lo fa il server dopo la griglia. **Lanciata il 6/11 alle 11:58** (PID 38564, staccata; GPU all'82% e 18 GB
   di memoria GPU dopo la fine dei task DiscoverPLF NASDAQ-100 L = 5). Fermata alle 13:42 per memoria GPU (vedi R1b),
-  a 7/54; da riprendere.
+  a 7/54; da riprendere. **Ripresa il 6/11 alle 17:56** (PID 25440, `logs/xai_eval2.out`; memoria GPU 25,6 GB).
+- [x] **R1d. Shapley/LIME dei 24 DiscoverPLF L = 5 parziali** (6/11 16:30): DJI seed 0 e 5 (+ seed 42 2020) e
+  NASDAQ-100 (15) hanno IG, Saliency e permutation, non Shapley/LIME (fatti dal codice vecchio dello scheduler).
+  Costano poco (~18 s per metodo e target, `params_*.json`; explain.py salta i metodi già scritti), ma lo scheduler
+  vecchio non li rifà e il suo rilancio arriva solo a fine griglia (~10/11). Da lanciare appena la memoria GPU
+  scende sotto 26 GB, come primo candidato: `explain.py --models DiscoverPLF --universes dji nasdaq100 --horizons 5`
+  (`logs/xai_plf_fill.out`): con questo il core L = 5 è completo intorno al 7/11 pomeriggio invece che il 10/11.
+  **Lanciato il 6/11 alle 17:11** (PID 10560; memoria GPU 25,0 GB, GPU all'81%). **Finito alle 17:42**: 29 run
+  completati (uno era già completo), ~60 s l'uno su DJI e ~90 s su NASDAQ-100. DiscoverPLF L = 5 completo su tutti
+  e tre gli universi core.
 - [x] **R2. Shapley e LIME**: dal 5/11 sera sono tra i metodi di default, quindi li fa lo scheduler su ogni run
   (il processo separato `xai_c2` è stato fermato). **Quando lo scheduler finisce, rilanciarlo una volta** (stesso
   comando di R1): i primi 5 task, partiti prima del cambio (DiscoverPLF L = 5), completano solo Shapley e LIME.

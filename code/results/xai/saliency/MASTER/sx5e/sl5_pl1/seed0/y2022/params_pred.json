@@ -1,0 +1,10 @@
+{
+  "date_stride": 1,
+  "method": "saliency",
+  "target": "pred",
+  "k": 10,
+  "rows": 2596,
+  "days": 52,
+  "seconds": 4.3,
+  "device": "cuda"
+}

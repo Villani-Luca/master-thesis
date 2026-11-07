@@ -1,0 +1,7 @@
+{
+  "method": "intrinsic",
+  "model": "MASTER",
+  "days": 53,
+  "date_stride": 1,
+  "replay_max_diff": 0.0
+}

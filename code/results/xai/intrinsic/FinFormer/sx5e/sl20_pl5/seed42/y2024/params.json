@@ -1,0 +1,7 @@
+{
+  "method": "intrinsic",
+  "model": "FinFormer",
+  "days": 54,
+  "date_stride": 1,
+  "replay_max_diff": 0.0
+}
