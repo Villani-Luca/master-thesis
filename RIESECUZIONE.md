@@ -23,7 +23,7 @@ Errori: `grep -l Traceback logs/grid/*.log` e `grep Traceback logs/xai_*.err`.
 Le spiegazioni ora coprono **tutte** le date di ribilanciamento (PIANO.md, registro del 5/11). Le uscite a date campionate
 sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto quando il core è rispiegato:
 
-- [ ] **R1. Core su questo PC**: `grid.py run --xai --universes dji nasdaq100 sx5e --workers 5` (lanciato alle 18:26,
+- [x] **R1. Core su questo PC** (completo il 10/11 alle 08:38, 756/756): `grid.py run --xai --universes dji nasdaq100 sx5e --workers 5` (lanciato alle 18:26,
   `logs/xai_core.out`; avanzamento: `python code/scripts/grid.py status --xai --universes dji nasdaq100 sx5e`). Prima
   L = 5 (252 run), poi L = 1 e 20 (504). Su Windows FinFormer esce con 0xC0000409 a fine processo: il task risulta FAILED
   nel log ma le uscite sono complete (lo conferma `status --xai`); rilanciare lo stesso comando rifà solo ciò che manca.
@@ -59,6 +59,38 @@ sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto qu
   FinFormer NASDAQ-100 L = 5 seed 0 e 5).
   7/11 04:43: HIST L = 1/20 ripreso come `xai_extra1c` (`logs/xai_extra1c.out`; memoria GPU 13,1 GB dopo la fine
   della valutazione estesa).
+  7/11 15:13: MASTER e MATCC completi (252/252, `xai_fast4` chiuso alle 14:57). Lanciato FinFormer L = 1/20 come
+  `xai_extra3` (`logs/xai_extra3.out`, PID 16388; memoria GPU 7,1 GB, GPU all'82%, 7 processi).
+  7/11 21:12: `xai_extra1c` (HIST L = 1/20) fermato: memoria GPU 31,85 GB stabile e 3,7 GB di memoria condivisa,
+  perché i task DiscoverPLF NASDAQ-100 L = 1 dello scheduler, passati al 2021, sono saliti a 7 GB ciascuno. Era
+  l'extra con più memoria (1,1 GB). Fatti: HIST NASDAQ-100 L = 1 seed 0 e seed 42 2020–2023 (9 run); il run seed 42
+  2024 era a metà e senza file scritti. Dopo: 31,5 GB e 2,9 GB condivisi. Da riprendere con lo stesso comando
+  (`explain.py --models HIST --universes dji nasdaq100 sx5e --horizons 1 20`, `logs/xai_extra1d.out`) quando la
+  memoria torna sotto 26 GB.
+  7/11 21:42: `xai_extra3` (FinFormer L = 1/20) fermato: RAM libera 4,1–4,9 GB (sotto 5) e memoria GPU 31,74 GB
+  stabile. I task DiscoverPLF NASDAQ-100 dello scheduler, passati al 2021, tengono 7,7 GB di RAM e fino a 7 GB di GPU
+  ciascuno. FinFormer era l'extra con più memoria GPU (0,43 GB contro 0,31 di FactorVAE; 2,6 GB di RAM). Fatti:
+  FinFormer DJI L = 1 seed 0 e 42 completi, seed 5 2020–2021 (12 run); il run seed 5 2022 era a metà. Dopo: RAM 7,1 GB,
+  memoria GPU 31,5 GB. Da riprendere con lo stesso comando (`logs/xai_extra3b.out`) quando RAM e memoria lo permettono.
+  7/11 22:27: anche `xai_extra2b` (FactorVAE L = 1/20, l'ultimo extra) fermato: RAM libera 1,3 GB e memoria GPU 31,67 GB
+  stabile. Tutti e 5 i task DiscoverPLF NASDAQ-100 dello scheduler sono ora sui run del 2021 e tengono ~9 GB di RAM
+  ciascuno (~45 GB su 63,6). Fatti: FactorVAE NASDAQ-100 L = 1 seed 0 completo e seed 42 2020–2021 (37/84 del
+  processo); il run seed 42 2022 era appena iniziato. Dopo: RAM 3,5–4,3 GB (commit 79 su 94 GB, quindi c'è ancora
+  margine nel file di paging), memoria GPU 31,3 GB. Restano solo i 5 task dello scheduler, che non si toccano. Da
+  riprendere con lo stesso comando (`logs/xai_extra2c.out`) per primo, quando la RAM libera torna sopra 10 GB.
+  8/11 17:38–18:07: lo scheduler ha finito DiscoverPLF NASDAQ-100 L = 1 (15/15) e L = 20 seed 0 e 5; ~5,1 h per run
+  sotto saturazione. Ora è su DiscoverPLF DJI L = 1/20 (~47 min per run) e NASDAQ-100 L = 20 seed 42.
+  8/11 18:40: FactorVAE L = 1/20 ripreso come `xai_extra2c` (PID 26284; memoria GPU 10,6 GB, RAM libera 37,7 GB, GPU 83%).
+  8/11 22:35: lo scheduler ha finito DiscoverPLF DJI L = 1 (15/15, ~56 min per run) e DJI L = 20 seed 0; ora è su DJI
+  L = 20 seed 5 e 42, EURO STOXX 50 L = 1 seed 0 e 5, NASDAQ-100 L = 20 seed 42.
+  9/11 00:39: HIST L = 1/20 ripreso come `xai_extra1d` (PID 22968; memoria GPU 17,1 GB, RAM libera 33 GB, GPU 82%).
+  9/11 09:50: lo scheduler ha finito DiscoverPLF L = 1/20 su tutto il core (DiscoverPLF completo) e lanciato FinFormer
+  NASDAQ-100 L = 1/20 (task 234–236, 240–241; ~6 GB di GPU e ~7,7 GB di RAM ciascuno). FinFormer extra non lanciato
+  (gruppo in coda allo scheduler). HIST NASDAQ-100 L = 1 completo.
+  9/11 12:40: `xai_extra2c` (FactorVAE) fermato di nuovo: RAM libera 2,5 GB, memoria GPU 31,2 GB e 3,1 GB condivisi.
+  Era l'extra con più memoria GPU (2,05 GB; 4,9 GB di RAM). Fatti: FactorVAE NASDAQ-100 L = 1 completo, L = 20 seed 0
+  2020–2022 (il 2023 ha IG e Saliency scritti). Dopo: RAM 9,3 GB, memoria GPU 30,4 GB. Da riprendere con lo stesso
+  comando (`logs/xai_extra2d.out`) quando RAM e memoria lo permettono.
 - [x] **R1c. Valutazione dei metodi estesa** (5/11 sera): `code/scripts/evaluate.py` ripete sanity check e deletion
   curve (IG e Saliency, 'own' e 'joint') su un run per modello × universo × orizzonte (seed 42, 2022, 5 date): 54 run
   sul core, ~1–15 min l'uno; uscite in `code/results/xai/evaluation/`. Provato su MASTER dji L = 5 (sanity 0,90,
@@ -100,11 +132,51 @@ sono in `code/results/xai_sampled_dates/`; tutto ciò che le usava va rifatto qu
 - [x] **R2. Shapley e LIME**: dal 5/11 sera sono tra i metodi di default, quindi li fa lo scheduler su ogni run
   (il processo separato `xai_c2` è stato fermato). **Quando lo scheduler finisce, rilanciarlo una volta** (stesso
   comando di R1): i primi 5 task, partiti prima del cambio (DiscoverPLF L = 5), completano solo Shapley e LIME.
-- [ ] **R3. Quando L = 5 è finito**: notebook 05, 06, 07, 08 rieseguiti; Observations e diagnosi ricontrollate;
+- [x] **R3. Quando L = 5 è finito**: notebook 05, 06, 07, 08 rieseguiti; Observations e diagnosi ricontrollate;
   `thesis_figures.py res_inputs res_agreement res_agreement_models res_variance`; numeri dei cap. 6 e 9 aggiornati.
-- [ ] **R4. Verifica del campionamento** (una frase nel cap. 5): classifiche con tutte le date contro una su due / una su
+  7/11 18:41: lanciati in background notebook 07, 08, 05, 06 (`nbconvert --execute --inplace`) e poi le tabelle res_*
+  (`logs/r3_run.ps1`, uscita in `logs/r3.out`). 07, 08 e 05 rieseguiti senza errori alle 18:43.
+  7/11 19:27: cap. 6 aggiornato dai notebook 05, 07, 08 (differenze piccole). Cambiano: permutation, la classifica
+  delle famiglie per calo del RankIC ora è debolmente legata a quella per impatto sul portafoglio (Spearman medio
+  0,01–0,36 per modello, prima −0,12–0,13; il testo dice "at most weakly related"), calo massimo 0,011, 12 coppie su 30
+  in cui il RankIC sale; varianza Alpha158 architettura 10% (prima 11%), interazioni 32%; accordo per modello e regimi
+  ritoccati di un centesimo. Restano: tabelle res_* (dopo il 06) e i numeri del testo che ne derivano (§6.2, famiglie
+  0,74–0,84 di §6.3), i TODO del notebook 06 (cap. 5 e §6.3, §6.6).
+  7/11 20:24: notebook 06 e tabelle res_* finiti (`ALL DONE` in `logs/r3.out`). 20:28: testo aggiornato.
+  - Tabelle: differenze di un punto (price-volume 9–13%, ultimo giorno 8–11% in §6.2; MATCC/HIST/DiscoverPLF).
+  - Cap. 5, §5.7 "Evaluating the Explanations": scritti i risultati al posto del TODO (sanity e deletion curve dai 54
+    run di R1c; accordo fra metodi e impostazioni dal notebook 06, DJI 2020 seed 42) e le scelte (IG joint, quota
+    netta). Aggiornati anche baseline zero (0,89 MASTER, 0,53–0,98), percorso own/joint (0,999–1,000 per MASTER,
+    MATCC, FactorVAE, HIST; **0,90 DiscoverPLF e 0,82 FinFormer**, prima "0,986–1,000") e quota netta vs Shapley.
+  - Cap. 6: pesi vicini all'inizializzazione (mediane 4% MASTER, 5% FactorVAE, 7% HIST) e sanity (HIST 0,98, MASTER
+    0,87, MATCC 0,71, gli altri 0,37–0,44) dai 54 run; tolti i due TODO del notebook 06.
+  - Cap. 9: 0,26 e 10% (RQ2).
+  Da guardare a mano: il nuovo §5.7 (testo nuovo, non solo numeri) e le due novità del notebook 06 che il testo prima
+  non diceva: MATCC si allontana dai pesi iniziali (98%) ma le attribuzioni cambiano poco; per DiscoverPLF il percorso
+  congiunto si discosta da quello per titolo e IG joint non batte il caso in 4 run su 9. Restano i TODO di cap. 5 non
+  legati al notebook 06 (quota del gradiente dagli altri titoli, LIME vs Shapley per titolo, convergenza di IG, ore GPU).
+- [x] **R4. Verifica del campionamento** (una frase nel cap. 5): classifiche con tutte le date contro una su due / una su
   quattro, per ogni run del core (`xai/` contro `xai_sampled_dates/`).
-- [ ] **R5. Quando L = 1 e 20 sono finiti**: notebook 07 e 08 con il fattore orizzonte (E4).
+  7/11 18:50: `python code/scripts/check_date_sampling.py` (tabella per run in `code/results/analysis/date_sampling.csv`).
+  IG su 329 run (L = 5 tutti, L = 1 e 20 quelli già fatti): Spearman delle feature mediana 0,996 (min 0,94), stessa
+  classifica delle famiglie nel 95% dei run (Spearman famiglie ≥ 0,93); Saliency 0,999 (min 0,96), 97%. Shapley e LIME
+  solo su 19 run in comune (la prima versione li aveva su pochi run). Frase nel cap. 5 (sezione "The days") aggiornata;
+  da rieseguire a R5, quando L = 1 e 20 sono completi.
+  7/11 18:35: L = 5 completo sul core (252/252).
+- [x] **R5. Quando L = 1 e 20 sono finiti**: notebook 07 e 08 con il fattore orizzonte (E4).
+  10/11 08:38: core completo, 756/756 (scheduler vecchio: "162 ok, 0 failed"). 12:38: rilanciato una volta con il
+  codice nuovo (`logs/xai_core2.out`): 0 task da fare, quindi niente buchi (anche Shapley/LIME dei DiscoverPLF L = 5).
+  R4 rieseguito sul core completo: IG su 342 run, Spearman feature mediana 0,995 (min 0,93), stessa classifica delle
+  famiglie nel 95%; Saliency 0,999 (min 0,96), 98%. Frase del cap. 5 aggiornata.
+  R5: `xaifin/analysis/variance.py` ha il fattore `horizon` (coppie di run che differiscono solo nell'orizzonte;
+  orizzonte come quinto fattore della scomposizione, solo se la tabella ne ha più d'uno: a L = 5 i numeri non cambiano,
+  verificato). Notebook 07 (sezione 7) e 08 (sezione 5) con le celle nuove, rieseguiti. Risultati (core, IG, quota netta):
+  famiglie Alpha158 tra orizzonti 0,69 (come tra modelli, 0,70; seed 0,82), feature 0,59 (come tra seed); 1 vs 5 0,71,
+  5 vs 20 0,81, 1 vs 20 0,54; scomposizione Alpha158 su 378 run: seed 34%, interazioni 39%, orizzonte 12% (47% per il
+  candle, che in MASTER e MATCC scende dal 13% a L = 1 al 6–8% a L = 20), modello 6%; Alpha360 orizzonte 5%.
+  Regimi: a ogni orizzonte nessuna famiglia si sposta di più di 4 punti, anni consecutivi 0,90–0,94.
+  **Testo nuovo da rivedere a mano**: cap. 6, paragrafo "The horizon moves the explanation as much as the architecture"
+  (§6.3) e una frase in §6.5. Le Observations/Diagnosis dei notebook 07 e 08 non parlano ancora dell'orizzonte.
 
 Le voci C1, C2, C4, C4b, C5 qui sotto restano spuntate per la versione a date campionate; R1–R5 le sostituiscono.
 

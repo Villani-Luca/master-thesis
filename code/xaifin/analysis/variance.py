@@ -6,13 +6,14 @@ seq_len, pred_len, seed, test_year). Two views of the same question:
 
 - pair_agreement: the agreement (analysis.agreement) of every pair of runs that differ in exactly
   one factor: two seeds of one model (training noise), two models on the same seed and year
-  (architecture), two years of one model (non-stationarity), two universes (universe effect).
+  (architecture), two years of one model (non-stationarity), two universes (universe effect), two
+  horizons (seq_len and pred_len change together, T = 5/20/60 for L = 1/5/20).
   Models of different feature groups share no feature, so they are only paired at the levels with
   common names (family, source, horizon, lag).
 - decomposition: an ANOVA-style split of the variance of each name's importance across runs into
-  model, universe and year main effects (type II sums of squares), their interactions, and the seed
-  (the spread of the three seeds within each model x universe x year cell), averaged over names
-  weighted by their mean importance. Main effects are not exactly additive when cells are missing
+  model, universe, year and horizon main effects (type II sums of squares; the horizon only when the
+  table has more than one), their interactions, and the seed (the spread of the three seeds within
+  each model x universe x year x horizon cell), averaged over names weighted by their mean importance. Main effects are not exactly additive when cells are missing
   (no 2020 for EURO STOXX 50); interactions are then the remainder, floored at 0.
 """
 
@@ -27,7 +28,8 @@ from xaifin.analysis.agreement import agreement
 from xaifin.config import MODEL_GROUPS, RESULTS_ROOT
 
 KEYS = ["model", "universe", "seq_len", "pred_len", "seed", "test_year"]
-FACTORS = {"seed": "seed", "model": "model", "year": "test_year", "universe": "universe"}
+FACTORS = {"seed": ["seed"], "model": ["model"], "year": ["test_year"], "universe": ["universe"],
+           "horizon": ["seq_len", "pred_len"]}  # the horizon fixes both (T = 5/20/60 for L = 1/5/20); pairs report L
 GROUP = {m: g for g, models in MODEL_GROUPS.items() for m in models}
 
 
@@ -68,8 +70,9 @@ def pair_agreement(table: pd.DataFrame, min_names: int = 3, **kwargs) -> pd.Data
     """Agreement of every pair of runs that differ in exactly one factor; one row per pair, with `factor`."""
     vecs = vectors(table)
     rows = []
-    for factor, column in FACTORS.items():
-        others = [k for k in KEYS if k != column]
+    for factor, columns in FACTORS.items():
+        others = [k for k in KEYS if k not in columns]
+        column = columns[-1]
         index = {k: i for i, k in enumerate(KEYS)}
         cells = {}
         for key in vecs:
@@ -110,9 +113,9 @@ def decomposition(table: pd.DataFrame, common_names: bool = True) -> pd.DataFram
         total = ((g["v"] - g["v"].mean()) ** 2).sum()
         if total <= 0 or len(g) < 4:
             continue
-        cell = g.groupby(["model", "universe", "test_year"])["v"].transform("mean")
+        cell = g.groupby(["model", "universe", "test_year", "pred_len"])["v"].transform("mean")
         seed_ss = ((g["v"] - cell) ** 2).sum()
-        factors = [f for f in ("model", "universe", "test_year") if g[f].nunique() > 1]
+        factors = [f for f in ("model", "universe", "test_year", "pred_len") if g[f].nunique() > 1]
         main = {}
         if factors:
             fit = smf.ols("v ~ " + " + ".join(f"C({f})" for f in factors), data=g).fit()
@@ -121,12 +124,13 @@ def decomposition(table: pd.DataFrame, common_names: bool = True) -> pd.DataFram
             ss = anova_lm(fit, typ=2)["sum_sq"]
             main = {f: ss[f"C({f})"] for f in factors}
         interactions = max(total - seed_ss - sum(main.values()), 0.0)
-        shares = {f: main.get(f, 0.0) / total for f in ("model", "universe", "test_year")}
+        shares = {f: main.get(f, 0.0) / total for f in ("model", "universe", "test_year", "pred_len")}
         rows.append({"name": name, "mean_importance": g["v"].mean(), **shares, "interactions": interactions / total,
                      "seed": seed_ss / total, "runs": len(g)})
-    parts = ["model", "universe", "year", "interactions", "seed"]
-    out = pd.DataFrame(rows, columns=["name", "mean_importance", "model", "universe", "test_year", "interactions", "seed",
-                                      "runs"]).rename(columns={"test_year": "year"})
+    parts = ["model", "universe", "year", "horizon", "interactions", "seed"]
+    out = pd.DataFrame(rows, columns=["name", "mean_importance", "model", "universe", "test_year", "pred_len",
+                                      "interactions", "seed", "runs"]).rename(columns={"test_year": "year",
+                                                                                       "pred_len": "horizon"})
     if out.empty:
         return out
     w = out["mean_importance"].abs()
