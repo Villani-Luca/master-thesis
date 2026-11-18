@@ -1,4 +1,4 @@
-"""Gradient attributions: Saliency and Integrated Gradients (THESIS_GUIDE.md Step 5.1).
+"""Gradient attributions: Saliency and Integrated Gradients (PROGETTO.md Step 5.1).
 
 Captum's attribution classes expand the inputs along dimension 0 to batch the integration steps,
 which here would mix the stocks of a day (dimension 0 is the stock). The two methods are therefore
@@ -45,7 +45,7 @@ class Saliency:
 class IntegratedGradients:
     """Integrated Gradients (Sundararajan et al. 2017) with baseline 0, per stock (see the module docstring)."""
 
-    # Defaults decided 2026-11-04 (PIANO.md): 16 steps (converged on every model tested), joint path, day-mean baseline.
+    # Defaults decided 2026-11-04 (PROGETTO.md): 16 steps (converged on every model tested), joint path, day-mean baseline.
     def __init__(self, n_steps: int = 16, path: str = "joint", baseline: str = "mean", method: str = "gausslegendre"):
         if path not in ("own", "joint"):
             raise ValueError(f"path must be 'own' or 'joint', not {path!r}")

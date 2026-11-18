@@ -2,7 +2,7 @@
 
 Sources: notebook `code/notebooks/04_portfolio_baseline.ipynb` (*Observations*),
 `code/results/analysis/portfolio_summary.csv`, `portfolio_margins.csv`, `xaifin/portfolio/topk.py`,
-`backtest.py`, `THESIS_GUIDE.md` Step 4. App page `6_Portfolio`.
+`backtest.py`, `PROGETTO.md` Step 4. App page `6_Portfolio`.
 
 ## Construction (FinBench's long-only evaluation)
 

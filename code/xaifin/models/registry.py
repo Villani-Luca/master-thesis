@@ -1,4 +1,4 @@
-"""Model name -> adapter class, and trained runs -> ready adapters (THESIS_GUIDE.md §2.2-2.3).
+"""Model name -> adapter class, and trained runs -> ready adapters (PROGETTO.md §2.2-2.3).
 
 Scripts, notebooks and the app pick a model by name (`get_adapter("HIST")`) and reopen a trained
 run from its folder in the results store (`load_run`).

@@ -1,4 +1,4 @@
-"""Streamlit entry point (THESIS_GUIDE.md Step 11). Run: streamlit run code/app/Home.py
+"""Streamlit entry point (PROGETTO.md Step 11). Run: streamlit run code/app/Home.py
 
 Pages live in app/pages/ and are added step by step. The app only reads the results store and
 calls xaifin; it contains no logic of its own.

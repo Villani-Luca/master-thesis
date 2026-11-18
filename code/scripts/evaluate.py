@@ -1,4 +1,4 @@
-"""Are the explanations trustworthy on every model, universe and horizon? (THESIS_GUIDE.md Step 6)
+"""Are the explanations trustworthy on every model, universe and horizon? (PROGETTO.md Step 6)
 
     python code/scripts/evaluate.py                                   # core universes, every model and horizon
     python code/scripts/evaluate.py --universes sp500 sxxp            # the big universes (on the H200)

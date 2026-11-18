@@ -1,6 +1,6 @@
 % ---------------------------------------------------------------------------
 % Chapter 9 - Conclusions
-% Limitations and future work written 2026-11-05 (PIANO.md registry of 2026-11-04/05, docs/thesis_topics.md
+% Limitations and future work written 2026-11-05 (PROGETTO.md registry of 2026-11-04/05, docs/thesis_topics.md
 % section 10). Opening and Section 9.1 written 2026-11-05 from Chapters 6 and 7 (final L = 5 results).
 % ---------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ The conclusions of this thesis are therefore about the models and their stabilit
 
 \paragraph{Portfolios.} The portfolios follow FinBench's long-only rule: equal weights, a fixed number of stocks, no transaction costs and the purchase at the open of each holding period. Turnover is reported, but the returns are gross. With daily rebalancing the purchase at the open removes the overnight returns, so the daily portfolios are comparable with their equal-weight benchmark but not with the index.
 
-\paragraph{Scope of the explanations.} The explanations cover the whole grid, every model, universe, horizon, test year and seed, on every weekly rebalance date. % TODO: confirm when the S&P 500 and STOXX Europe 600 runs explained on the H200 are in (RIESECUZIONE.md, section E).
+\paragraph{Scope of the explanations.} The explanations cover the whole grid, every model, universe, horizon, test year and seed, on every weekly rebalance date. % TODO: confirm when the S&P 500 and STOXX Europe 600 runs explained on the H200 are in (PROGETTO.md, section S).
 The attributions depend on two choices discussed in Chapter~\ref{ch:xai_method}: the baseline, the average stock of the day, which makes the market features invisible to the gradient methods, and the joint integration path. Finally, the sanity check shows that for some models, HIST in particular, the attributions depend more on the architecture than on the trained weights (Section~\ref{sec:xm_evaluation}), which limits what their explanations can say about what the models learned.
 
 % ===========================================================================

@@ -1,4 +1,4 @@
-"""Are the explanations trustworthy? Sanity check and faithfulness (THESIS_GUIDE.md Step 6, PIANO.md C1).
+"""Are the explanations trustworthy? Sanity check and faithfulness (PROGETTO.md Step 6, PROGETTO.md C1).
 
 - sanity_check (Adebayo et al. 2018): the attributions of the trained model against those of the same
   architecture with its initial weights (the adapter built for the run's seed and not trained, i.e. the

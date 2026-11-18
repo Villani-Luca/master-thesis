@@ -2,7 +2,7 @@
 
 Command-line entry points for batch runs over the grid of models × universes × years × seeds. They only parse arguments and call `xaifin`; no logic lives here.
 
-Planned (see `THESIS_GUIDE.md`):
+Planned (see `PROGETTO.md`):
 
 | Script | Step | Does |
 |---|---|---|

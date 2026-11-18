@@ -1,4 +1,4 @@
-"""Long-only top-k holdings from a model's test predictions (THESIS_GUIDE.md Step 4).
+"""Long-only top-k holdings from a model's test predictions (PROGETTO.md Step 4).
 
 Same rules as FinBench's create_long_short_portfolio_history (Evaluation/portfolio/transforms.py,
 backtest.py), with short_k = 0. FinBench is MIT licensed, Copyright (c) 2026 softlab-unimore.

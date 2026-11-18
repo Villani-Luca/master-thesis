@@ -1,4 +1,4 @@
-"""Cross-sectional permutation importance of feature families (THESIS_GUIDE.md Step 5.1, decision D5).
+"""Cross-sectional permutation importance of feature families (PROGETTO.md Step 5.1, decision D5).
 
 On each explained day, the inputs of one family (all its columns, at every time step) are shuffled
 across the stocks of the day with one permutation, so that each stock gets another stock's values

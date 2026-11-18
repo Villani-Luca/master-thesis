@@ -1,4 +1,4 @@
-"""Daily cross-sectional datasets: one sample = one trading day = one DayBatch (THESIS_GUIDE.md §2.3).
+"""Daily cross-sectional datasets: one sample = one trading day = one DayBatch (PROGETTO.md §2.3).
 
 Three ways of building the inputs, as in FinBench:
 

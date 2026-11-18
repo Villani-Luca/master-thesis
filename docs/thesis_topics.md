@@ -2,7 +2,7 @@
 
 Every topic the work so far supports or the plan will produce, grouped by the chapter it belongs to. For each topic: **status**, **where the material is**, and the **artefact** (table, figure, paragraph) it can become. Use it to plan chapters and to check that nothing found along the way is lost.
 
-**Status:** ✅ material ready · ◐ partly done · ☐ planned (step of [`THESIS_GUIDE.md`](../THESIS_GUIDE.md)) · ⭘ optional
+**Status:** ✅ material ready · ◐ partly done · ☐ planned (step of [`PROGETTO.md`](../PROGETTO.md)) · ⭘ optional
 
 Last updated: 2026-10-06 (Step 2, equivalence test).
 

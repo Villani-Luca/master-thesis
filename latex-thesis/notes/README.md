@@ -17,7 +17,7 @@ go in the text. The notes are in English, like the thesis.
 
 ## Status at 2026-10-22
 
-- **Done** (Steps 0–4 of `THESIS_GUIDE.md`): environment and literature, model groups and data
+- **Done** (Steps 0–4 of `PROGETTO.md`): environment and literature, model groups and data
   analysis, unified framework with six verified adapters, rolling training of 252 runs (6 models ×
   DJI, NASDAQ-100, EURO STOXX 50 × test years 2020–2024 × 3 seeds, L = 5), long-only top-k portfolios
   validated against FinBench, app pages Data / Models / Portfolio, chapter 2 (Background) drafted.

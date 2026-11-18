@@ -1,4 +1,4 @@
-"""Rolling-window training: one run = one cell of the grid, saved to the results store (THESIS_GUIDE.md §2.2, Step 3).
+"""Rolling-window training: one run = one cell of the grid, saved to the results store (PROGETTO.md §2.2, Step 3).
 
 A run trains one model on one universe, test year and seed with trainer.fit, evaluates the kept
 weights on the test year and writes, in RunConfig.run_dir:

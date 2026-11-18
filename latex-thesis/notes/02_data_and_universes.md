@@ -1,7 +1,7 @@
 # 2. Data and universes
 
 Sources: notebook `code/notebooks/01_universes_and_data.ipynb` (sections and *Observations*),
-`xaifin/config.py`, `xaifin/data/features.py`, `xaifin/data/quality.py`, `THESIS_GUIDE.md` Step 1.
+`xaifin/config.py`, `xaifin/data/features.py`, `xaifin/data/quality.py`, `PROGETTO.md` Step 1.
 App page `1_Data` shows the same tables and charts.
 
 ## Universes

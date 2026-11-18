@@ -1,7 +1,7 @@
 % ---------------------------------------------------------------------------
 % Chapter 5 - Explainability Methodology
 % First draft, 2026-11-04. Sources: xaifin/xai/*, scripts/explain.py, notebook 05_xai_single_model,
-% PIANO.md (B1-B7 and the decisions of 2026-11-04), docs/thesis_topics.md section 5.
+% PROGETTO.md (B1-B7 and the decisions of 2026-11-04), docs/thesis_topics.md section 5.
 % Numbers marked TODO come from trial runs and are to be replaced by those of the final run
 % (MASTER, DJI, T = 20, L = 5, seed 42, test year 2020) once it is retrained and explained.
 % ---------------------------------------------------------------------------
@@ -136,7 +136,7 @@ Table~\ref{tab:xm_cost} reports the cost of IG per explained day and target, mea
     \label{tab:xm_cost}
 \end{table}
 
-Every method is applied to every trained run: the 1242 runs of the grid (six models, five universes, three horizons, three seeds and every test year), on every rebalance date and for both targets. IG, Saliency, the exact Shapley values and LIME on the families and the permutation importance are computed for all the models, and the intrinsic weights for MASTER, MATCC and FinFormer. The three core universes were explained on the RTX 5090 and the two large ones, whose days cost several times more, on an NVIDIA H200. The two machines run the same code, and one run explained on both gives the same attributions. % TODO (RIESECUZIONE.md R1 and section E): total GPU hours, and the agreement measured by check_xai.py on the H200.
+Every method is applied to every trained run: the 1242 runs of the grid (six models, five universes, three horizons, three seeds and every test year), on every rebalance date and for both targets. IG, Saliency, the exact Shapley values and LIME on the families and the permutation importance are computed for all the models, and the intrinsic weights for MASTER, MATCC and FinFormer. The three core universes were explained on the RTX 5090 and the two large ones, whose days cost several times more, on an NVIDIA H200. The two machines run the same code, and one run explained on both gives the same attributions. % TODO (PROGETTO.md R1 and section S): total GPU hours, and the agreement measured by check_xai.py on the H200.
 
 % ===========================================================================
 \section{Evaluating the Explanations}

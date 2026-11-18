@@ -3,7 +3,7 @@
 Sources: notebook `code/notebooks/03_rolling_training.ipynb` (*Observations*),
 `code/results/analysis/metrics_summary.csv` (one row per run, all 252 runs),
 `code/results/analysis/finbench_comparison_regression.csv` and `latex-thesis/tables/finbench_regression.tex`
-(by `code/scripts/compare_finbench.py`), `xaifin/config.py`, `xaifin/training/`, `THESIS_GUIDE.md` Step 3.
+(by `code/scripts/compare_finbench.py`), `xaifin/config.py`, `xaifin/training/`, `PROGETTO.md` Step 3.
 
 ## Protocol (FinBench, paper §4.1)
 

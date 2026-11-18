@@ -1,4 +1,4 @@
-"""Generic training and evaluation of any ModelAdapter (THESIS_GUIDE.md Steps 2-3).
+"""Generic training and evaluation of any ModelAdapter (PROGETTO.md Steps 2-3).
 
 The model-specific parts (loss, optimizer, scheduler, gradient clipping, the rule that picks the
 final weights) come from the adapter, so one loop trains all six models as FinBench does
@@ -22,7 +22,7 @@ from xaifin.data.datasets import DayBatch
 from xaifin.models.base import ModelAdapter
 from xaifin.training.metrics import summary
 
-# hparams['selection'] -> what FinBench keeps (THESIS_GUIDE.md Step 3, docs/model_notes.md issue 10).
+# hparams['selection'] -> what FinBench keeps (PROGETTO.md Step 3, docs/model_notes.md issue 10).
 SELECTION_RULES = {
     "train_loss_threshold": "MASTER (base_model.py fit): stop after the first epoch whose training loss is at most "
                             "train_stop_loss_thred, keep the last weights",

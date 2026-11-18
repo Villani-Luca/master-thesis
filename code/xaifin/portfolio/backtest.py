@@ -1,4 +1,4 @@
-"""Daily returns and performance of top-k portfolios (THESIS_GUIDE.md Step 4).
+"""Daily returns and performance of top-k portfolios (PROGETTO.md Step 4).
 
 Returns as FinBench's portfolio_daily_returns (Evaluation/portfolio/returns.py): within each holding
 period, each held stock earns its close-to-close return on adjusted prices, except on its first day,
@@ -112,7 +112,7 @@ def yearly_returns(returns: pd.Series) -> pd.Series:
 
 
 def portfolio_dir(model: str, universe: str, seq_len: int, pred_len: int, seed: int, k: int) -> Path:
-    """results/portfolio/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/top<k>/ (THESIS_GUIDE.md §2.2)."""
+    """results/portfolio/<MODEL>/<universe>/sl<T>_pl<L>/seed<S>/top<k>/ (PROGETTO.md §2.2)."""
     return RESULTS_ROOT / "portfolio" / model / universe / f"sl{seq_len}_pl{pred_len}" / f"seed{seed}" / f"top{k}"
 
 

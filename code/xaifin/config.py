@@ -1,4 +1,4 @@
-"""Project-wide paths and experimental protocol (THESIS_GUIDE.md §2.4-2.5)."""
+"""Project-wide paths and experimental protocol (PROGETTO.md §2.4-2.5)."""
 
 from pathlib import Path
 from typing import NamedTuple

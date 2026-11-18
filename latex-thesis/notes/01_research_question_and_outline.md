@@ -1,6 +1,6 @@
 # 1. Research question, structure and scope
 
-Sources: `docs/papers/Outline Tesi.pdf`, `THESIS_GUIDE.md` (top and §Step 12), `docs/stato_avanzamento.md`, `PIANO.md`.
+Sources: `docs/papers/Outline Tesi.pdf`, `PROGETTO.md` (sections 2–4, guide top and §Step 12), `docs/stato_avanzamento.md`.
 
 ## Research question
 

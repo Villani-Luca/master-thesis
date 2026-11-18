@@ -1,6 +1,6 @@
 # 6. Software, reproducibility and compute
 
-Sources: `code/xaifin/`, `code/scripts/`, `code/app/`, `THESIS_GUIDE.md` §2 and Step 11,
+Sources: `code/xaifin/`, `code/scripts/`, `code/app/`, `PROGETTO.md` §2 and Step 11,
 `code/scripts/remote/`, `decision_claude.md` (H200 measurements, 2026-10-22).
 
 ## The `xaifin` package

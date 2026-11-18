@@ -1,4 +1,4 @@
-"""Intrinsic explanations: the weights a model computes for itself (THESIS_GUIDE.md Step 5.1).
+"""Intrinsic explanations: the weights a model computes for itself (PROGETTO.md Step 5.1).
 
 Supporting evidence only (attention is not explanation, Jain and Wallace 2019). The models are not
 changed: MASTER's forward pass is replayed with its own modules; for MATCC and FinFormer read-only

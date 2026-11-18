@@ -1,6 +1,6 @@
 # Model notes: the six alpha-based regression models
 
-Step 0.2 of [`THESIS_GUIDE.md`](../THESIS_GUIDE.md). One note per model: what it predicts, its inputs, normalizations, loss, whether it is cross-sectional, and which internal signals can be inspected for the XAI work. Each note compares the **paper** with the **FinBench implementation** (`code/finbench/Regression/<MODEL>/`), because FinBench is the code the thesis trains. Line references point into that folder. The thesis prose version is in `latex-thesis/chapters/02_second_chapter.tex`.
+Step 0.2 of [`PROGETTO.md`](../PROGETTO.md). One note per model: what it predicts, its inputs, normalizations, loss, whether it is cross-sectional, and which internal signals can be inspected for the XAI work. Each note compares the **paper** with the **FinBench implementation** (`code/finbench/Regression/<MODEL>/`), because FinBench is the code the thesis trains. Line references point into that folder. The thesis prose version is in `latex-thesis/chapters/02_second_chapter.tex`.
 
 ## Summary
 

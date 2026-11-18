@@ -1,4 +1,4 @@
-"""Long-only top-k portfolios from the trained runs' test predictions (THESIS_GUIDE.md Step 4).
+"""Long-only top-k portfolios from the trained runs' test predictions (PROGETTO.md Step 4).
 
     python code/scripts/run_portfolio.py                 # every complete (model, universe, seed)
     python code/scripts/run_portfolio.py --partial --force

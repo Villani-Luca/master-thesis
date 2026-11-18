@@ -1,4 +1,4 @@
-"""Step 2 page: trained models (THESIS_GUIDE.md).
+"""Step 2 page: trained models (PROGETTO.md).
 
 Pick a run of the results store, then see its configuration, training curve and test metrics, and
 the predictions of its checkpoint, recomputed through the model's adapter (xaifin.models.registry).
@@ -79,7 +79,7 @@ else:
     st.plotly_chart(viz.metric_heatmap(grid, metric, title, dark), theme=None, width="stretch")
     st.caption(
         f"Mean over the seeds trained so far (column 'seeds' below). Blue: {metric} above 0, red: below. "
-        "Each model keeps its weights with FinBench's own rule (THESIS_GUIDE.md Step 3)."
+        "Each model keeps its weights with FinBench's own rule (PROGETTO.md Step 3)."
     )
     st.dataframe(grid.pivot(index="model", columns="test_year", values=metric).style.format("{:+.4f}", na_rep="–"))
     with st.expander("Cells with seed counts and standard deviations"):

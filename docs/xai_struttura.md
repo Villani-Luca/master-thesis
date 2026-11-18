@@ -1,7 +1,7 @@
 # XAI: come è strutturato, cosa gira dove
 
-Aggiornato il 2026-11-05. Le decisioni e il loro registro sono in [PIANO.md](../PIANO.md); i passi operativi da
-spuntare in [RIESECUZIONE.md](../RIESECUZIONE.md) (voci R1–R5 e sezione E).
+Aggiornato il 2026-11-05. Le decisioni, il loro registro e i passi operativi da spuntare (voci R1–R5 e sezione S) sono in
+[PROGETTO.md](../PROGETTO.md).
 
 ## 1. A cosa serve
 

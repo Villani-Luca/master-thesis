@@ -1,4 +1,4 @@
-"""Agreement between two importance rankings (THESIS_GUIDE.md Step 7).
+"""Agreement between two importance rankings (PROGETTO.md Step 7).
 
 Inputs are importance vectors (pd.Series indexed by feature, lag, family, ... name; larger = more
 important), e.g. one level of xai.aggregate.global_importance. They are compared on the names they

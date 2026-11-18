@@ -1,4 +1,4 @@
-"""Shapley values and LIME on feature families (THESIS_GUIDE.md Step 5.1, PIANO.md B4, decision D5).
+"""Shapley values and LIME on feature families (PROGETTO.md Step 5.1, PROGETTO.md B4, decision D5).
 
 The players are the feature families of the model's inputs: 7 for the Alpha158 models, 3 for the
 Alpha360 models. A family is "absent" when its inputs are set, for every stock of the day,

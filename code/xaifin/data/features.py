@@ -1,4 +1,4 @@
-"""Feature names and their grouping into families, sources and horizons (THESIS_GUIDE.md Step 1).
+"""Feature names and their grouping into families, sources and horizons (PROGETTO.md Step 1).
 
 Attributions are compared across models on these groups. Alpha158 and Alpha360 models share
 almost no individual features, so they can only be compared at the level of family, source and

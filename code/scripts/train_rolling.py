@@ -1,4 +1,4 @@
-"""Train models on the rolling windows and save them to the results store (THESIS_GUIDE.md Step 3).
+"""Train models on the rolling windows and save them to the results store (PROGETTO.md Step 3).
 
     python code/scripts/train_rolling.py --models MASTER --universes dji --years 2020 --seeds 42
     python code/scripts/train_rolling.py --models all --universes dji nasdaq100 sx5e --years 2020-2024

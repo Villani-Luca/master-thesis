@@ -1,4 +1,4 @@
-"""Check of the date sampling (RIESECUZIONE.md R4): global importance from all rebalancing dates (results/xai/) against
+"""Check of the date sampling (PROGETTO.md R4): global importance from all rebalancing dates (results/xai/) against
 the first version on a subset of them (results/xai_sampled_dates/: one date in two at L = 5, one in four at L = 1 and 20).
 
 For every run, method and target present in both: Spearman correlation of the feature importances, whether the family

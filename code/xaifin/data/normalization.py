@@ -16,7 +16,7 @@ class RobustZScore:
     """Per-feature (x - median) / (1.4826 * MAD), clipped to [-3, 3], with statistics fit on one table.
 
     Fit it on the training period only, then apply it to every split. After the transform, 0 is the
-    training median of each feature: the natural masking baseline (THESIS_GUIDE.md §2.3).
+    training median of each feature: the natural masking baseline (PROGETTO.md §2.3).
 
     `columns` defaults to every column except instrument, date and Label: the same columns as
     FinBench's `df.columns[2:-1]`.

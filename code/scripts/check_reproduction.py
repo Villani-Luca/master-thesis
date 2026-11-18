@@ -1,4 +1,4 @@
-"""Do the retrained runs reproduce the originals? (PIANO.md, 2026-11-04)
+"""Do the retrained runs reproduce the originals? (PROGETTO.md, 2026-11-04)
 
     python code/scripts/check_reproduction.py
 

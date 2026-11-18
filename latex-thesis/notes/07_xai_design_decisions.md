@@ -1,6 +1,6 @@
 # 7. XAI: design decisions taken so far (not implemented yet)
 
-Sources: `THESIS_GUIDE.md` Steps 5–9, `PIANO.md` (decisions D1–D6, 2026-10-22), `docs/model_notes.md`
+Sources: `PROGETTO.md` Steps 5–9, `PROGETTO.md` (decisions D1–D6, 2026-10-22), `docs/model_notes.md`
 (§ "What this means for the XAI framework"). Everything here is a **plan**: write the methodology from
 it, then check against the code once Steps 5–7 are done.
 

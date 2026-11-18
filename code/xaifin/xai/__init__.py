@@ -1,4 +1,4 @@
-"""Explanation methods and their evaluation (THESIS_GUIDE.md Steps 5 and 6).
+"""Explanation methods and their evaluation (PROGETTO.md Steps 5 and 6).
 
 Planned modules: base.py (Explainer protocol, masking, baselines), gradient.py (Captum methods),
 shap_lime.py (KernelSHAP / LIME on feature groups), permutation.py (cross-sectional permutation

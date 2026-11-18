@@ -1,4 +1,4 @@
-"""How fragile are the allocation decisions? Margins to the top-k boundary against seed noise (THESIS_GUIDE.md Step 9.1).
+"""How fragile are the allocation decisions? Margins to the top-k boundary against seed noise (PROGETTO.md Step 9.1).
 
 A model retrained with another seed scores the same stock on the same day differently. Scores are compared
 as daily cross-sectional z-scores, the scale of portfolio.topk's margin_z, so that seeds and models with

@@ -1,5 +1,5 @@
 """Plotly figures shared by the notebooks and the Streamlit app, so both draw identical charts
-(THESIS_GUIDE.md Step 11).
+(PROGETTO.md Step 11).
 
 Colors follow the dataviz reference palette: categorical slots in fixed order (the first 6 validated
 as adjacent series in light and dark mode; slots 4-6 and two of the first three are below 3:1 on the

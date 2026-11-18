@@ -1,4 +1,4 @@
-"""What every explanation method shares: targets, dates, own-input gradients, storage (THESIS_GUIDE.md Step 5).
+"""What every explanation method shares: targets, dates, own-input gradients, storage (PROGETTO.md Step 5).
 
 An explainer attributes, for one day, each stock's target to that stock's own inputs: a method
 `explain(adapter, batch, target, k) -> attr[N, T, F]`. Five of the six models mix the stocks of a
@@ -6,7 +6,7 @@ day (attention, graphs, factors), so a stock's score also depends on the other s
 the guide prescribes (§2.3), the attribution of stock i only covers x_i, with the other stocks'
 inputs held at their values, and the whole day always goes through the model.
 
-Targets (decision D4 of PIANO.md):
+Targets (decision D4 of PROGETTO.md):
 - "pred": the score s_i.
 - "topk_margin": s_i minus the score stock i has to beat to be in the top k, i.e. the k-th highest
   score among the other stocks. Positive for the held stocks (then it is s_i - s_(k+1)), negative for
@@ -39,7 +39,7 @@ from xaifin.models.base import ModelAdapter
 from xaifin.portfolio.topk import MAX_PREDICTION_AGE_DAYS, rebalance_periods
 
 TARGETS = ("pred", "topk_margin")
-REBALANCE_EVERY = 5  # L = 5 business days for every horizon (PIANO.md B2)
+REBALANCE_EVERY = 5  # L = 5 business days for every horizon (PROGETTO.md B2)
 REBALANCE_STRIDE = 1  # explain every rebalance date
 GRAD_CHUNK_BYTES = 2**30  # memory for the batched own-input gradients (N x [N, T, F] floats)
 

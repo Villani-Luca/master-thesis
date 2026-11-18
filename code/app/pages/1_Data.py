@@ -1,4 +1,4 @@
-"""Step 1 page: universes and data (THESIS_GUIDE.md).
+"""Step 1 page: universes and data (PROGETTO.md).
 
 Draws the cached summaries of xaifin.data.summary with the same figures as notebook
 01_universes_and_data. Every chart has its table view next to it.

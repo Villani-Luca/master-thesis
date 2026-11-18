@@ -1,4 +1,4 @@
-"""The ModelAdapter interface: build, train, load and run any model the same way (THESIS_GUIDE.md §2.3).
+"""The ModelAdapter interface: build, train, load and run any model the same way (PROGETTO.md §2.3).
 
 Training, XAI, portfolios and the app only talk to adapters. An adapter owns one model for one run
 (model, universe, rolling window, seed, T, L) and knows, for that model:
@@ -29,7 +29,7 @@ from xaifin.data.datasets import DayBatch
 
 @dataclass
 class RunConfig:
-    """One training run: the cell of the grid (THESIS_GUIDE.md §2.2) plus hyper-parameter overrides."""
+    """One training run: the cell of the grid (PROGETTO.md §2.2) plus hyper-parameter overrides."""
 
     model: str
     universe: str

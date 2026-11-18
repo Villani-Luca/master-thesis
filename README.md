@@ -2,12 +2,12 @@
 
 Master's thesis, University of Modena and Reggio Emilia. It studies which input features drive the predictions of recent stock-forecasting models (MASTER, MATCC, FactorVAE, HIST, DiscoverPLF, FinFormer), how those attributions translate into long-only top-k portfolio decisions, and whether prediction instability comes from the data or from the model design.
 
-The step-by-step plan is in [`THESIS_GUIDE.md`](THESIS_GUIDE.md).
+The project file (status, plan, decisions and the step-by-step technical guide) is [`PROGETTO.md`](PROGETTO.md).
 
 ## Layout
 
 ```
-├── THESIS_GUIDE.md       step-by-step plan (notebook + package + app per step)
+├── PROGETTO.md           status, plan, decisions, re-runs and the step-by-step guide
 ├── docs/
 │   ├── papers/           papers and the thesis outline
 │   ├── model_groups.md   FinBench models grouped by input data

@@ -1,4 +1,4 @@
-"""Attributions of the trained runs, saved to the results store (THESIS_GUIDE.md Step 5, PIANO.md B6).
+"""Attributions of the trained runs, saved to the results store (PROGETTO.md Step 5, PROGETTO.md B6).
 
     python code/scripts/explain.py --models MASTER --universes dji --years 2020
     python code/scripts/explain.py --methods ig saliency permutation --universes dji nasdaq100 sx5e

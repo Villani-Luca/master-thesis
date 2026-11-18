@@ -1,7 +1,7 @@
 # 3. Models and the unified framework
 
 Sources: `docs/model_notes.md` (per-model notes and the ten FinBench issues), `docs/model_groups.md`,
-notebook `code/notebooks/02_model_adapters.ipynb`, `xaifin/models/`, `THESIS_GUIDE.md` Steps 1–2.
+notebook `code/notebooks/02_model_adapters.ipynb`, `xaifin/models/`, `PROGETTO.md` Steps 1–2.
 Chapter 2 already describes the six models from the papers; this file is about how they are used here.
 
 ## Why these six models

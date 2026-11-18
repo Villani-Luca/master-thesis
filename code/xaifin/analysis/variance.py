@@ -1,4 +1,4 @@
-"""Where the disagreement between explanations comes from: seed, model, year or universe (THESIS_GUIDE.md Step 7).
+"""Where the disagreement between explanations comes from: seed, model, year or universe (PROGETTO.md Step 7).
 
 The global importance of every explained run (results/xai/<method>/.../global_<target>.parquet,
 xai.aggregate) is collected into one long table, indexed by the run's cell (model, universe,

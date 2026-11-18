@@ -1,4 +1,4 @@
-"""Step 4 page: long-only top-k portfolios (THESIS_GUIDE.md).
+"""Step 4 page: long-only top-k portfolios (PROGETTO.md).
 
 Every week (L = 5 trading days) the portfolio buys the k stocks with the highest predicted score, in
 equal parts, and holds them until the next rebalance. Compared with two benchmarks: all the stocks

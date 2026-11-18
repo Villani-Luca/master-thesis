@@ -1,4 +1,4 @@
-"""The results store on disk: shareable CSV copies of the outputs, and the checkpoint archive (THESIS_GUIDE.md §2.2).
+"""The results store on disk: shareable CSV copies of the outputs, and the checkpoint archive (PROGETTO.md §2.2).
 
 What stays in git (small, readable without the code): per run config.json, metrics.json and
 train_history.csv; per portfolio metrics.json and returns.csv.gz. What does not (.gitignore, kept
